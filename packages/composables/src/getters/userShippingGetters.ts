@@ -1,13 +1,15 @@
 import { UserShippingGetters } from '@vue-storefront/core';
-import type {
-  UserShippingAddress as Address,
-  UserShippingAddressItem as AddressItem,
-  UserShippingAddressSearchCriteria
-} from '@vue-storefront/moqui-api';
+import type {UserShippingAddress as Address, UserShippingAddressItem as AddressItem, UserShippingAddressSearchCriteria} from '@vue-storefront/moqui-api';
+import { populateAddressesList } from '../helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAddresses(shipping: Address, criteria?: UserShippingAddressSearchCriteria): AddressItem[] {
-  return [];
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (!shipping || shipping.length === 0) {
+    return [];
+  }
+  return populateAddressesList(shipping);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

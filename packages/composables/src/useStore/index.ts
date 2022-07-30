@@ -1,17 +1,16 @@
-import { Store } from '@vue-storefront/moqui-api';
-import { Context, useStoreFactory } from '@vue-storefront/core';
+import {Context, Logger, useStoreFactory} from '@vue-storefront/core';
 
-export const useStore = useStoreFactory<Store>({
+export const useStore = useStoreFactory<any>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load(context: Context, params) {
-    console.log('Mocked: useStore.load');
+    Logger.debug('Mocked: useStore.load');
 
     return Promise.resolve({});
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   change(context: Context, params) {
-    console.log('Mocked: useStore.change');
+    Logger.debug('Mocked: useStore.change');
 
     return Promise.resolve({});
   }

@@ -3,60 +3,69 @@ import {
   AgnosticPrice,
   AgnosticTotals,
   AgnosticCoupon,
-  AgnosticDiscount,
-  AgnosticAttribute
+  AgnosticDiscount
 } from '@vue-storefront/core';
 import type { Cart, CartItem } from '@vue-storefront/moqui-api';
+import { populateCartItems } from '../helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getItems(cart: Cart): CartItem[] {
-  return [
-    {}
-  ];
+function getItems (cart: Cart): CartItem[] {
+  return populateCartItems(cart.psdata.products);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemName(item: CartItem): string {
-  return 'Name';
+  return item.name;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemImage(item: CartItem): string {
-  return 'https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081223_1_large.jpg';
+  return item.image;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemPrice(item: CartItem): AgnosticPrice {
   return {
-    regular: 12,
-    special: 10
+    regular: item.regularPrice,
+    special: item.discountPrice
   };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemQty(item: CartItem): number {
-  return 1;
+  return item.quantity;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getItemAttributes(item: CartItem, filterByAttributeName?: Array<string>): Record<string, AgnosticAttribute | string> {
-  return {
-    color: 'red'
-  };
+function getItemAttributes(item: CartItem, filterByAttributeName?: Array<string>):any {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item.attributesArray;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemSku(item: CartItem): string {
-  return '';
+  return item.reference;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotals(cart: Cart): AgnosticTotals {
-  return {
-    total: 12,
-    subtotal: 12,
-    special: 10
-  };
+  if (cart) {
+    const products = cart.psdata.products;
+    let regularPrice = 0;
+    let discountPrice = 0;
+    for (const item of products) {
+      regularPrice += item.price_without_reduction;
+      discountPrice += item.price;
+    }
+    return {
+      total: regularPrice,
+      subtotal: regularPrice,
+      special: discountPrice
+    };
+  } else {
+    return {subtotal: 0, total: 0};
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -66,7 +75,15 @@ function getShippingPrice(cart: Cart): number {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotalItems(cart: Cart): number {
-  return 1;
+  if (cart) {
+    let sum = 0;
+    for (const cartElement of cart.psdata.products) {
+      sum += parseInt(cartElement.cart_quantity);
+    }
+
+    return sum;
+  }
+  return 0;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

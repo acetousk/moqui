@@ -1,21 +1,15 @@
 {
   "name": "@vue-storefront/moqui",
-  "version": "0.0.1",
-  "private": true,
+  "version": "1.0.1",
+  "private": false,
+  "license": "MIT",
   "sideEffects": false,
-  "main": "./lib/index.js",
-  "exports": {
-    ".": "./lib/index.js",
-    "./nuxt": "./nuxt/index.js",
-    "./package.json": "./package.json"
-  },
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.es.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "yarn build:clear && yarn build:package && yarn build:types",
-    "build:clear": "rimraf lib",
-    "build:package": "node ../../scripts/build --file=src/index.ts",
-    "build:types": "tsc --emitDeclarationOnly",
-    "dev": "yarn build:package --watch",
+    "build": "rimraf lib && rollup -c",
+    "dev": "rollup -c -w",
     "precommit": "lint-staged",
     "prepublish": "yarn build",
     "test": "jest",
@@ -23,7 +17,7 @@
     "update:update": "ncu -u"
   },
   "dependencies": {
-    "@vue-storefront/moqui-api": "0.0.1",
+    "@vue-storefront/moqui-api": "1.0.1",
     "@vue-storefront/core": "~2.5.4"
   },
   "devDependencies": {
@@ -34,7 +28,8 @@
     "@nuxtjs/composition-api": "^0.29.3"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "nuxt/**/*"
   ],
   "publishConfig": {
     "access": "public"

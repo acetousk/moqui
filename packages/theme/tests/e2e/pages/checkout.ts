@@ -1,63 +1,54 @@
 import { Customer } from '../types/customer';
 import { el } from './utils/element';
 
-class Checkout {
-  protected step: string;
-
-  get heading(): Cypress.Chainable {
-    return cy.get(`h3:contains("${Cypress._.capitalize(this.step)}")`);
-  }
+class Shipping {
 
   get firstName(): Cypress.Chainable {
-    return el(`${this.step}-firstName`, 'input');
+    return el('shipping-firstName', 'input');
   }
 
   get lastName(): Cypress.Chainable {
-    return el(`${this.step}-lastName`);
+    return el('shipping-lastName');
   }
 
   get streetName(): Cypress.Chainable {
-    return el(`${this.step}-streetName`);
+    return el('shipping-streetName');
   }
 
   get apartment(): Cypress.Chainable {
-    return el(`${this.step}-apartment`);
+    return el('shipping-apartment');
   }
 
   get city(): Cypress.Chainable {
-    return el(`${this.step}-city`);
+    return el('shipping-city');
   }
 
   get state(): Cypress.Chainable {
-    return el(`${this.step}-state`, 'input');
+    return el('shipping-state', 'input');
   }
 
   get country(): Cypress.Chainable {
-    return el(`${this.step}-country`, 'select');
+    return el('shipping-country', 'select');
   }
 
   get zipcode(): Cypress.Chainable {
-    return el(`${this.step}-zipcode`);
+    return el('shipping-zipcode');
   }
 
   get phone(): Cypress.Chainable {
-    return el(`${this.step}-phone`);
-  }
-
-}
-
-class Shipping extends Checkout {
-  constructor() {
-    super();
-    this.step = 'shipping';
+    return el('shipping-phone');
   }
 
   get continueToBillingButton(): Cypress.Chainable {
-    return cy.contains('Continue to billing');
+    return el('continue-to-billing');
+  }
+
+  get heading(): Cypress.Chainable {
+    return el('shipping-heading');
   }
 
   get selectShippingButton(): Cypress.Chainable {
-    return cy.contains('Select shipping method');
+    return el('select-shipping');
   }
 
   get shippingMethods(): Cypress.Chainable {
@@ -77,14 +68,49 @@ class Shipping extends Checkout {
   }
 }
 
-class Billing extends Checkout {
-  constructor() {
-    super();
-    this.step = 'billing';
+class Billing {
+  get firstName(): Cypress.Chainable {
+    return el('billing-firstName');
+  }
+
+  get lastName(): Cypress.Chainable {
+    return el('billing-lastName');
+  }
+
+  get streetName(): Cypress.Chainable {
+    return el('billing-streetName');
+  }
+
+  get apartment(): Cypress.Chainable {
+    return el('billing-apartment');
+  }
+
+  get city(): Cypress.Chainable {
+    return el('billing-city');
+  }
+
+  get state(): Cypress.Chainable {
+    return el('billing-state', 'input');
+  }
+
+  get country(): Cypress.Chainable {
+    return el('billing-country', 'select');
+  }
+
+  get zipcode(): Cypress.Chainable {
+    return el('billing-zipcode');
+  }
+
+  get phone(): Cypress.Chainable {
+    return el('billing-phone');
   }
 
   get continueToPaymentButton(): Cypress.Chainable {
-    return cy.contains('Continue to payment');
+    return el('continue-to-payment');
+  }
+
+  get heading(): Cypress.Chainable {
+    return el('billing-heading');
   }
 
   public fillForm(customer: Customer) {
@@ -103,7 +129,7 @@ class Billing extends Checkout {
 
 class Payment {
   get makeAnOrderButton(): Cypress.Chainable {
-    return cy.contains('Make an order');
+    return el('make-an-order');
   }
 
   get paymentMethods(): Cypress.Chainable {

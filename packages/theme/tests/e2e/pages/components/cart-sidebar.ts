@@ -1,6 +1,8 @@
+import { el } from '../utils/element';
+
 class Cart {
   get goToCheckoutButton(): Cypress.Chainable {
-    return cy.contains('Go to checkout');
+    return el('go-to-checkout-btn');
   }
 }
 

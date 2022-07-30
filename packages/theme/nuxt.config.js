@@ -1,10 +1,20 @@
 import webpack from 'webpack';
+import { VSF_LOCALE_COOKIE } from '@vue-storefront/core';
 import theme from './themeConfig';
+import { getRoutes } from './routes';
 
 export default {
   server: {
     port: 3000,
     host: '0.0.0.0'
+  },
+
+  publicRuntimeConfig: {
+    theme,
+    baseURL: process.env.BASE_URL,
+    productStoreId: 'POPC_DEFAULT',
+    psCustomerCookieKey: 'ps-customer-cookie-key',
+    psCustomerCookieValue: 'ps-customer-cookie-value'
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -66,7 +76,8 @@ export default {
           apiClient: '@vue-storefront/moqui-api',
           composables: '@vue-storefront/moqui'
         }
-      }
+      },
+      routes: false
     }],
     // @core-development-only-end
     /* project-only-start
@@ -82,8 +93,14 @@ export default {
     }],
     'cookie-universal-nuxt',
     'vue-scrollto/nuxt',
-    '@vue-storefront/middleware/nuxt'
+    '@vue-storefront/middleware/nuxt',
   ],
+
+  // Not sure if this does anything
+  // As per: https://www.npmjs.com/package/cookie-universal-nuxt
+  //  To make it work for SSR, remember to set `ssr: true` and `target: 'server'`
+  ssr: true,
+  target: 'server',
 
   i18n: {
     currency: 'USD',
@@ -121,7 +138,9 @@ export default {
         }
       }
     },
-    detectBrowserLanguage: false
+    detectBrowserLanguage: {
+      cookieKey: VSF_LOCALE_COOKIE
+    }
   },
 
   styleResources: {
@@ -130,6 +149,11 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    babel: {
+      plugins: [
+        ['@babel/plugin-proposal-private-methods', { loose: true }]
+      ]
+    },
     transpile: [
       'vee-validate/dist/rules'
     ],
@@ -145,10 +169,18 @@ export default {
   },
 
   router: {
-    middleware: ['checkout']
-  },
-  publicRuntimeConfig: {
-    theme
+    extendRoutes(routes) {
+      getRoutes(`${__dirname}/_theme`)
+        .forEach((route) => routes.unshift(route));
+    },
+    middleware: ['checkout'],
+    scrollBehavior (_to, _from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      } else {
+        return { x: 0, y: 0 };
+      }
+    }
   },
   pwa: {
     meta: {

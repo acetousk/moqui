@@ -8,67 +8,107 @@ import {
   AgnosticBreadcrumb,
   AgnosticFacet
 } from '@vue-storefront/core';
-import type { Facet, FacetSearchCriteria } from '@vue-storefront/moqui-api';
+import type { PsProduct, Facet, FacetSearchCriteria } from '@vue-storefront/moqui-api';
+import { populateCategoryProducts } from '../helpers';
+import { populateCategoryTree } from '../helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAll(params: FacetSearchResult<Facet>, criteria?: FacetSearchCriteria): AgnosticFacet[] {
   return [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getGrouped(params: FacetSearchResult<Facet>, criteria?: FacetSearchCriteria): AgnosticGroupedFacet[] {
+const replaceSpacesWithDash = (word) => {
+  return word.replace(/\s/g, '-');
+};
+
+const normalizeFacet = (result, facet) => {
+  const label = replaceSpacesWithDash(facet.label);
+  result.push({
+    type: facet.type,
+    id: label,
+    label: facet.label,
+    value: label,
+    attrName: label,
+    selected: facet.active,
+    count: facet.magnitude
+  });
+  return result;
+};
+
+function buildFacets(facets = []) {
+  return facets.reduce((result, facetGroup) => {
+    if (facetGroup.displayed && facetGroup.widgetType !== 'slider') {
+      const label = replaceSpacesWithDash(facetGroup.label);
+      result.push(
+        {
+          id: label,
+          label: facetGroup.label,
+          options: facetGroup.filters.reduce(normalizeFacet, []),
+          count: null
+        }
+      );
+    }
+    return result;
+  }, []);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/explicit-module-boundary-types
+function getGrouped(searchResult, criteria?: FacetSearchCriteria): AgnosticGroupedFacet[] {
+  const facets = searchResult?.data?.facets;
+
+  if (facets !== null) {
+    return buildFacets(facets);
+  }
+
   return [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/explicit-module-boundary-types
 function getSortOptions(params: FacetSearchResult<Facet>): AgnosticSort {
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const sortOptions = params?.data?.sortOptions;
+
   return {
-    options: [],
-    selected: ''
+    options: sortOptions?.options ? sortOptions.options : [],
+    selected: sortOptions?.selected ? sortOptions.selected : ''
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getCategoryTree(params: FacetSearchResult<Facet>): AgnosticCategoryTree {
-  return {
-    label: '',
-    slug: '',
-    items: null,
-    isCurrent: false,
-    count: 0
-  };
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+function getCategoryTree(psdata: any): AgnosticCategoryTree {
+
+  if (!psdata.data) {
+    return {isCurrent: false, items: [], label: ''};
+  }
+
+  return populateCategoryTree(psdata.data.categories);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getProducts(params: FacetSearchResult<Facet>): any {
-  return [
-    {
-      _id: 1,
-      _description: 'Some description',
-      _categoriesRef: [
-        '1',
-        '2'
-      ],
-      name: 'Black jacket',
-      sku: 'black-jacket',
-      images: [
-        'https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081223_1_large.jpg'
-      ],
-      price: {
-        original: 12.34,
-        current: 10.00
-      }
-    }
-  ];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/explicit-module-boundary-types
+function getProducts(psdata: any): PsProduct[] {
+  if (!psdata.data) {
+    return [];
+  }
+  const products = Array.isArray(psdata.data.products) ? psdata.data.products : [psdata.data.products];
+  return populateCategoryProducts(products);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getPagination(params: FacetSearchResult<Facet>): AgnosticPagination {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/explicit-module-boundary-types
+function getPagination(searchResult): AgnosticPagination {
+  if (!searchResult.data) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return {};
+  }
+  const pagination = searchResult.data?.pagination;
+
   return {
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 1,
-    itemsPerPage: 10,
+    currentPage: pagination.current_page,
+    totalPages: pagination.pages_count,
+    totalItems: pagination.total_items,
+    itemsPerPage: 12,
     pageOptions: []
   };
 }

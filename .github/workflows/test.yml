@@ -14,23 +14,28 @@ on:
 
 jobs:
   prepare_dependencies:
-    name: Install dependencies
+    name: Prepare dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
           node-version: '14'
-          cache: 'yarn'
+
+      - name: Get cached dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
   lint:
-    name: Run linter
+    name: Lint
     needs: prepare_dependencies
     runs-on: ubuntu-latest
     steps:
@@ -38,19 +43,21 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
           node-version: '14'
-          cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
+      - name: Get cached dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Run linter
         run: yarn lint
 
   test:
-    name: Test all packages
+    name: Test api-client and composables
     needs: prepare_dependencies
     runs-on: ubuntu-latest
     steps:
@@ -58,13 +65,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
           node-version: '14'
-          cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
+      - name: Get cached dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Build api-client
         run: yarn build:api-client

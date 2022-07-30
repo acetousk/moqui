@@ -2,7 +2,7 @@ import { el } from '../utils/element';
 
 class Header {
   get cart(): Cypress.Chainable {
-    return el('header-icons').children().eq(2);
+    return el('app-header-cart');
   }
 
   get categories(): Cypress.Chainable {

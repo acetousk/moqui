@@ -1,17 +1,49 @@
-import { useShippingProviderFactory, UseShippingProviderParams, Context } from '@vue-storefront/core';
+import {useShippingProviderFactory, UseShippingProviderParams, Context} from '@vue-storefront/core';
 import type { ShippingProvider, ShippingMethod } from '@vue-storefront/moqui-api';
+import {handleRequest} from '../helpers';
 
 const params: UseShippingProviderParams<ShippingProvider, ShippingMethod> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load: async (context: Context, { customQuery }) => {
-    console.log('Mocked: loadShippingProvider');
-    return {};
+    const data = await handleRequest(context, {method: 'get', url: '/carriers'});
+
+    if (data.code === 200) {
+      return data.psdata;
+    } else {
+      // add to cart failed
+      return {};
+    }
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  save: async (context: Context, { shippingMethod, customQuery }) => {
-    console.log('Mocked: saveShippingProvider');
-    return {};
+  save: async (context: Context, params) => {
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { shippingMethod } = params;
+
+    await handleRequest(context, {method: 'post',
+      url: '/setcarriercheckout',
+      data: {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line camelcase
+        id_address: shippingMethod.addressId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line camelcase
+        id_carrier: shippingMethod.carrierId
+      }
+    });
+
+    const data = await handleRequest(context, {method: 'get', url: '/carriers'});
+
+    if (data.code === 200) {
+      return data.psdata;
+    } else {
+      // add to cart failed
+      return {};
+    }
   }
 };
 

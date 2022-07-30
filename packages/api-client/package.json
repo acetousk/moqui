@@ -1,22 +1,16 @@
 {
   "name": "@vue-storefront/moqui-api",
-  "version": "0.0.1",
-  "private": true,
+  "version": "1.0.1",
+  "private": false,
+  "license": "MIT",
   "sideEffects": false,
-  "main": "./lib/index.js",
-  "exports": {
-    ".": "./lib/index.js",
-    "./server": "./lib/index.server.js",
-    "./package.json": "./package.json"
-  },
+  "server": "server/index.js",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.es.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "yarn build:clear && yarn build:package && yarn build:server && yarn build:types",
-    "build:clear": "rimraf lib",
-    "build:package": "node ../../scripts/build --file=src/index.ts",
-    "build:server": "node ../../scripts/build --file=src/index.server.ts",
-    "build:types": "tsc --emitDeclarationOnly",
-    "dev": "concurrently \"yarn build:package --watch\" \"yarn build:server --watch\"",
+    "build": "rimraf lib server && rollup -c",
+    "dev": "rollup -c -w",
     "precommit": "lint-staged",
     "prepublish": "yarn build",
     "test": "jest",
@@ -24,13 +18,19 @@
     "update:update": "ncu -u"
   },
   "dependencies": {
-    "@vue-storefront/core": "~2.5.4"
+    "@vue-storefront/core": "~2.5.4",
+    "axios": "^0.23.0",
+    "cookie": "^0.5.0",
+    "log4js": "^6.5.2"
   },
   "devDependencies": {
-    "concurrently": "^7.0.0"
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "rollup-plugin-typescript2": "^0.30.0"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "server/**/*",
+    "types/**/*"
   ],
   "publishConfig": {
     "access": "public"

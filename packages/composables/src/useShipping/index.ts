@@ -1,5 +1,5 @@
 import {
-  Context,
+  Context, Logger,
   useShippingFactory,
   UseShippingParams
 } from '@vue-storefront/core';
@@ -11,14 +11,12 @@ import type {
 const params: UseShippingParams<ShippingAddress, AddParams> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load: async (context: Context, { customQuery }) => {
-    console.log('Mocked: useShipping.load');
-    return {};
+    Logger.debug('use shipping load');
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  save: async (context: Context, { shippingDetails, customQuery }) => {
-    console.log('Mocked: useShipping.save');
-    return {};
+  save: async (context: Context, params) => {
+    Logger.debug('use shipping save');
   }
 };
 
