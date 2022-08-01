@@ -8,7 +8,8 @@ const state = reactive({
   isCategoryGridView: true,
   isFilterSidebarOpen: false,
   isMobileMenuOpen: false,
-  isAddReviewModalOpen: false
+  isAddReviewModalOpen: false,
+  isSearchResultsOpen: false
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -59,6 +60,12 @@ const useUiState = () => {
     state.isAddReviewModalOpen = !state.isAddReviewModalOpen;
   };
 
+  const isSearchResultsOpen = computed(() => state.isSearchResultsOpen);
+  const toggleSearchResultsOpen = () => {
+    state.isSearchResultsOpen = !state.isSearchResultsOpen;
+  };
+
+
   return {
     isCartSidebarOpen,
     isWishlistSidebarOpen,
@@ -68,6 +75,7 @@ const useUiState = () => {
     isFilterSidebarOpen,
     isMobileMenuOpen,
     isAddReviewModalOpen,
+    isSearchResultsOpen,
     toggleCartSidebar,
     toggleWishlistSidebar,
     toggleLoginModal,
@@ -76,7 +84,8 @@ const useUiState = () => {
     changeToCategoryListView,
     toggleFilterSidebar,
     toggleMobileMenu,
-    toggleAddReviewModalOpen
+    toggleAddReviewModalOpen,
+    toggleSearchResultsOpen
   };
 };
 

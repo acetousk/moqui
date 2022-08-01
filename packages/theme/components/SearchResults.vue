@@ -21,14 +21,27 @@
                   v-for="(product, index) in products"
                   :key="index"
                   class="result-card"
-                  :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
-                  :score-rating="productGetters.getAverageRating(product)"
-                  :reviews-count="7"
-                  :image="addBasePath(productGetters.getCoverImage(product))"
-                  :alt="productGetters.getName(product)"
                   :title="productGetters.getName(product)"
-                  :link="`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`"
-                />
+                  :image="productGetters.getCoverImage(product)"
+                  :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
+                  :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+                  :max-rating="5"
+                  :score-rating="productGetters.getAverageRating(product)"
+                  :wishlistIcon="false"
+                  :isAddedToCart="isInCart({ product })"
+                  :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+                  :alt="productGetters.getName(product)"
+                  @click:add-to-cart="addItemToCart({ product, quantity: 1})"
+                >
+                  <template #add-to-cart-icon v-if="productGetters.getIsVirtual(product)">
+                    <SfIcon
+                      key="more"
+                      icon="more"
+                      size="20px"
+                      color="white"
+                    />
+                  </template>
+                </SfProductCard>
               </div>
             </SfScrollable>
             <div class="results--mobile smartphone-only">
@@ -36,13 +49,17 @@
                 v-for="(product, index) in products"
                 :key="index"
                 class="result-card"
-                :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
-                :score-rating="productGetters.getAverageRating(product)"
-                :reviews-count="7"
-                :image="addBasePath(productGetters.getCoverImage(product))"
-                :alt="productGetters.getName(product)"
                 :title="productGetters.getName(product)"
-                :link="`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`"
+                :image="productGetters.getCoverImage(product)"
+                :regular-price="$n(productGetters.getPrice(product).regular, 'currency')"
+                :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+                :max-rating="5"
+                :score-rating="productGetters.getAverageRating(product)"
+                :wishlistIcon="false"
+                :isAddedToCart="isInCart({ product })"
+                :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+                :alt="productGetters.getName(product)"
+                @click:add-to-cart="addItemToCart({ product, quantity: 1})"
               />
             </div>
           </SfMegaMenuColumn>
@@ -74,11 +91,13 @@ import {
   SfScrollable,
   SfMenuItem,
   SfButton,
-  SfImage
+  SfImage,
+  SfIcon
 } from '@storefront-ui/vue';
 import { ref, watch, computed } from '@nuxtjs/composition-api';
-import { productGetters } from '@vue-storefront/moqui';
+import { productGetters, useCart } from '@vue-storefront/moqui';
 import { addBasePath } from '@vue-storefront/core';
+import {useAddToCart} from '~/composables';
 
 export default {
   name: 'SearchResults',
@@ -90,7 +109,8 @@ export default {
     SfScrollable,
     SfMenuItem,
     SfButton,
-    SfImage
+    SfImage,
+    SfIcon
   },
   props: {
     visible: {
@@ -108,6 +128,8 @@ export default {
   setup(props, { emit }) {
     const isSearchOpen = ref(props.visible);
     const products = computed(() => props.result);
+    const { isInCart } = useCart();
+    const { addItemToCart } = useAddToCart();
 
     watch(() => props.visible, (newVal) => {
       isSearchOpen.value = newVal;
@@ -123,7 +145,9 @@ export default {
       isSearchOpen,
       productGetters,
       products,
-      addBasePath
+      addBasePath,
+      addItemToCart,
+      isInCart
     };
   }
 };

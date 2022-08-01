@@ -2,7 +2,7 @@
   <div>
     <SfHeader
       class="sf-header--has-mobile-search"
-      :class="{'header-on-top': isSearchOpen}"
+      :class="{'header-on-top': isSearchResultsOpen}"
       :isNavVisible="isMobileMenuOpen"
     >
       <!-- TODO: add mobile view buttons after SFUI team PR -->
@@ -62,9 +62,8 @@
           :value="term"
           @input="handleSearch"
           @keydown.enter="handleSearch($event)"
-          @focus="isSearchOpen = true"
+          @focus="!isSearchResultsOpen.value ? toggleSearchResultsOpen() : () => {}"
           @keydown.esc="closeSearch"
-          v-click-outside="closeSearch"
         >
           <template #icon>
             <SfButton
@@ -81,7 +80,7 @@
               v-else
               aria-label="Open search"
               class="sf-search-bar__button sf-button--pure"
-              @click="isSearchOpen ? isSearchOpen = false : isSearchOpen = true"
+              @click="toggleSearchResultsOpen"
             >
               <span class="sf-search-bar__icon">
                 <SfIcon color="var(--c-text)" size="20px" icon="search" />
@@ -92,13 +91,14 @@
       </template>
     </SfHeader>
     <SearchResults
-      :visible="isSearchOpen"
+      :visible="isSearchResultsOpen"
       :result="result"
       :term="term"
       @close="closeSearch"
       @removeSearchResults="removeSearchResults"
+      v-click-outside="closeSearch"
     />
-    <SfOverlay :visible="isSearchOpen" />
+    <SfOverlay :visible="isSearchResultsOpen" />
   </div>
 </template>
 
@@ -136,8 +136,9 @@ export default {
     const { setTermForUrl, getFacetsFromURL } = useUiHelpers();
     const { isAuthenticated } = useUser();
     const { cart } = useCart();
+    const { isSearchResultsOpen, toggleSearchResultsOpen } = useUiState();
+
     const term = ref(getFacetsFromURL().phrase);
-    const isSearchOpen = ref(false);
     const searchBarRef = ref(null);
     const isMobile = ref(mapMobileObserver().isMobile.get());
 
@@ -161,21 +162,13 @@ export default {
       toggleLoginModal();
     };
 
-    const closeSearch = () => {
-      const wishlistClassName = 'sf-product-card__wishlist-icon';
-      const isWishlistIconClicked = event.path.find(p => wishlistClassName.search(p.className) > 0);
-      if (isWishlistIconClicked || !isSearchOpen.value) return;
-
-      term.value = '';
-      isSearchOpen.value = false;
-    };
-
     const handleSearch = debounce(async (paramValue) => {
       if (!paramValue.target) {
         term.value = paramValue;
       } else {
         term.value = paramValue.target.value;
       }
+      // console.log('handleSearch term.value: ' + JSON.stringify(term.value));
 
       await productSearch({
         type: 'instant-search',
@@ -186,7 +179,21 @@ export default {
 
     }, 200);
 
+    const closeSearch = () => {
+      // const wishlistClassName = 'sf-product-card__wishlist-icon';
+      // const isWishlistIconClicked = event.path.find(p => wishlistClassName.search(p.className) > 0);
+      // if (isWishlistIconClicked || !isSearchResultsOpen) return;
+
+      // console.log('closeSearch param: ' + JSON.stringify(param));
+      // console.log('closeSearch isSearchResultsOpen: ' + JSON.stringify(isSearchResultsOpen));
+      if (!isSearchResultsOpen.value) return;
+
+      term.value = '';
+      if (isSearchResultsOpen.value) toggleSearchResultsOpen();
+    };
+
     const closeOrFocusSearchBar = () => {
+      // console.log('closeOrFocusSearchBar');
       if (isMobile.value) {
         return closeSearch();
       } else {
@@ -196,9 +203,15 @@ export default {
     };
 
     watch(() => term.value, (newVal, oldVal) => {
-      const shouldSearchBeOpened = (!isMobile.value && term.value.length > 0) && ((!oldVal && newVal) || (newVal.length !== oldVal.length && isSearchOpen.value === false));
-      if (shouldSearchBeOpened) {
-        isSearchOpen.value = true;
+      // if (not mobile and the search term string is not empty) and
+      //  (the search term string was just empty or (the search term string length has changed and the search results are not open))
+      const shouldSearchBeOpened = (!isMobile.value && term.value.length > 0) &&
+        ((!oldVal && newVal) || (newVal.length !== oldVal.length && isSearchResultsOpen.value === false));
+      // console.log('watch oldVal: ' + JSON.stringify(oldVal) + ' newVal: ' + JSON.stringify(newVal));
+
+      // console.log('watch shouldSearchBeOpened: ' + JSON.stringify(shouldSearchBeOpened) + ' !isSearchResultsOpen: ' + JSON.stringify(!isSearchResultsOpen));
+      if (shouldSearchBeOpened && !isSearchResultsOpen) {
+        toggleSearchResultsOpen();
       }
     });
 
@@ -218,7 +231,8 @@ export default {
       toggleWishlistSidebar,
       setTermForUrl,
       term,
-      isSearchOpen,
+      isSearchResultsOpen,
+      toggleSearchResultsOpen,
       closeSearch,
       handleSearch,
       result,

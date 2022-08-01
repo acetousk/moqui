@@ -16,6 +16,7 @@
             :wishlistIcon="false"
             :isAddedToCart="isInCart({ product })"
             :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+            :alt="productGetters.getName(product)"
             @click:add-to-cart="addItemToCart({ product, quantity: 1})"
           >
             <template #add-to-cart-icon v-if="productGetters.getIsVirtual(product)">

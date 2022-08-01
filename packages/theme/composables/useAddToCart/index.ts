@@ -1,7 +1,7 @@
-// import { Logger } from '@vue-storefront/core';
+import { Logger } from '@vue-storefront/core';
 import { productGetters, useCart } from '@vue-storefront/moqui';
 import { useRouter, useContext } from '@nuxtjs/composition-api';
-import { useUiNotification } from '~/composables';
+import { useUiNotification, useUiState } from '~/composables';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const useAddToCart = () => {
@@ -9,14 +9,17 @@ const useAddToCart = () => {
   const { app } = useContext();
   const { addItem: addItemToCartBase, error: cartError } = useCart();
   const { send: sendNotification } = useUiNotification();
+  const { isSearchResultsOpen, toggleSearchResultsOpen } = useUiState();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addItemToCart = (params: { product: any, variant: any, quantity: number }) => {
 
     params.product.variant = params.variant;
 
+    // console.log('addItemToCart productGetters.getIsVirtual(params.product): ' + JSON.stringify(productGetters.getIsVirtual(params.product)) + ' params.variant: ' + JSON.stringify(params.variant));
     if (productGetters.getIsVirtual(params.product) && !params.variant) {
       // Logger.debug('addItemToCart redirecting to: ' + JSON.stringify(app.localePath(`/p/${productGetters.getId(params.product)}/${productGetters.getSlug(params.product)}`)));
+      if (isSearchResultsOpen.value) toggleSearchResultsOpen();
       return router.push(app.localePath(`/p/${productGetters.getId(params.product)}/${productGetters.getSlug(params.product)}`));
     }
 
@@ -24,7 +27,6 @@ const useAddToCart = () => {
     addItemToCartBase(params)
       .then(() => {
         if (cartError.value.addItem) throw {message: cartError.value.addItem?.message};
-        // console.log('addItemToCart cart: ' + JSON.stringify(cart));
         // console.log('addItemToCart cartError.value.addItem: ' + JSON.stringify(cartError.value.addItem));
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
