@@ -137,7 +137,8 @@
     {
       "files": ["*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/explicit-module-boundary-types": ["error"]
+        // We don't need this for now
+        // "@typescript-eslint/explicit-module-boundary-types": ["error"]
       }
     }
   ]
