@@ -20,9 +20,6 @@ COPY . .
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN npm install \
-    && npm run build
-
 RUN cd docs \
   && npm install \
   && sed -i "s/base: '\/',/base: '\/moqui\/',/g" ./.vuepress/config.js \
