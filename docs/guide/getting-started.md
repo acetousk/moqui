@@ -15,7 +15,8 @@ This is a simple quick introduction to running Moqui. For more information on ho
 ```bash
 git --version 
 ```
-::: details
+::: tip
+
 It should look something like this:
 ```bash
 me@moqui:~$ git --version
@@ -28,7 +29,7 @@ If you have troubles installing git, checkout [this Github tutorial](https://git
 ```bash
 java -version
 ```
-::: details
+::: tip
 It should look something like this:
 ```bash
 me@moqui:~$ java -version
@@ -55,7 +56,7 @@ cd moqui-framework
 ./gradlew getRuntime downloadOpenSearch getComponentSet -PcomponentSet=vue-storefront
 ```
 
-::: details
+::: tip
 To make sure everything worked run:
 ```bash
 ls -l runtime/component
@@ -105,7 +106,7 @@ If following the Get Moqui Running tutorial, make sure your working directory is
 ```bash
 node -v
 ```
-::: details
+::: tip
 It should look something like this:
 ```bash
 me@moqui:~$ node -v
@@ -117,7 +118,7 @@ v16.16.0
 ```bash
 yarn -v
 ```
-::: details
+::: tip
 It should look something like this:
 ```bash
 me@moqui:~$ yarn -v
