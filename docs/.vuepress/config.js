@@ -84,6 +84,7 @@ module.exports = {
           ['/', 'Introduction'],
           ['/guide/getting-started', 'Getting started'],
           ['/guide/about', 'About'],
+          ['https://github.com/vuestorefront-community/moqui', 'Repository'],
           ['https://demo.moqui.org/toolstatic/lib/swagger-ui/index.html?url=https://demo.moqui.org/rest/service.swagger/pop', 'Demo Moqui API'],
         ]
       },

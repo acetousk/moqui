@@ -1,17 +1,33 @@
-FROM node:14 AS build
+# Docs require puppeteer / chromium to generate OpenGraph images.
+# https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-on-alpine
+
+FROM node:16-alpine AS build
 
 WORKDIR /var/www
 
+# Installs latest Chromium (92) package.
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
 COPY . .
 
-RUN yarn install --network-concurrency 1
-RUN cd packages/api-client && yarn build && yarn cache clean --all
-RUN cd packages/composables && yarn build && yarn cache clean --all
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN npm install \
+    && npm run build
 
 RUN cd docs \
   && npm install \
   && sed -i "s/base: '\/',/base: '\/moqui\/',/g" ./.vuepress/config.js \
   && cat ./.vuepress/config.js \
+  && npm run api-extract \
   && npm run build
 
 FROM nginx
