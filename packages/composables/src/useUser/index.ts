@@ -10,39 +10,82 @@ import type {
 } from '../types';
 
 const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load: async (context: Context) => {
-    console.log('Mocked: useUser.load');
-    return {};
+    console.log('###Run: useUser.load');
+    try {
+      const response = await context.$moqui.api.loadUser();
+      return response;
+    } catch (error) {
+      throw { message: error.response?.data?.message || error };
+    }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   logOut: async (context: Context) => {
-    console.log('Mocked: useUser.logOut');
+    console.log('###Run: useUser.logOut');
+    try {
+      const response = await context.$moqui.api.logoutUser();
+      return response;
+    } catch (error) {
+      throw { message: error.response?.data?.message || error };
+    }
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateUser: async (context: Context, { currentUser, updatedUserData }) => {
-    console.log('Mocked: useUser.updateUser');
-    return {};
+    console.log('###Run: useUser.updateUser');
+    const response = await context.$moqui.api.updateUser({
+      ...updatedUserData
+    });
+
+    return response;
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  register: async (context: Context, { email, password, firstName, lastName }) => {
-    console.log('Mocked: useUser.register');
-    return {};
+  register: async (context: Context, { emailAddress, password, firstName, lastName }) => {
+    console.log('###Run: useUser.register');
+    try {
+      const response = await context.$moqui.api.registerUser({
+        emailAddress,
+        firstName,
+        lastName,
+        password
+      });
+
+      return response;
+
+    } catch (error) {
+      throw { message: error.response?.data?.message || error };
+    }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   logIn: async (context: Context, { username, password }) => {
-    console.log('Mocked: useUser.logIn');
-    return {};
+    console.log('###Run: useUser.logIn');
+    try {
+      const response = await context.$moqui.api.loginUser({
+        username,
+        password
+      });
+
+      return response;
+
+    } catch (error) {
+      throw { message: error.response?.data?.message || error };
+    }
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   changePassword: async (context: Context, { currentUser, currentPassword, newPassword }) => {
     console.log('Mocked: useUser.changePassword');
-    return {};
+    try {
+      const response = await context.$moqui.api.changePassword({
+        currentPassword,
+        newPassword
+      });
+
+      return response;
+
+    } catch (error) {
+      throw { message: error.response?.data?.message || error };
+    }
   }
 };
 

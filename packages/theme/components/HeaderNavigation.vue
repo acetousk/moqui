@@ -4,9 +4,9 @@
       v-for="(category, index) in categories"
       :key="index"
       class="nav-item"
-      v-e2e="`app-header-url_${category}`"
-      :label="category"
-      :link="localePath(`/c/${category}`)"
+      v-e2e="`app-header-url_${category.slug}`"
+      :label="category.label"
+      :link="localePath(`/c/${category.slug}`)"
     />
   </div>
   <SfModal v-else :visible="isMobileMenuOpen">
@@ -14,13 +14,13 @@
       v-for="(category, index) in categories"
       :key="index"
       class="nav-item"
-      v-e2e="`app-header-url_${category}`"
+      v-e2e="`app-header-url_${category.slug}`"
     >
       <template #mobile-navigation-item>
         <SfMenuItem
-          :label="category"
+          :label="category.label"
           class="sf-header-navigation-item__menu-item"
-          :link="localePath(`/c/${category}`)"
+          :link="localePath(`/c/${category.slug}`)"
           @click="toggleMobileMenu"
         />
       </template>
@@ -29,9 +29,10 @@
 </template>
 
 <script>
+import { useStore } from '@vue-storefront/moqui';
 import { SfMenuItem, SfModal } from '@storefront-ui/vue';
 import { useUiState } from '~/composables';
-
+import { computed } from '@vue/composition-api';
 export default {
   name: 'HeaderNavigation',
   components: {
@@ -45,8 +46,10 @@ export default {
     }
   },
   setup() {
+    const { response } = useStore();
+    const categories = computed(() => response.value?.menuCategoryList);
+
     const { isMobileMenuOpen, toggleMobileMenu } = useUiState();
-    const categories = ['women', 'men'];
 
     return {
       categories,

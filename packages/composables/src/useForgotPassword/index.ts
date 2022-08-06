@@ -6,7 +6,7 @@ import {
 
 const factoryParams: UseForgotPasswordFactoryParams<any> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  resetPassword: async (context: Context, { email, customQuery }) => {
+  resetPassword: async (context: Context, { emailAddress, customQuery }) => {
     console.log('Mocked: resetPassword');
     return {};
   },

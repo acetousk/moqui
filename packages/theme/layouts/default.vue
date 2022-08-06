@@ -5,9 +5,9 @@
     </LazyHydrate>
 
     <AppHeader />
-
+    <div>Load Error: {{ loadError }}</div>
     <div id="layout">
-      <nuxt :key="route.fullPath"/>
+      <nuxt :key="route.fullPath" />
 
       <BottomNavigation />
       <CartSidebar />
@@ -34,6 +34,8 @@ import Notification from '~/components/Notification';
 import { onSSR } from '@vue-storefront/core';
 import { useRoute } from '@nuxtjs/composition-api';
 import { useCart, useStore, useUser, useWishlist } from '@vue-storefront/moqui';
+import { computed } from '@nuxtjs/composition-api';
+// import { useUiNotification } from '~/composables';
 
 export default {
   name: 'DefaultLayout',
@@ -51,22 +53,22 @@ export default {
   },
 
   setup() {
+    // const { send: sendNotification } = useUiNotification();
+
     const route = useRoute();
-    const { load: loadStores } = useStore();
+    const { load: loadStores, error } = useStore();
     const { load: loadUser } = useUser();
     const { load: loadCart } = useCart();
     const { load: loadWishlist } = useWishlist();
 
+    const loadError = computed(() => error.value.load);
+
     onSSR(async () => {
-      await Promise.all([
-        loadStores(),
-        loadUser(),
-        loadCart(),
-        loadWishlist()
-      ]);
+      await Promise.all([loadStores(), loadUser(), loadCart(), loadWishlist()]);
     });
 
     return {
+      loadError,
       route
     };
   }
@@ -74,7 +76,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "~@storefront-ui/vue/styles";
+@import '~@storefront-ui/vue/styles';
 
 #layout {
   box-sizing: border-box;

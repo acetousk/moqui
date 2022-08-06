@@ -34,6 +34,7 @@ import ProfileUpdateForm from '~/components/MyAccount/ProfileUpdateForm';
 import PasswordResetForm from '~/components/MyAccount/PasswordResetForm';
 import { SfTabs, SfInput, SfButton } from '@storefront-ui/vue';
 import { useUser } from '@vue-storefront/moqui';
+import { onMounted } from '@nuxtjs/composition-api';
 
 extend('email', {
   ...email,
@@ -60,6 +61,10 @@ extend('confirmed', {
   message: 'Passwords don\'t match'
 });
 
+extend('nothavenumber', {
+  validate: value => String(value).match(/^([^0-9]*)$/),
+  message: 'This field should not have a number'
+});
 export default {
   name: 'PersonalDetails',
 
@@ -72,8 +77,11 @@ export default {
   },
 
   setup() {
-    const { updateUser, changePassword } = useUser();
+    const { load, updateUser, changePassword } = useUser();
 
+    onMounted(() => {
+      load();
+    });
     const formHandler = async (fn, onComplete, onError) => {
       try {
         const data = await fn();

@@ -22,6 +22,10 @@ export type UseStoreFilterParams = TODO;
 
 export type UseUserUpdateParams = TODO;
 
-export type UseUserRegisterParams = TODO;
-
+export interface UseUserRegisterParams {
+  emailAddress: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
 export type useUserOrderSearchParams = TODO;
