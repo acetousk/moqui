@@ -1,12 +1,12 @@
 <template>
-  <SfTabs :open-tab="1">
+  <SfTabs :open-tab="openTab" @click:tab="(t) => (openTab = t)">
     <!-- Personal data update -->
     <SfTab title="Personal data">
       <p class="message">
         {{ $t('Feel free to edit') }}
       </p>
 
-      <ProfileUpdateForm @submit="updatePersonalData" />
+      <ProfileUpdateForm :loading="loading" @submit="updatePersonalData" />
 
       <p class="notice">
         {{ $t('Use your personal data') }}
@@ -22,7 +22,7 @@
         <span class="message__label">example@email.com</span>
       </p>
 
-      <PasswordResetForm @submit="updatePassword" />
+      <PasswordResetForm :loading="loading" @submit="updatePassword" />
     </SfTab>
   </SfTabs>
 </template>
@@ -34,7 +34,7 @@ import ProfileUpdateForm from '~/components/MyAccount/ProfileUpdateForm';
 import PasswordResetForm from '~/components/MyAccount/PasswordResetForm';
 import { SfTabs, SfInput, SfButton } from '@storefront-ui/vue';
 import { useUser } from '@vue-storefront/moqui';
-import { onMounted } from '@nuxtjs/composition-api';
+import { onMounted, computed, ref } from '@nuxtjs/composition-api';
 
 extend('email', {
   ...email,
@@ -52,8 +52,13 @@ extend('min', {
 });
 
 extend('password', {
-  validate: value => String(value).length >= 8 && String(value).match(/[A-Za-z]/gi) && String(value).match(/[0-9]/gi),
-  message: 'Password must have at least 8 characters including one letter and a number'
+  validate: (value) =>
+    String(value).length >= 8 &&
+    String(value).match(/[A-Za-z]/gi) &&
+    String(value).match(/[0-9]/gi) &&
+    String(value).match(/[#?!@$%^&*-]/gi),
+  message:
+    'Password must have at least 8 characters including one letter, a number and a special character'
 });
 
 extend('confirmed', {
@@ -62,7 +67,7 @@ extend('confirmed', {
 });
 
 extend('nothavenumber', {
-  validate: value => String(value).match(/^([^0-9]*)$/),
+  validate: (value) => String(value).match(/^([^0-9]*)$/),
   message: 'This field should not have a number'
 });
 export default {
@@ -77,32 +82,54 @@ export default {
   },
 
   setup() {
-    const { load, updateUser, changePassword } = useUser();
-
+    const { load, updateUser, changePassword, error, loading } = useUser();
+    const openTab = ref(1);
     onMounted(() => {
       load();
     });
-    const formHandler = async (fn, onComplete, onError) => {
-      try {
-        const data = await fn();
-        await onComplete(data);
-      } catch (error) {
-        onError(error);
+
+    const changePasswordError = computed(() => error.value.changePassword);
+    const updateUserError = computed(() => error.value.updateUser);
+    const formHandler = async (fn, errorVar, onComplete, onError) => {
+      await fn();
+      if (errorVar.value) {
+        onError(errorVar.value);
+      } else {
+        onComplete();
       }
     };
 
-    const updatePersonalData = ({ form, onComplete, onError }) => formHandler(() => updateUser({ user: form.value }), onComplete, onError);
-    const updatePassword = ({ form, onComplete, onError }) => formHandler(() => changePassword({ current: form.value.currentPassword, new: form.value.newPassword }), onComplete, onError);
+    const updatePersonalData = ({ form, onComplete, onError }) =>
+      formHandler(
+        () => updateUser({ user: form.value }),
+        updateUserError,
+        onComplete,
+        onError
+      );
+    const updatePassword = ({ form, onComplete, onError }) =>
+      formHandler(
+        () =>
+          changePassword({
+            current: form.value.currentPassword,
+            new: form.value.newPassword
+          }),
+        changePasswordError,
+        onComplete,
+        onError
+      );
 
     return {
       updatePersonalData,
-      updatePassword
+      updatePassword,
+      loading,
+      openTab,
+      loguy: (e) => console.log(e)
     };
   }
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .message,
 .notice {
   font-family: var(--font-family--primary);
@@ -119,5 +146,4 @@ export default {
   margin: var(--spacer-lg) 0 0 0;
   font-size: var(--font-size--sm);
 }
-
 </style>

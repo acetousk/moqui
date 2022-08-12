@@ -20,13 +20,15 @@
           <ShippingDetails />
         </SfContentPage>
 
-        <SfContentPage title="Billing details">
+        <!--
+          <SfContentPage title="Billing details">
           <BillingDetails />
         </SfContentPage>
 
         <SfContentPage title="My newsletter">
           <MyNewsletter />
         </SfContentPage>
+        -->
       </SfContentCategory>
 
       <SfContentCategory title="Order details">
@@ -41,11 +43,15 @@
 </template>
 <script>
 import { SfBreadcrumbs, SfContentPages } from '@storefront-ui/vue';
-import { computed, onBeforeUnmount, useRoute, useRouter } from '@nuxtjs/composition-api';
+import {
+  computed,
+  onBeforeUnmount,
+  useRoute,
+  useRouter
+} from '@nuxtjs/composition-api';
 import { useUser } from '@vue-storefront/moqui';
 import MyProfile from './MyAccount/MyProfile';
 import ShippingDetails from './MyAccount/ShippingDetails';
-import BillingDetails from './MyAccount/BillingDetails';
 import MyNewsletter from './MyAccount/MyNewsletter';
 import OrderHistory from './MyAccount/OrderHistory';
 import {
@@ -60,13 +66,10 @@ export default {
     SfContentPages,
     MyProfile,
     ShippingDetails,
-    BillingDetails,
     MyNewsletter,
     OrderHistory
   },
-  middleware: [
-    'is-authenticated'
-  ],
+  middleware: ['is-authenticated'],
   setup(props, context) {
     const route = useRoute();
     const router = useRouter();
@@ -77,7 +80,10 @@ export default {
       const { pageName } = route.value.params;
 
       if (pageName) {
-        return (pageName.charAt(0).toUpperCase() + pageName.slice(1)).replace('-', ' ');
+        return (pageName.charAt(0).toUpperCase() + pageName.slice(1)).replace(
+          '-',
+          ' '
+        );
       } else if (!isMobile.value) {
         return 'My profile';
       } else {
@@ -123,7 +129,7 @@ export default {
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 #my-account {
   box-sizing: border-box;
   @include for-desktop {

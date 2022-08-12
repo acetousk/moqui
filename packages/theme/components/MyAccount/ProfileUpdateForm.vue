@@ -32,19 +32,21 @@
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
-        <!--        <ValidationProvider-->
-        <!--          v-slot="{ errors }"-->
-        <!--          rules="required"-->
-        <!--          class="form__element">-->
-        <!--          <SfSelect-->
-        <!--            v-model="form.gender"-->
-        <!--            label="gender"-->
-        <!--            required>-->
-        <!--            <SfSelectOption v-for="option of genderOptions" :key="option.value" :value="option.value">-->
-        <!--              {{option.label}}-->
-        <!--            </SfSelectOption>-->
-        <!--          </SfSelect>-->
-        <!--        </ValidationProvider>-->
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required"
+          class="form__element"
+        >
+          <SfSelect v-model="form.gender" label="Gender">
+            <SfSelectOption
+              v-for="option of genderOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </SfSelectOption>
+          </SfSelect>
+        </ValidationProvider>
         <ValidationProvider
           v-slot="{ errors }"
           rules="required|email"
@@ -62,22 +64,6 @@
           />
         </ValidationProvider>
       </div>
-      <div class="form__horizontal">
-        <ValidationProvider
-          v-slot="{ errors }"
-          rules="required|min:8"
-          class="form__element"
-        >
-          <SfInput
-            v-model="password"
-            type="password"
-            name="password"
-            label="Current Password"
-            required
-            class="form__element"
-          />
-        </ValidationProvider>
-      </div>
       <SfButton type="submit" class="form__button" :disabled="loading">
         <SfLoader :class="{ loader: loading }" :loading="loading">
           <div>{{ $t('Update personal data') }}</div>
@@ -88,7 +74,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref } from '@nuxtjs/composition-api';
+import { computed, defineComponent } from '@nuxtjs/composition-api';
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import { useUser, userGetters } from '@vue-storefront/moqui';
 import {
@@ -128,55 +114,49 @@ export default defineComponent({
     const { user } = useUser();
     const { send: sendNotification } = useUiNotification();
 
-    const password = ref('');
-    // const genderOptions = [
-    //   { value: 1, label: 'male' },
-    //   { value: 2, label: 'female' }
-    // ];
+    const genderOptions = [
+      { value: 'M', label: 'Male' },
+      { value: 'F', label: 'Female' }
+    ];
 
     const form = computed(() => ({
       firstName: user.value ? userGetters.getFirstName(user.value) : '',
       lastName: user.value ? userGetters.getLastName(user.value) : '',
-      email: user.value ? userGetters.getEmailAddress(user.value) : ''
-      // gender: user.value ? userGetters.getGender(user.value) : ''
+      email: user.value ? userGetters.getEmailAddress(user.value) : '',
+      gender: user.value ? userGetters.getGender(user.value) : ''
     }));
 
     const submitForm = (resetValidationFn) => () => {
       const onComplete = (data) => {
-        password.value = '';
         sendNotification({
           id: Symbol('user_updated'),
-          message: data.message
-            ? data.message
-            : 'The user account data was successfully updated!',
+          message:
+            data?.message || 'The user account data was successfully updated!',
           type: 'success',
           icon: 'check',
           persist: false,
-          title: 'User Account'
+          title: 'User Profile'
         });
         resetValidationFn();
       };
       const onError = (error) => {
         sendNotification({
           id: Symbol('user_updated'),
-          message: error.message,
+          message: error?.message || 'Your profile failed to update.',
           type: 'danger',
           icon: 'cross',
           persist: false,
-          title: 'User Account'
+          title: 'User Profile'
         });
       };
-
-      if (password.value) form.value.password = password.value;
 
       emit('submit', { form, onComplete, onError });
     };
 
     return {
-      password,
+      genderOptions,
       form,
       submitForm
-      // genderOptions
     };
   }
 });
