@@ -7,12 +7,12 @@ import type {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAddresses(shipping: Address, criteria?: UserShippingAddressSearchCriteria): AddressItem[] {
-  return [];
+  return shipping;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getDefault(shipping: Address): Address {
-  return {};
+function getDefault(shipping: Address): AddressItem {
+  return shipping.find(addr => addr.isDefault === true);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -37,7 +37,7 @@ function getStreetNumber(address: AddressItem): string | number {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCity(address: AddressItem): string {
-  return '';
+  return address.city;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -52,12 +52,12 @@ function getLastName(address: AddressItem): string {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCountry(address: AddressItem): string {
-  return '';
+  return address.countryId;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getPhone(address: AddressItem): string {
-  return '';
+  return address.phone ? (String(address.phone?.countryCode || '') + String(address.phone?.areaCode || '') + String(address.phone?.contactNumber || '')) : '';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,7 +67,7 @@ function getEmail(address: AddressItem): string {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getProvince(address: AddressItem): string {
-  return '';
+  return address.stateId;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

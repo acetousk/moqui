@@ -1,13 +1,12 @@
 <template>
   <transition name="fade">
     <SfTabs
-      v-if="edittingAddress"
+      v-if="editingAddress"
       key="edit-address"
       :open-tab="1"
       class="tab-orphan"
     >
-      <SfTab
-        :title="isNewAddress ? 'Add the address' : 'Update the address'">
+      <SfTab :title="isNewAddress ? 'Add the address' : 'Update the address'">
         <p class="message">
           {{ $t('Contact details updated') }}
         </p>
@@ -15,15 +14,16 @@
         <ShippingAddressForm
           :address="activeAddress"
           :isNew="isNewAddress"
-          @submit="saveAddress" />
+          @cancel="
+            editingAddress = false;
+            activeAddress = null;
+          "
+          @submit="saveAddress"
+        />
       </SfTab>
     </SfTabs>
 
-    <SfTabs
-      v-else
-      :open-tab="1"
-      key="address-list"
-      class="tab-orphan">
+    <SfTabs v-else :open-tab="1" key="address-list" class="tab-orphan">
       <SfTab title="Shipping details">
         <p class="message">
           {{ $t('Manage shipping addresses') }}
@@ -32,7 +32,8 @@
           <div
             v-for="address in addresses"
             :key="userShippingGetters.getId(address)"
-            class="shipping">
+            class="shipping"
+          >
             <div class="shipping__content">
               <div class="shipping__address">
                 <UserShippingAddress :address="address" />
@@ -47,22 +48,20 @@
                 class="smartphone-only"
                 @click="removeAddress(address)"
               />
-              <SfButton
-                @click="changeAddress(address)">
+              <SfButton @click="changeAddress(address)">
                 {{ $t('Change') }}
               </SfButton>
 
               <SfButton
                 class="color-light shipping__button-delete desktop-only"
-                @click="removeAddress(address)">
+                @click="removeAddress(address)"
+              >
                 {{ $t('Delete') }}
               </SfButton>
             </div>
           </div>
         </transition-group>
-        <SfButton
-          class="action-button"
-          @click="changeAddress()">
+        <SfButton class="action-button" @click="changeAddress()">
           {{ $t('Add new address') }}
         </SfButton>
       </SfTab>
@@ -70,16 +69,13 @@
   </transition>
 </template>
 <script>
-import {
-  SfTabs,
-  SfButton,
-  SfIcon
-} from '@storefront-ui/vue';
+import { SfTabs, SfButton, SfIcon } from '@storefront-ui/vue';
 import UserShippingAddress from '~/components/UserShippingAddress';
 import ShippingAddressForm from '~/components/MyAccount/ShippingAddressForm';
 import { useUserShipping, userShippingGetters } from '@vue-storefront/moqui';
 import { ref, computed } from '@nuxtjs/composition-api';
 import { onSSR } from '@vue-storefront/core';
+import { useUiNotification } from '~/composables';
 
 export default {
   name: 'ShippingDetails',
@@ -91,28 +87,78 @@ export default {
     ShippingAddressForm
   },
   setup() {
-    const { shipping, load: loadUserShipping, addAddress, deleteAddress, updateAddress } = useUserShipping();
-    const addresses = computed(() => userShippingGetters.getAddresses(shipping.value));
-    const edittingAddress = ref(false);
+    const { send: sendNotification } = useUiNotification();
+
+    const {
+      shipping,
+      load: loadUserShipping,
+      addAddress,
+      deleteAddress,
+      updateAddress,
+      error
+    } = useUserShipping();
+
+    const addresses = computed(() =>
+      userShippingGetters.getAddresses(shipping.value)
+    );
+    const editingAddress = ref(false);
     const activeAddress = ref(undefined);
     const isNewAddress = computed(() => !activeAddress.value);
 
     const changeAddress = (address = undefined) => {
       activeAddress.value = address;
-      edittingAddress.value = true;
+      editingAddress.value = true;
     };
 
-    const removeAddress = address => deleteAddress({ address });
+    const addAddressError = computed(() => error.value.addAddress);
+    const deleteAddressError = computed(() => error.value.deleteAddress);
+    const updateAddressError = computed(() => error.value.updateAddress);
+
+    const removeAddress = async (address) => {
+      await deleteAddress({ address });
+
+      if (deleteAddressError.value) {
+        sendNotification({
+          id: Symbol('shipping_address_update_failed'),
+          message: error?.message || 'Address failed to delete.',
+          type: 'danger',
+          icon: 'cross',
+          persist: false,
+          title: 'Shipping Address'
+        });
+      } else {
+        sendNotification({
+          id: Symbol('shipping_address_updated'),
+          message: 'Address deleted successfully!',
+          type: 'success',
+          icon: 'check',
+          persist: false,
+          title: 'Shipping Address'
+        });
+      }
+    };
 
     const saveAddress = async ({ form, onComplete, onError }) => {
-      try {
-        const actionMethod = isNewAddress.value ? addAddress : updateAddress;
-        const data = await actionMethod({ address: form });
-        edittingAddress.value = false;
+      const actionMethod = isNewAddress.value ? addAddress : updateAddress;
+      const actionError = isNewAddress.value
+        ? addAddressError
+        : updateAddressError;
+      await actionMethod({
+        address: {
+          ...form.value,
+          phone: {
+            countryCode: form.value.phone.substring(1, 2),
+            areaCode: form.value.phone.substring(2, 5),
+            contactNumber: form.value.phone.substring(5)
+          }
+        }
+      });
+      if (actionError.value) {
+        onError(actionError.value);
+      } else {
+        editingAddress.value = false;
         activeAddress.value = undefined;
-        await onComplete(data);
-      } catch (error) {
-        onError(error);
+        await onComplete(shipping.value);
       }
     };
 
@@ -127,7 +173,7 @@ export default {
       saveAddress,
       userShippingGetters,
       addresses,
-      edittingAddress,
+      editingAddress,
       activeAddress,
       isNewAddress
     };
@@ -135,8 +181,7 @@ export default {
 };
 </script>
 
-<style lang='scss' scoped>
-
+<style lang="scss" scoped>
 .message {
   font-family: var(--font-family--primary);
   line-height: 1.6;

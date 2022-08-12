@@ -20,10 +20,14 @@ export type UseShippingAddParams = TODO;
 
 export type UseStoreFilterParams = TODO;
 
-export type UseUserUpdateParams = TODO;
+export type UseUserUpdateParams = {
+  firstName: string;
+  lastName: string;
+  gender: string;
+};
 
 export interface UseUserRegisterParams {
-  emailAddress: string;
+  email: string;
   password: string;
   firstName?: string;
   lastName?: string;

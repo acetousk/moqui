@@ -44,12 +44,6 @@ export type UserBillingAddressItem = TODO;
 
 export type UserBillingAddressSearchCriteria = TODO;
 
-export type UserShippingAddress = TODO;
-
-export type UserShippingAddressItem = TODO;
-
-export type UserShippingAddressSearchCriteria = TODO;
-
 export type ShippingAddress = TODO;
 
 export type ShippingMethod = TODO;
