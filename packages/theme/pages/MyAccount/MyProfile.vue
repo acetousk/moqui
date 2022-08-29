@@ -19,7 +19,7 @@
       <p class="message">
         {{ $t('Change password your account') }}:<br />
         {{ $t('Your current email address is') }}
-        <span class="message__label">example@email.com</span>
+        <span class="message__label">{{ userGetters.getEmailAddress(user) }}</span>
       </p>
 
       <PasswordResetForm :loading="loading" @submit="updatePassword" />
@@ -33,8 +33,8 @@ import { email, required, min, confirmed } from 'vee-validate/dist/rules';
 import ProfileUpdateForm from '~/components/MyAccount/ProfileUpdateForm';
 import PasswordResetForm from '~/components/MyAccount/PasswordResetForm';
 import { SfTabs, SfInput, SfButton } from '@storefront-ui/vue';
-import { useUser } from '@vue-storefront/moqui';
-import { onMounted, computed, ref } from '@nuxtjs/composition-api';
+import { useUser, userGetters } from '@vue-storefront/moqui';
+import { onMounted, computed, ref, useRouter } from '@nuxtjs/composition-api';
 
 extend('email', {
   ...email,
@@ -81,8 +81,9 @@ export default {
     PasswordResetForm
   },
 
-  setup() {
-    const { load, updateUser, changePassword, error, loading } = useUser();
+  setup(_props, context) {
+    const router = useRouter();
+    const { user, load, updateUser, changePassword, error, loading, setUser } = useUser();
     const openTab = ref(1);
     onMounted(() => {
       load();
@@ -94,6 +95,10 @@ export default {
       await fn();
       if (errorVar.value) {
         onError(errorVar.value);
+        if (errorVar.value.code === 401) {
+          setUser(null);
+          router.push(context.root.localePath({ name: 'home' }));
+        }
       } else {
         onComplete();
       }
@@ -123,7 +128,8 @@ export default {
       updatePassword,
       loading,
       openTab,
-      loguy: (e) => console.log(e)
+      user,
+      userGetters
     };
   }
 };
@@ -135,13 +141,16 @@ export default {
   font-family: var(--font-family--primary);
   line-height: 1.6;
 }
+
 .message {
   margin: 0 0 var(--spacer-xl) 0;
   font-size: var(--font-size--base);
+
   &__label {
     font-weight: 400;
   }
 }
+
 .notice {
   margin: var(--spacer-lg) 0 0 0;
   font-size: var(--font-size--sm);

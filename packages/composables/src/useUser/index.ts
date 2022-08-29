@@ -10,16 +10,15 @@ import type {
 } from '../types';
 
 const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
+
   load: async (context: Context) => {
-    // const apiState = context.$moqui.config.state;
-    // if (!apiState.getCustomerLoggedIn()) {
-    //   return null;
-    // }
     console.log('###Run: useUser.load');
     try {
       const response = await context.$moqui.api.loadUser();
       return response;
     } catch (error) {
+      // If we run into a 401, we got to return null so that the user state is reset
+      if ((error.response?.data?.code || error.code) === 401) return null;
       throw {
         message: error.response?.data?.message || error.message,
         code: error.response?.data?.code || error.code
@@ -27,20 +26,11 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  logOut: async (context: Context, { currentUser }) => {
-    // const apiState = context.$moqui.config.state;
-
+  logOut: async (context: Context /* , { currentUser } */) => {
     console.log('###Run: useUser.logOut');
     try {
-      // TODO
-      // console.log('context.$moqui.config.state.setCustomerLoggedIn')
-      // console.log(context.$moqui.config)
-      const response = await context.$moqui.api.logoutUser();
-
-      // context.$moqui.config.state.setCustomerLoggedIn(false);
-      // currentUser = null;
-      return response;
+      context.$moqui.config.app.$cookies.remove('vsf-auth');
+      await context.$moqui.api.logoutUser();
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -49,8 +39,7 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  updateUser: async (context: Context, { currentUser, updatedUserData }) => {
+  updateUser: async (context: Context, { /* currentUser, */ updatedUserData }) => {
     console.log('###Run: useUser.updateUser');
     try {
       const response = await context.$moqui.api.updateUser({
@@ -70,13 +59,13 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     console.log('###Run: useUser.register');
     try {
       const response = await context.$moqui.api.registerUser({
-        email,
+        emailAddress: email,
         firstName,
         lastName,
         password
       });
 
-      return response;
+      return response?.customerInfo;
 
     } catch (error) {
       throw {
@@ -94,8 +83,14 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
         password
       });
 
-      return response;
+      if (response.forcePasswordChange) {
+        throw {
+          message: 'Your account requires a password change before login.',
+          code: '403'
+        };
+      }
 
+      return response?.customerInfo;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -104,7 +99,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   changePassword: async (context: Context, { currentUser, currentPassword, newPassword }) => {
     console.log('Run: useUser.changePassword');
     try {

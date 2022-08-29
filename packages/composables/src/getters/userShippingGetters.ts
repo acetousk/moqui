@@ -1,43 +1,33 @@
 import { UserShippingGetters } from '@vue-storefront/core';
 import type {
   UserShippingAddress as Address,
-  UserShippingAddressItem as AddressItem,
-  UserShippingAddressSearchCriteria
+  UserShippingAddressItem as AddressItem
+  // UserShippingAddressSearchCriteria
 } from '@vue-storefront/moqui-api';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getAddresses(shipping: Address, criteria?: UserShippingAddressSearchCriteria): AddressItem[] {
-  return shipping;
+function getId(address: AddressItem): string {
+  return address?.addressId || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getAddresses(shipping: Address /* , criteria?: UserShippingAddressSearchCriteria */): AddressItem[] {
+  return shipping || [];
+}
+
 function getDefault(shipping: Address): AddressItem {
-  return shipping.find(addr => addr.isDefault === true);
+  return shipping.find(addr => addr.isDefault === true) || shipping?.[0] || null;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotal(shipping: Address): number {
-  return 0;
+  return shipping?.length || 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getPostCode(address: AddressItem): string {
-  return '';
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getStreetName(address: AddressItem): string {
-  return '';
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getStreetNumber(address: AddressItem): string | number {
-  return '';
+  return address?.postalCode || '';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCity(address: AddressItem): string {
-  return address.city;
+  return address?.city || '';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,23 +41,30 @@ function getLastName(address: AddressItem): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getCountry(address: AddressItem): string {
-  return address.countryId;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getPhone(address: AddressItem): string {
-  return address.phone ? (String(address.phone?.countryCode || '') + String(address.phone?.areaCode || '') + String(address.phone?.contactNumber || '')) : '';
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getEmail(address: AddressItem): string {
   return '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getCountry(address: AddressItem): string {
+  return address?.countryName || address?.countryId || '';
+}
+
+function getPhone(address: AddressItem): string {
+  return address.phone ? (String(address.phone?.countryCode || '') + String(address.phone?.areaCode || '') + String(address.phone?.contactNumber || '')) : '';
+}
+
 function getProvince(address: AddressItem): string {
-  return address.stateId;
+  return address?.stateName || address?.stateId || '';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getStreetName(address: AddressItem): string {
+  return '';
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getStreetNumber(address: AddressItem): string | number {
+  return '';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -77,11 +74,6 @@ function getCompanyName(address: AddressItem): string {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTaxNumber(address: AddressItem): string {
-  return '';
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getId(address: AddressItem): string {
   return '';
 }
 

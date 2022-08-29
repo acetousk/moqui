@@ -1,6 +1,8 @@
 export interface User {
+    username: string;
     emailAddress: string;
     firstName: string;
+    middleName?: string;
     lastName: string
     gender?: string
 }
@@ -17,6 +19,8 @@ export type UserShippingAddressItem = {
     city: string;
     stateId: string;
     countryId: string;
+    stateName: string;
+    countryName: string;
     postalCode: string;
     phone: {
         countryCode: number;

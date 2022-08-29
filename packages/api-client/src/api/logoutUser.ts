@@ -1,9 +1,8 @@
-import { UserLogoutParams, UserLogoutResponse } from 'src/types/api';
+import { UserLogoutResponse } from 'src/types/api';
 import type { Context } from '../types/context';
 import getHeaders from './helpers/getHeaders';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default async function logoutUser(context: Context, params: UserLogoutParams) {
+export default async function logoutUser(context: Context /* , params: UserLogoutParams */) {
 
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/logout', context.config.api);

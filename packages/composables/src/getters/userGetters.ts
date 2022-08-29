@@ -10,15 +10,15 @@ function getLastName(user: User): string {
 }
 
 function getFullName(user: User): string {
-  return getFirstName(user) + ' ' + getLastName(user);
+  return `${getFirstName(user)} ${getLastName(user)}`;
 }
 
 function getEmailAddress(user: User): string {
-  return user.emailAddress;
+  return user?.emailAddress || '';
 }
 
 function getGender(user: User): string {
-  return user.gender;
+  return user?.gender || '';
 }
 
 export const userGetters: UserGetters<User> = {

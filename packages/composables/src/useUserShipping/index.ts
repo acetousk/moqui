@@ -9,7 +9,6 @@ import type {
 } from '@vue-storefront/moqui-api';
 
 const params: UseUserShippingFactoryParams<Address, AddressItem> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   addAddress: async (context: Context, params) => {
     console.log('Run: useUserShipping.addAddress');
     try {
@@ -35,7 +34,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deleteAddress: async (context: Context, params) => {
     console.log('Run: useUserShipping.deleteAddress');
     try {
@@ -51,7 +49,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateAddress: async (context: Context, params) => {
     console.log('Run: useUserShipping.updateAddress');
     try {
@@ -77,7 +74,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load: async (context: Context, params) => {
     console.log('Run: useUserShipping.load');
     try {

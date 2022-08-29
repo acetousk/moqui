@@ -9,10 +9,23 @@ export default async function loadUser(context: Context, params: UserLoadParams)
 
   console.log(`api-client/loadUser => ${url.href}`);
   // Use axios to send a GET request
-  const { data, headers } = await context.client.get<UserLoadResponse>(url.href, {
+  const { data, headers, status } = await context.client.get<UserLoadResponse>(url.href, {
     headers: getHeaders(context)
   });
 
+  console.log('context/getCustomerLoggedIn');
+  console.log(context.config.state.getCustomerLoggedIn());
+  // console.log(context.config.app.$cookies)
+  // console.log('context.config.state.setCustomerLoggedIn');
+  // console.log(context.config.state.setCustomerLoggedIn);
+  if (status === 200) {
+    // context.app.$cookies.set('vsf-auth', true);
+    context.config.state.setCustomerLoggedIn(true);
+  } else {
+    context.config.state.setCustomerLoggedIn(false);
+
+    // context.app.$cookies.set('vsf-auth', false);
+  }
   // Return data from the API
   return {
     data, headers
