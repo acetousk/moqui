@@ -1,9 +1,6 @@
 <template>
   <div id="product">
-    <SfBreadcrumbs
-      class="breadcrumbs desktop-only"
-      :breadcrumbs="breadcrumbs"
-    />
+    <SfBreadcrumbs class="breadcrumbs desktop-only" :breadcrumbs="breadcrumbs" />
     <div class="product">
       <LazyHydrate when-idle>
         <SfGallery :images="productGallery" class="product__gallery" />
@@ -11,132 +8,85 @@
 
       <div class="product__info">
         <div class="product__header">
-          <SfHeading
-            :title="productGetters.getName(product)"
-            :level="3"
-            class="sf-heading--no-underline sf-heading--left"
-          />
-          <SfIcon
-            icon="drag"
-            size="xxl"
-            color="var(--c-text-disabled)"
-            class="product__drag-icon smartphone-only"
-          />
+          <SfHeading :title="productGetters.getName(product, productVariant)" :level="3"
+            class="sf-heading--no-underline sf-heading--left" />
+          <SfIcon icon="drag" size="xxl" color="var(--c-text-disabled)" class="product__drag-icon smartphone-only" />
         </div>
         <div class="product__price-and-rating">
-          <SfPrice
-            :regular="$n(productGetters.getPrice(product).regular, 'currency')"
-            :special="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
-          />
+          <SfPrice :regular="$n(productGetters.getPrice(product).regular, 'currency')" :special="
+            productGetters.getPrice(product, productVariant).special &&
+            $n(productGetters.getPrice(product, productVariant).special, 'currency')
+          " />
           <div>
             <div class="product__rating">
-              <SfRating
-                :score="averageRating"
-                :max="5"
-              />
+              <SfRating :score="averageRating" :max="5" />
               <a v-if="!!totalReviews" href="#" class="product__count">
-                ({{ totalReviews }})
+                ({{  totalReviews  }})
               </a>
             </div>
-            <SfButton class="sf-button--text">{{ $t('Read all reviews') }}</SfButton>
+            <SfButton class="sf-button--text" @click="scrollToReviews">{{
+               $t('Read all reviews')
+              }}</SfButton>
           </div>
         </div>
         <div>
           <p class="product__description desktop-only">
-            {{ description }}
+            {{  productGetters.getShortDescription(product, productVariant)  }}
           </p>
-          <SfButton class="sf-button--text desktop-only product__guide">
+          <!-- <SfButton class="sf-button--text desktop-only product__guide">
             {{ $t('Size guide') }}
-          </SfButton>
-          <SfSelect
-            v-e2e="'size-select'"
-            v-if="options.size"
-            :value="configuration.size"
-            @input="size => updateFilter({ size })"
-            label="Size"
-            class="sf-select--underlined product__select-size"
-            :required="true"
-          >
-            <SfSelectOption
-              v-for="size in options.size"
-              :key="size.value"
-              :value="size.value"
-            >
-              {{size.label}}
+          </SfButton> -->
+          <SfSelect v-e2e="'size-select'" v-if="options.PftSize" :value="configuration.PftSize"
+            @input="(size) => updateFilter({ PftSize: size })" label="Size"
+            class="sf-select--underlined product__select-size" :required="true">
+            <SfSelectOption v-for="size in options.PftSize" :key="size.value" :value="size.value">
+              {{  size.label  }}
             </SfSelectOption>
           </SfSelect>
-          <div v-if="options.color && options.color.length > 1" class="product__colors desktop-only">
-            <p class="product__color-label">{{ $t('Color') }}:</p>
-            <SfColor
-              v-for="(color, i) in options.color"
-              :key="i"
-              :color="color.value"
-              class="product__color"
-              @click="updateFilter({ color: color.value })"
-            />
+          <div v-if="options.PftColor && options.PftColor.length > 1" class="product__colors desktop-only">
+            <p class="product__color-label">{{  $t('Color')  }}:</p>
+            <SfColor v-for="(color, i) in options.PftColor" :key="i" :color="color.name" class="product__color"
+              @click="updateFilter({ PftColor: color.value })" :selected="configuration.PftColor === color.value" />
           </div>
-          <SfAddToCart
-            v-e2e="'product_add-to-cart'"
-            :stock="stock"
-            v-model="qty"
-            :disabled="loading"
-            :canAddToCart="stock > 0"
-            class="product__add-to-cart"
-            @click="addItem({ product, quantity: parseInt(qty) })"
-          />
+          {{  productVariant  }}
+          <SfAddToCart v-e2e="'product_add-to-cart'" :stock="stock" v-model="qty" :disabled="loading"
+            :canAddToCart="stock > 0" class="product__add-to-cart"
+            @click="addItem({ product: { productId: productVariant ? productVariant.productId : product.productId }, quantity: parseInt(qty) })" />
         </div>
 
         <LazyHydrate when-idle>
-          <SfTabs :open-tab="1" class="product__tabs">
+          <SfTabs id="ProductTabs" :open-tab="currentTab" class="product__tabs">
             <SfTab title="Description">
               <div class="product__description">
-                  {{ $t('Product description') }}
+                {{  productGetters.getDescription(product, productVariant)  }}
               </div>
-              <SfProperty
-                v-for="(property, i) in properties"
-                :key="i"
-                :name="property.name"
-                :value="property.value"
-                class="product__property"
-              >
-                <template v-if="property.name === 'Category'" #value>
+              <SfProperty v-for="(stdAttribute, i) in standardAttributes" :key="i" :name="stdAttribute.name"
+                :value="stdAttribute.value" class="product__property">
+                <template v-if="stdAttribute.name === 'Category'" #value>
                   <SfButton class="product__property__button sf-button--text">
-                    {{ property.value }}
+                    {{  stdAttribute.value  }}
                   </SfButton>
                 </template>
               </SfProperty>
             </SfTab>
             <SfTab title="Read reviews">
-              <SfReview
-                v-for="review in reviews"
-                :key="reviewGetters.getReviewId(review)"
-                :author="reviewGetters.getReviewAuthor(review)"
-                :date="reviewGetters.getReviewDate(review)"
-                :message="reviewGetters.getReviewMessage(review)"
-                :max-rating="5"
-                :rating="reviewGetters.getReviewRating(review)"
-                :char-limit="250"
-                read-more-text="Read more"
-                hide-full-text="Read less"
-                class="product__review"
-              />
+              <ProductReview :product="product" />
             </SfTab>
-            <SfTab
-              title="Additional Information"
-              class="product__additional-info"
-            >
-            <div class="product__additional-info">
-              <p class="product__additional-info__title">{{ $t('Brand') }}</p>
-              <p>{{ brand }}</p>
-              <p class="product__additional-info__title">{{ $t('Instruction1') }}</p>
-              <p class="product__additional-info__paragraph">
-                {{ $t('Instruction2') }}
-              </p>
-              <p class="product__additional-info__paragraph">
-                {{ $t('Instruction3') }}
-              </p>
-              <p>{{ careInstructions }}</p>
-            </div>
+            <SfTab title="Additional Information" class="product__additional-info">
+              <div class="product__additional-info">
+                <p class="product__additional-info__title">{{  $t('Brand')  }}</p>
+                <p>{{  brand  }}</p>
+                <p class="product__additional-info__title">
+                  {{  $t('Instruction1')  }}
+                </p>
+                <p class="product__additional-info__paragraph">
+                  {{  $t('Instruction2')  }}
+                </p>
+                <p class="product__additional-info__paragraph">
+                  {{  $t('Instruction3')  }}
+                </p>
+                <p>{{  careInstructions  }}</p>
+              </div>
             </SfTab>
           </SfTabs>
         </LazyHydrate>
@@ -144,17 +94,12 @@
     </div>
 
     <LazyHydrate when-visible>
-      <RelatedProducts
-        :products="relatedProducts"
-        :loading="relatedLoading"
-        title="Match it with"
-      />
+      <RelatedProducts :products="relatedProducts" :loading="relatedLoading" :title="$t('You might also like')" />
     </LazyHydrate>
 
-    <LazyHydrate when-visible>
+    <!-- <LazyHydrate when-visible>
       <InstagramFeed />
-    </LazyHydrate>
-
+    </LazyHydrate> -->
   </div>
 </template>
 <script>
@@ -172,16 +117,19 @@ import {
   SfBanner,
   SfAlert,
   SfSticky,
-  SfReview,
   SfBreadcrumbs,
   SfButton,
   SfColor
 } from '@storefront-ui/vue';
 
-import InstagramFeed from '~/components/InstagramFeed.vue';
 import RelatedProducts from '~/components/RelatedProducts.vue';
+import ProductReview from '~/components/ProductReview.vue';
 import { ref, computed, useRoute, useRouter } from '@nuxtjs/composition-api';
-import { useProduct, useCart, productGetters, useReview, reviewGetters } from '@vue-storefront/moqui';
+import {
+  useProduct,
+  useCart,
+  productGetters
+} from '@vue-storefront/moqui';
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
 import { addBasePath } from '@vue-storefront/core';
@@ -189,63 +137,129 @@ import { addBasePath } from '@vue-storefront/core';
 export default {
   name: 'Product',
   transition: 'fade',
-  setup() {
+  setup(_props, context) {
     const qty = ref(1);
+    const currentTab = ref(1);
     const route = useRoute();
     const router = useRouter();
     const { products, search } = useProduct('products');
-    const { products: relatedProducts, search: searchRelatedProducts, loading: relatedLoading } = useProduct('relatedProducts');
+    const {
+      products: relatedProducts,
+      search: searchRelatedProducts,
+      loading: relatedLoading
+    } = useProduct('relatedProducts');
     const { addItem, loading } = useCart();
-    const { reviews: productReviews, search: searchReviews } = useReview('productReviews');
 
+    // route pattern: /p/:id/:slug/
+    // see: https://docs.vuestorefront.io/v2/getting-started/layouts-and-routing.html
+    // naming is not optimal, but let's assume id=VirtualProduct and slug=ProductVariant
     const id = computed(() => route.value.params.id);
-    const product = computed(() => productGetters.getFiltered(products.value, { master: true, attributes: route.value.query })[0]);
-    const options = computed(() => productGetters.getAttributes(products.value, ['color', 'size']));
-    const configuration = computed(() => productGetters.getAttributes(product.value, ['color', 'size']));
-    const categories = computed(() => productGetters.getCategoryIds(product.value));
-    const reviews = computed(() => reviewGetters.getItems(productReviews.value));
+    const slug = computed(() => route.value.params.slug);
+
+    const options = computed(() =>
+      productGetters.getAttributes(products.value, ['PftColor', 'PftSize'], route.value.query)
+    );
+    const standardAttributes = computed(() =>
+      productGetters.getStandardAttributes(products.value)
+    );
+
+    const breadcrumbs = computed(() =>
+      [{
+        text: 'Home',
+        link: '/'
+      }, ...productGetters.getBreadCrumbs(products.value)]
+    );
+
+    const configuration = computed(() =>
+      productGetters.getSelectedAttributes(products.value, slug.value, route.value.query)
+    );
+
+    const product = computed(
+      () =>
+        productGetters.getFilteredVariants(products.value, {
+          master: true,
+          attributes: configuration.value
+        })
+    );
+
+    const productVariant = computed(
+      () =>
+        productGetters.getProductVariantFromUrlSlug(products.value, slug.value)
+    );
+
+    const categories = computed(() =>
+      productGetters.getCategoryIds(product.value)
+    );
 
     // TODO: Breadcrumbs are temporary disabled because productGetters return undefined. We have a mocks in data
     // const breadcrumbs = computed(() => productGetters.getBreadcrumbs ? productGetters.getBreadcrumbs(product.value) : props.fallbackBreadcrumbs);
-    const productGallery = computed(() => productGetters.getGallery(product.value).map(img => ({
-      mobile: { url: addBasePath(img.small) },
-      desktop: { url: addBasePath(img.normal) },
-      big: { url: addBasePath(img.big) },
-      alt: product.value._name || product.value.name
-    })));
+    const productGallery = computed(() =>
+      productGetters.getGallery(product.value).map((img) => ({
+        mobile: { url: addBasePath(img.small) },
+        desktop: { url: addBasePath(img.normal) },
+        big: { url: addBasePath(img.big) },
+        alt: product.value._name || productGetters.getName(product.value)
+      }))
+    );
 
     onSSR(async () => {
-      await search({ id: id.value });
-      await searchRelatedProducts({ catId: [categories.value[0]], limit: 8 });
-      await searchReviews({ productId: id.value });
+      await search({ productId: id.value, variantId: slug.value, type: 'single' });
+      await searchRelatedProducts({
+        catId: [categories.value[0]],
+        productSlug: slug.value,
+        limit: 8,
+        type: 'related'
+      });
     });
 
     const updateFilter = (filter) => {
-      router.push({
-        path: route.value.path,
-        query: {
-          ...configuration.value,
-          ...filter
-        }
-      });
+      const matchedVariant = productGetters.getProductVariantFromFilters(products.value, slug.value, filter);
+      // If we match a variant, change the slug, which represents the slug of product variant – see note above
+      if (matchedVariant) {
+        router.push({
+          path: route.value.path.substring(0, route.value.path.lastIndexOf('/')) + '/' + matchedVariant
+        });
+      } else {
+        // Otherwise, set the filter as an intermediate attribute in the query params
+        router.push({
+          path: route.value.path,
+          query: {
+            ...filter
+          }
+        });
+      }
+    };
+
+    const scrollToReviews = () => {
+      currentTab.value = 2;
+      context.root.$scrollTo('#ProductTabs', 2000);
     };
 
     return {
+      currentTab,
       updateFilter,
       configuration,
       product,
-      reviews,
-      reviewGetters,
-      averageRating: computed(() => productGetters.getAverageRating(product.value)),
-      totalReviews: computed(() => productGetters.getTotalReviews(product.value)),
-      relatedProducts: computed(() => productGetters.getFiltered(relatedProducts.value, { master: true })),
+      breadcrumbs,
+      productVariant,
+      standardAttributes,
+      averageRating: computed(() =>
+        productGetters.getAverageRating(product.value)
+      ),
+      totalReviews: computed(() =>
+        productGetters.getTotalReviews(product.value)
+      ),
+      relatedProducts: computed(() =>
+        productGetters.getFiltered(relatedProducts.value, { master: true })
+      ),
       relatedLoading,
       options,
       qty,
       addItem,
       loading,
       productGetters,
-      productGallery
+      productGallery,
+      scrollToReviews
     };
   },
   components: {
@@ -263,11 +277,11 @@ export default {
     SfImage,
     SfBanner,
     SfSticky,
-    SfReview,
     SfBreadcrumbs,
     SfButton,
-    InstagramFeed,
+    // InstagramFeed,
     RelatedProducts,
+    ProductReview,
     LazyHydrate
   },
   data() {
@@ -291,31 +305,12 @@ export default {
           value: 'Germany'
         }
       ],
-      description: 'Find stunning women cocktail and party dresses. Stand out in lace and metallic cocktail dresses and party dresses from all your favorite brands.',
+      description:
+        'Find stunning women cocktail and party dresses. Stand out in lace and metallic cocktail dresses and party dresses from all your favorite brands.',
       detailsIsActive: false,
       brand:
-          'Brand name is the perfect pairing of quality and design. This label creates major everyday vibes with its collection of modern brooches, silver and gold jewellery, or clips it back with hair accessories in geo styles.',
-      careInstructions: 'Do not wash!',
-      breadcrumbs: [
-        {
-          text: 'Home',
-          route: {
-            link: '#'
-          }
-        },
-        {
-          text: 'Category',
-          route: {
-            link: '#'
-          }
-        },
-        {
-          text: 'Pants',
-          route: {
-            link: '#'
-          }
-        }
-      ]
+        'Brand name is the perfect pairing of quality and design. This label creates major everyday vibes with its collection of modern brooches, silver and gold jewellery, or clips it back with hair accessories in geo styles.',
+      careInstructions: 'Do not wash!'
     };
   }
 };
@@ -324,22 +319,27 @@ export default {
 <style lang="scss" scoped>
 #product {
   box-sizing: border-box;
+
   @include for-desktop {
     max-width: 1272px;
     margin: 0 auto;
   }
 }
+
 .product {
   @include for-desktop {
     display: flex;
   }
+
   &__info {
     margin: var(--spacer-sm) auto;
+
     @include for-desktop {
       max-width: 32.625rem;
       margin: 0 0 0 7.5rem;
     }
   }
+
   &__header {
     --heading-title-color: var(--c-link);
     --heading-title-font-weight: var(--font-weight--bold);
@@ -347,143 +347,166 @@ export default {
     margin: 0 var(--spacer-sm);
     display: flex;
     justify-content: space-between;
+
     @include for-desktop {
       --heading-title-font-weight: var(--font-weight--semibold);
       margin: 0 auto;
     }
   }
+
   &__drag-icon {
     animation: moveicon 1s ease-in-out infinite;
   }
+
   &__price-and-rating {
     margin: 0 var(--spacer-sm) var(--spacer-base);
     align-items: center;
+
     @include for-desktop {
       display: flex;
       justify-content: space-between;
       margin: var(--spacer-sm) 0 var(--spacer-lg) 0;
     }
   }
+
   &__rating {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     margin: var(--spacer-xs) 0 var(--spacer-xs);
   }
+
   &__count {
-    @include font(
-      --count-font,
+    @include font(--count-font,
       var(--font-weight--normal),
       var(--font-size--sm),
       1.4,
-      var(--font-family--secondary)
-    );
+      var(--font-family--secondary));
     color: var(--c-text);
     text-decoration: none;
     margin: 0 0 0 var(--spacer-xs);
   }
+
   &__description {
-    @include font(
-      --product-description-font,
+    @include font(--product-description-font,
       var(--font-weight--light),
       var(--font-size--base),
       1.6,
-      var(--font-family--primary)
-    );
+      var(--font-family--primary));
   }
+
   &__select-size {
     margin: 0 var(--spacer-sm);
+
     @include for-desktop {
       margin: 0;
     }
   }
+
   &__colors {
-    @include font(
-      --product-color-font,
+    @include font(--product-color-font,
       var(--font-weight--normal),
       var(--font-size--lg),
       1.6,
-      var(--font-family--secondary)
-    );
+      var(--font-family--secondary));
     display: flex;
     align-items: center;
     margin-top: var(--spacer-xl);
   }
+
   &__color-label {
     margin: 0 var(--spacer-lg) 0 0;
   }
+
   &__color {
     margin: 0 var(--spacer-2xs);
+    border: 1px solid black;
   }
+
   &__add-to-cart {
     margin: var(--spacer-base) var(--spacer-sm) 0;
+
     @include for-desktop {
       margin-top: var(--spacer-2xl);
     }
   }
+
   &__guide,
   &__compare,
   &__save {
     display: block;
     margin: var(--spacer-xl) 0 var(--spacer-base) auto;
   }
+
   &__compare {
     margin-top: 0;
   }
+
   &__tabs {
     --tabs-title-z-index: 0;
     margin: var(--spacer-lg) auto var(--spacer-2xl);
     --tabs-title-font-size: var(--font-size--lg);
+
     @include for-desktop {
       margin-top: var(--spacer-2xl);
     }
   }
+
   &__property {
     margin: var(--spacer-base) 0;
+
     &__button {
       --button-font-size: var(--font-size--base);
     }
   }
+
   &__review {
     padding-bottom: 24px;
     border-bottom: var(--c-light) solid 1px;
     margin-bottom: var(--spacer-base);
   }
+
   &__additional-info {
     color: var(--c-link);
-    @include font(
-      --additional-info-font,
+    @include font(--additional-info-font,
       var(--font-weight--light),
       var(--font-size--sm),
       1.6,
-      var(--font-family--primary)
-    );
+      var(--font-family--primary));
+
     &__title {
       font-weight: var(--font-weight--normal);
       font-size: var(--font-size--base);
       margin: 0 0 var(--spacer-sm);
+
       &:not(:first-child) {
         margin-top: 3.5rem;
       }
     }
+
     &__paragraph {
       margin: 0;
     }
   }
+
   &__gallery {
     flex: 1;
   }
 }
+
 .breadcrumbs {
   margin: var(--spacer-base) auto var(--spacer-lg);
 }
+
 @keyframes moveicon {
   0% {
     transform: translate3d(0, 0, 0);
   }
+
   50% {
     transform: translate3d(0, 30%, 0);
   }
+
   100% {
     transform: translate3d(0, 0, 0);
   }

@@ -9,14 +9,36 @@ import type {
 } from '../types';
 
 const params: UseProductFactoryParams<Product, SearchParams> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   productsSearch: async (context: Context, params) => {
-    // const data = await context.$moqui.api.getProduct(params);
+    console.log('Run: useProduct.productsSearch');
+    console.log('params');
+    console.log(params);
+    try {
+      if (params.type === 'single') {
+        const response = await context.$moqui.api.getProduct({
+          productSlug: params.productId,
+          variantSlug: params.variantId
+        });
+        return response;
 
-    // return data;
-    console.log('Mocked: useProduct.productsSearch');
-
-    return {};
+      } else if (params.type === 'featured') {
+        const response = await context.$moqui.api.getFeaturedProducts({
+          pageSize: 10
+        });
+        return response.productList;
+      } else if (params.type === 'related') {
+        const response = await context.$moqui.api.getRelatedProducts({
+          // categorySlug: params.categorySlug,
+          productSlug: params.productSlug
+        });
+        return response.productList;
+      } else return [];
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 
