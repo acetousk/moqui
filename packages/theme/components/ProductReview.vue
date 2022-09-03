@@ -47,8 +47,7 @@ import {
   SfButton
 } from '@storefront-ui/vue';
 import { reviewGetters, productGetters, useReview, useUser } from '@vue-storefront/moqui';
-import { computed } from '@vue/composition-api';
-import { onSSR } from '@vue-storefront/core';
+import { computed, onMounted } from '@vue/composition-api';
 import ReviewForm from '~/components/ReviewForm.vue';
 import BasicPagination from '~/components/Shared/BasicPagination.vue';
 import { useUiState } from '~/composables';
@@ -67,12 +66,13 @@ export default {
     BasicPagination
   },
   props: {
-    product: Object
+    productId: String
   },
   setup(props) {
     const { reviews: productReviews, loading, search, addReview, error } =
-      useReview('productReviews');
+      useReview(props.productId);
     const addReviewError = computed(() => error.value.addReview);
+    const productId = computed(() => props.productId);
 
     const { isAuthenticated } = useUser();
     const { isAddReviewModalOpen, toggleAddReviewModalOpen } = useUiState();
@@ -81,17 +81,17 @@ export default {
     );
     const pagination = computed(() => reviewGetters.getPagination(productReviews.value));
 
-    onSSR(async () => {
-      await search({ productId: productGetters.getId(props.product), pageSize: 2 });
+    onMounted(async () => {
+      await search({ productId: productId.value, pageSize: 2 });
     });
 
     const handleGetReview = async (pageNumber: number) => {
-      await search({ productId: productGetters.getId(props.product), pageIndex: pageNumber, pageSize: 2 });
+      await search({ productId: productId.value, pageIndex: pageNumber, pageSize: 2 });
     };
 
     const handleAddReview = async ({ form, onComplete, onError }) => {
       await addReview({
-        productId: productGetters.getId(props.product),
+        productId: productId.value,
         review: form.productReview,
         rating: form.rating
       });
