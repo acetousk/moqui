@@ -7,7 +7,8 @@ const state = reactive({
   isNewsletterModalOpen: false,
   isCategoryGridView: true,
   isFilterSidebarOpen: false,
-  isMobileMenuOpen: false
+  isMobileMenuOpen: false,
+  isAddReviewModalOpen: false
 });
 
 const useUiState = () => {
@@ -52,6 +53,11 @@ const useUiState = () => {
     state.isFilterSidebarOpen = !state.isFilterSidebarOpen;
   };
 
+  const isAddReviewModalOpen = computed(() => state.isAddReviewModalOpen);
+  const toggleAddReviewModalOpen = () => {
+    state.isAddReviewModalOpen = !state.isAddReviewModalOpen;
+  };
+
   return {
     isCartSidebarOpen,
     isWishlistSidebarOpen,
@@ -60,6 +66,7 @@ const useUiState = () => {
     isCategoryGridView,
     isFilterSidebarOpen,
     isMobileMenuOpen,
+    isAddReviewModalOpen,
     toggleCartSidebar,
     toggleWishlistSidebar,
     toggleLoginModal,
@@ -67,7 +74,8 @@ const useUiState = () => {
     changeToCategoryGridView,
     changeToCategoryListView,
     toggleFilterSidebar,
-    toggleMobileMenu
+    toggleMobileMenu,
+    toggleAddReviewModalOpen
   };
 };
 
