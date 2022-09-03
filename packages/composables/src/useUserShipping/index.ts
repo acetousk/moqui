@@ -10,7 +10,6 @@ import type {
 
 const params: UseUserShippingFactoryParams<Address, AddressItem> = {
   addAddress: async (context: Context, params) => {
-    console.log('Run: useUserShipping.addAddress');
     try {
       const response = await context.$moqui.api.createCustomerAddress({
         alias: params.address.alias,
@@ -35,7 +34,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
   },
 
   deleteAddress: async (context: Context, params) => {
-    console.log('Run: useUserShipping.deleteAddress');
     try {
       const response = await context.$moqui.api.deleteCustomerAddress({
         addressId: params.address.addressId
@@ -50,7 +48,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
   },
 
   updateAddress: async (context: Context, params) => {
-    console.log('Run: useUserShipping.updateAddress');
     try {
       const response = await context.$moqui.api.updateCustomerAddress({
         addressId: params.address.addressId,
@@ -75,7 +72,6 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
   },
 
   load: async (context: Context, params) => {
-    console.log('Run: useUserShipping.load');
     try {
       const response = await context.$moqui.api.getCustomerAddresses(params);
       return response.postalAddressList;
@@ -87,7 +83,7 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
     }
   },
 
-  // @ts-expect-error IMPL
+  // @ts-expect-error Not Implemented
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setDefaultAddress: async (context: Context, params) => {
     console.log('Mocked: useUserShipping.setDefaultAddress');

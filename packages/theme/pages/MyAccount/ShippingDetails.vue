@@ -5,11 +5,8 @@
         <p class="message">
           {{ $t('Contact details updated') }}
         </p>
-
-        <ShippingAddressForm :address="activeAddress" :isNew="isNewAddress" @cancel="
-  editingAddress = false;
-activeAddress = null;
-        " @submit="saveAddress" />
+        <ShippingAddressForm :address="activeAddress" :isNew="isNewAddress" @cancel="cancelEditAddress"
+          @submit="saveAddress" />
       </SfTab>
     </SfTabs>
 
@@ -117,6 +114,11 @@ export default {
       }
     };
 
+    const cancelEditAddress = () => {
+      editingAddress.value = false;
+      activeAddress.value = null;
+    };
+
     const saveAddress = async ({ form, onComplete, onError }) => {
       const actionMethod = isNewAddress.value ? addAddress : updateAddress;
       const actionError = isNewAddress.value
@@ -154,6 +156,7 @@ export default {
       updateAddress,
       removeAddress,
       saveAddress,
+      cancelEditAddress,
       userShippingGetters,
       addresses,
       editingAddress,
