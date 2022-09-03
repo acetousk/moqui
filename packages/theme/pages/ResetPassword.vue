@@ -6,50 +6,21 @@
     <div v-if="!isPasswordChanged">
       <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
         <form class="form" @submit.prevent="handleSubmit(setNewPassword)">
-          <ValidationProvider
-            rules="required|password"
-            vid="password"
-            v-slot="{ errors }"
-          >
-            <SfInput
-              v-e2e="'reset-password-modal-password'"
-              v-model="form.password"
-              :valid="!errors[0]"
-              :errorMessage="errors[0]"
-              :label="$t('Password')"
-              name="password"
-              type="password"
-              class="form__element"
-            />
+          <ValidationProvider rules="required|password" vid="password" v-slot="{ errors }">
+            <SfInput v-e2e="'reset-password-modal-password'" v-model="form.password" :valid="!errors[0]"
+              :errorMessage="errors[0]" :label="$t('Password')" name="password" type="password" class="form__element" />
           </ValidationProvider>
-          <ValidationProvider
-            rules="required|password|confirmed:password"
-            v-slot="{ errors }"
-          >
-            <SfInput
-              v-e2e="'reset-password-modal-password-repeat'"
-              v-model="form.repeatPassword"
-              :valid="!errors[0]"
-              :errorMessage="errors[0]"
-              :label="$t('Repeat Password')"
-              name="repeat-password"
-              type="password"
-              class="form__element"
-            />
+          <ValidationProvider rules="required|password|confirmed:password" v-slot="{ errors }">
+            <SfInput v-e2e="'reset-password-modal-password-repeat'" v-model="form.repeatPassword" :valid="!errors[0]"
+              :errorMessage="errors[0]" :label="$t('Repeat Password')" name="repeat-password" type="password"
+              class="form__element" />
           </ValidationProvider>
           <div v-if="passwordMatchError || forgotPasswordError.setNew">
             {{ passwordMatchError || forgotPasswordError.setNew.message }}
           </div>
-          <SfButton
-            v-e2e="'reset-password-modal-submit'"
-            type="submit"
-            class="sf-button--full-width form__button"
-            :disabled="forgotPasswordLoading"
-          >
-            <SfLoader
-              :class="{ loader: forgotPasswordLoading }"
-              :loading="forgotPasswordLoading"
-            >
+          <SfButton v-e2e="'reset-password-modal-submit'" type="submit" class="sf-button--full-width form__button"
+            :disabled="forgotPasswordLoading">
+            <SfLoader :class="{ loader: forgotPasswordLoading }" :loading="forgotPasswordLoading">
               <div>{{ $t('Save Password') }}</div>
             </SfLoader>
           </SfButton>
@@ -140,9 +111,11 @@ export default {
       }
 
       await setNew({
-        email: route.value.query.email,
         tokenValue: route.value.query.token,
-        newPassword: form.value.password
+        newPassword: form.value.password,
+        customQuery: {
+          email: route.value.query.email
+        }
       });
     };
 
@@ -163,38 +136,46 @@ export default {
   --modal-index: 3;
   --overlay-z-index: 3;
 }
+
 .form {
   margin-top: var(--spacer-sm);
+
   &__element {
     margin: 0 0 var(--spacer-xl) 0;
   }
 }
+
 .action {
   display: flex;
   align-items: center;
   justify-content: center;
   margin: var(--spacer-xl) 0 var(--spacer-xl) 0;
-  font: var(--font-weight--light) var(--font-size--base) / 1.6
-    var(--font-family--secondary);
-  & > * {
+  font: var(--font-weight--light) var(--font-size--base) / 1.6 var(--font-family--secondary);
+
+  &>* {
     margin: 0 0 0 var(--spacer-xs);
   }
 }
+
 .action {
   margin: var(--spacer-xl) 0 var(--spacer-xl) 0;
 }
+
 .checkbox {
   margin-bottom: var(--spacer-2xl);
 }
+
 .bottom {
   text-align: center;
   margin-bottom: var(--spacer-lg);
   font-size: var(--h3-font-size);
   font-weight: var(--font-weight--semibold);
   font-family: var(--font-family--secondary);
+
   &__paragraph {
     color: var(--c-primary);
     margin: 0 0 var(--spacer-base) 0;
+
     @include for-desktop {
       margin: 0;
     }
