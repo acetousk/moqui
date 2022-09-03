@@ -10,16 +10,38 @@ import type {
 } from '../types';
 
 const params: UseReviewFactoryParams<Review, SearchParams, AddParams> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   searchReviews: async (context: Context, params) => {
-    console.log('Mocked: useReview.searchReviews');
-    return {};
+    try {
+      const response = await context.$moqui.api.getReviews({
+        productId: params.productId,
+        pageIndex: params.pageIndex,
+        pageSize: params.pageSize
+      });
+      return response;
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   addReview: async (context: Context, params) => {
-    console.log('Mocked: useReview.addReview');
-    return {};
+    try {
+      const response = await context.$moqui.api.addReview({
+        productId: params.productId,
+        productRating: params.rating,
+        productReview: params.review
+      });
+      return response;
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 
