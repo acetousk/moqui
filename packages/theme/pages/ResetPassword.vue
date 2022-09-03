@@ -1,85 +1,111 @@
 <template>
-  <SfModal
-    v-e2e="'login-modal'"
-    visible
-    class="modal"
-    :cross="false"
-  >
+  <SfModal v-e2e="'login-modal'" visible class="modal" :cross="false">
     <template #modal-bar>
-      <SfBar
-        class="sf-modal__bar"
-        :title="$t('Reset Password')"
-      />
+      <SfBar class="sf-modal__bar" :title="$t('Reset Password')" />
     </template>
-      <div v-if="!isPasswordChanged">
-        <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
-          <form class="form" @submit.prevent="handleSubmit(setNewPassword)">
-            <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput
-                v-e2e="'reset-password-modal-password'"
-                v-model="form.password"
-                :valid="!errors[0]"
-                :errorMessage="errors[0]"
-                :label="$t('Password')"
-                name="password"
-                type="password"
-                class="form__element"
-              />
-            </ValidationProvider>
-            <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput
-                v-e2e="'reset-password-modal-password-repeat'"
-                v-model="form.repeatPassword"
-                :valid="!errors[0]"
-                :errorMessage="errors[0]"
-                :label="$t('Repeat Password')"
-                name="repeat-password"
-                type="password"
-                class="form__element"
-              />
-            </ValidationProvider>
-            <div v-if="passwordMatchError || forgotPasswordError.setNew">
-              {{ passwordMatchError || forgotPasswordError.setNew.message }}
-            </div>
-            <SfButton
-              v-e2e="'reset-password-modal-submit'"
-              type="submit"
-              class="sf-button--full-width form__button"
-              :disabled="forgotPasswordLoading"
+    <div v-if="!isPasswordChanged">
+      <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
+        <form class="form" @submit.prevent="handleSubmit(setNewPassword)">
+          <ValidationProvider
+            rules="required|password"
+            vid="password"
+            v-slot="{ errors }"
+          >
+            <SfInput
+              v-e2e="'reset-password-modal-password'"
+              v-model="form.password"
+              :valid="!errors[0]"
+              :errorMessage="errors[0]"
+              :label="$t('Password')"
+              name="password"
+              type="password"
+              class="form__element"
+            />
+          </ValidationProvider>
+          <ValidationProvider
+            rules="required|password|confirmed:password"
+            v-slot="{ errors }"
+          >
+            <SfInput
+              v-e2e="'reset-password-modal-password-repeat'"
+              v-model="form.repeatPassword"
+              :valid="!errors[0]"
+              :errorMessage="errors[0]"
+              :label="$t('Repeat Password')"
+              name="repeat-password"
+              type="password"
+              class="form__element"
+            />
+          </ValidationProvider>
+          <div v-if="passwordMatchError || forgotPasswordError.setNew">
+            {{ passwordMatchError || forgotPasswordError.setNew.message }}
+          </div>
+          <SfButton
+            v-e2e="'reset-password-modal-submit'"
+            type="submit"
+            class="sf-button--full-width form__button"
+            :disabled="forgotPasswordLoading"
+          >
+            <SfLoader
+              :class="{ loader: forgotPasswordLoading }"
+              :loading="forgotPasswordLoading"
             >
-              <SfLoader :class="{ loader: forgotPasswordLoading }" :loading="forgotPasswordLoading">
-                <div>{{ $t('Save Password') }}</div>
-              </SfLoader>
-            </SfButton>
-          </form>
-        </ValidationObserver>
-      </div>
-      <div v-else>
-        <p>{{ $t('Password Changed') }}</p>
-        <SfButton class="sf-button--text" link="/">
-          {{ $t('Back to home') }}
-        </SfButton>
-      </div>
+              <div>{{ $t('Save Password') }}</div>
+            </SfLoader>
+          </SfButton>
+        </form>
+      </ValidationObserver>
+    </div>
+    <div v-else>
+      <p>{{ $t('Password Changed') }}</p>
+      <SfButton class="sf-button--text" link="/">
+        {{ $t('Back to home') }}
+      </SfButton>
+    </div>
   </SfModal>
 </template>
 <script>
-
-import { SfModal, SfButton, SfLoader, SfBar, SfInput } from '@storefront-ui/vue';
+import {
+  SfModal,
+  SfButton,
+  SfLoader,
+  SfBar,
+  SfInput
+} from '@storefront-ui/vue';
 import { ref, computed, useRoute } from '@nuxtjs/composition-api';
-import { useForgotPassword, forgotPasswordGetters } from '@vue-storefront/moqui';
+import {
+  useForgotPassword,
+  forgotPasswordGetters
+} from '@vue-storefront/moqui';
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required } from 'vee-validate/dist/rules';
+
+import { required, confirmed } from 'vee-validate/dist/rules';
 
 extend('required', {
   ...required,
   message: 'This field is required'
 });
 
+extend('confirmed', {
+  ...confirmed,
+  message: 'Passwords don\'t match'
+});
+
+extend('password', {
+  validate: (value) =>
+    String(value).length >= 8 &&
+    String(value).match(/[A-Za-z]/gi) &&
+    String(value).match(/[0-9]/gi) &&
+    String(value).match(/[#?!@$%^&*-]/gi),
+  message:
+    'Password must have at least 8 characters including one letter, a number and a special character'
+});
+
 export default {
   name: 'ResetPassword',
   layout: 'blank',
   middleware({ redirect, route }) {
-    if (!route.query.token) {
+    if (!route.query.token || !route.query.email) {
       return redirect('/');
     }
   },
@@ -94,10 +120,17 @@ export default {
   },
   setup() {
     const route = useRoute();
-    const { result, setNew, error: forgotPasswordError, loading: forgotPasswordLoading } = useForgotPassword();
+    const {
+      result,
+      setNew,
+      error: forgotPasswordError,
+      loading: forgotPasswordLoading
+    } = useForgotPassword();
     const passwordMatchError = ref(false);
     const form = ref({});
-    const isPasswordChanged = computed(() => forgotPasswordGetters.isPasswordChanged(result.value));
+    const isPasswordChanged = computed(() =>
+      forgotPasswordGetters.isPasswordChanged(result.value)
+    );
 
     const setNewPassword = async () => {
       passwordMatchError.value = false;
@@ -107,6 +140,7 @@ export default {
       }
 
       await setNew({
+        email: route.value.query.email,
         tokenValue: route.value.query.token,
         newPassword: form.value.password
       });
@@ -125,7 +159,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .modal {
   --modal-index: 3;
   --overlay-z-index: 3;
@@ -141,7 +174,8 @@ export default {
   align-items: center;
   justify-content: center;
   margin: var(--spacer-xl) 0 var(--spacer-xl) 0;
-  font: var(--font-weight--light) var(--font-size--base) / 1.6 var(--font-family--secondary);
+  font: var(--font-weight--light) var(--font-size--base) / 1.6
+    var(--font-family--secondary);
   & > * {
     margin: 0 0 0 var(--spacer-xs);
   }

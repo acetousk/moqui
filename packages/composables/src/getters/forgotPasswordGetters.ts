@@ -1,17 +1,16 @@
 import { ForgotPasswordGetters } from '@vue-storefront/core';
-import type { PasswordResetResult } from '@vue-storefront/moqui-api';
+import type { ResetPasswordResponse } from '@vue-storefront/moqui-api';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getResetPasswordToken(result: PasswordResetResult): string {
+function getResetPasswordToken(result: ResetPasswordResponse): string {
   return '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function isPasswordChanged(result: PasswordResetResult): boolean {
-  return true;
+function isPasswordChanged(result: ResetPasswordResponse): boolean {
+  return result?.updateSuccessful === true;
 }
 
-export const forgotPasswordGetters: ForgotPasswordGetters<PasswordResetResult> = {
+export const forgotPasswordGetters: ForgotPasswordGetters<ResetPasswordResponse> = {
   getResetPasswordToken,
   isPasswordChanged
 };
