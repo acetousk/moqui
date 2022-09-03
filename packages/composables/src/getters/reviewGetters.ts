@@ -1,44 +1,54 @@
-import { ReviewGetters, AgnosticRateCount } from '@vue-storefront/core';
+import { ReviewGetters, AgnosticRateCount, AgnosticPagination } from '@vue-storefront/core';
 import type { Review, ReviewItem } from '@vue-storefront/moqui-api';
+import formatDate from 'src/helpers/formatDate';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface ReviewGettersExt<REVIEW, REVIEW_ITEM> extends ReviewGetters<REVIEW, REVIEW_ITEM> {
+  [getterName: string]: (element: any, options?: any) => unknown;
+
+}
 function getItems(review: Review): ReviewItem[] {
-  return [];
+  return review?.reviewItems || [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewId(item: ReviewItem): string {
-  return '';
+  return item?.productReviewId || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewAuthor(item: ReviewItem): string {
-  return '';
+  return item?.postedByName || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewMessage(item: ReviewItem): string {
-  return '';
+  return item?.productReview || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewRating(item: ReviewItem): number {
-  return 0;
+  return item?.productRating || 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewDate(item: ReviewItem): string {
+  if (item?.postedTimestamp) {
+    return formatDate(item.postedTimestamp);
+  }
   return '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotalReviews(review: Review): number {
-  return 0;
+  return (review?.reviewListCount) || 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getAverageRating(review: Review): number {
-  return 0;
+  return review?.productRating || 0;
+
+}
+function getPagination(review: Review): AgnosticPagination {
+  return {
+    currentPage: (review?.reviewListPageIndex || 0) + 1,
+    totalPages: (review?.reviewListPageMaxIndex || 0) + 1,
+    totalItems: (review?.reviewListCount || 0),
+    itemsPerPage: (review?.reviewListPageSize || 0),
+    pageOptions: [5]
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,12 +56,11 @@ function getRatesCount(review: Review): AgnosticRateCount[] {
   return [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getReviewsPage(review: Review): number {
-  return 0;
+  return (review?.reviewListPageIndex || 0) + 1;
 }
 
-export const reviewGetters: ReviewGetters<Review, ReviewItem> = {
+export const reviewGetters: ReviewGettersExt<Review, ReviewItem> = {
   getItems,
   getReviewId,
   getReviewAuthor,
@@ -60,6 +69,7 @@ export const reviewGetters: ReviewGetters<Review, ReviewItem> = {
   getReviewDate,
   getTotalReviews,
   getAverageRating,
+  getPagination,
   getRatesCount,
   getReviewsPage
 };
