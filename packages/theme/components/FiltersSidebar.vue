@@ -32,7 +32,7 @@
             <SfFilter
               v-for="option in facet.options"
               :key="`${facet.id}-${option.value}`"
-              :label="option.id + `${option.count ? ` (${option.count})` : ''}`"
+              :label="option.value + `${option.count ? ` (${option.count})` : ''}`"
               :selected="isFilterSelected(facet, option)"
               class="filters__item"
               @change="() => selectFilter(facet, option)"
@@ -50,7 +50,7 @@
             <SfFilter
               v-for="option in facet.options"
               :key="`${facet.id}-${option.id}`"
-              :label="option.id"
+              :label="option.value"
               :selected="isFilterSelected(facet, option)"
               class="filters__item"
               @change="() => selectFilter(facet, option)"
@@ -60,20 +60,15 @@
       </SfAccordion>
       <template #content-bottom>
         <div class="filters__buttons">
-          <SfButton
-            class="sf-button--full-width"
-            @click="applyFilters"
-          >
+          <SfButton class="sf-button--full-width" @click="applyFilters">
             {{ $t('Done') }}
-          </SfButton
-          >
+          </SfButton>
           <SfButton
             class="sf-button--full-width filters__button-clear"
             @click="clearFilters"
           >
             {{ $t('Clear all') }}
-          </SfButton
-          >
+          </SfButton>
         </div>
       </template>
     </SfSidebar>
@@ -106,32 +101,39 @@ export default {
     SfHeading
   },
   setup(props, context) {
-    const { changeFilters, isFacetColor } = useUiHelpers();
+    const { changeFilters, isFacetColor, getFacetsFromURL } = useUiHelpers();
     const { toggleFilterSidebar, isFilterSidebarOpen } = useUiState();
     const { result } = useFacet();
 
-    const facets = computed(() => facetGetters.getGrouped(result.value, ['color', 'size']));
+    const facets = computed(() =>
+      facetGetters.getGrouped(result.value, getFacetsFromURL().filters)
+    );
     const selectedFilters = ref({});
 
     const setSelectedFilters = () => {
-      if (!facets.value.length || Object.keys(selectedFilters.value).length) return;
-      selectedFilters.value = facets.value.reduce((prev, curr) => ({
-        ...prev,
-        [curr.id]: curr.options
-          .filter(o => o.selected)
-          .map(o => o.id)
-      }), {});
+      if (!facets.value.length || Object.keys(selectedFilters.value).length)
+        return;
+      selectedFilters.value = facets.value.reduce(
+        (prev, curr) => ({
+          ...prev,
+          [curr.id]: curr.options.filter((o) => o.selected).map((o) => o.id)
+        }),
+        {}
+      );
     };
 
-    const isFilterSelected = (facet, option) => (selectedFilters.value[facet.id] || []).includes(option.id);
+    const isFilterSelected = (facet, option) =>
+      (selectedFilters.value[facet.id] || []).includes(option.id);
 
     const selectFilter = (facet, option) => {
       if (!selectedFilters.value[facet.id]) {
         Vue.set(selectedFilters.value, facet.id, []);
       }
 
-      if (selectedFilters.value[facet.id].find(f => f === option.id)) {
-        selectedFilters.value[facet.id] = selectedFilters.value[facet.id].filter(f => f !== option.id);
+      if (selectedFilters.value[facet.id].find((f) => f === option.id)) {
+        selectedFilters.value[facet.id] = selectedFilters.value[
+          facet.id
+        ].filter((f) => f !== option.id);
         return;
       }
 
