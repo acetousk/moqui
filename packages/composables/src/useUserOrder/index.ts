@@ -3,17 +3,27 @@ import {
   useUserOrderFactory,
   UseUserOrderFactoryParams
 } from '@vue-storefront/core';
-import type { Order } from '@vue-storefront/moqui-api';
+import type { CustomerOrders } from '@vue-storefront/moqui-api';
 import type {
   useUserOrderSearchParams as SearchParams
 } from '../types';
 
-const params: UseUserOrderFactoryParams<Order, SearchParams> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const params: UseUserOrderFactoryParams<CustomerOrders, SearchParams> = {
   searchOrders: async (context: Context, params) => {
-    console.log('Mocked: searchOrders');
-    return {};
+    try {
+      const response = await context.$moqui.api.getCustomerOrders({
+        page: params.page || 1,
+        itemsPerPage: params.itemsPerPage || 5
+      });
+      return response;
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 
-export const useUserOrder = useUserOrderFactory<Order, SearchParams>(params);
+export const useUserOrder = useUserOrderFactory<CustomerOrders, SearchParams>(params);
