@@ -4,21 +4,50 @@ import {
   UseShippingParams
 } from '@vue-storefront/core';
 import type { ShippingAddress } from '@vue-storefront/moqui-api';
+import { useCart } from 'src/useCart';
 import type {
   UseShippingAddParams as AddParams
 } from '../types';
 
 const params: UseShippingParams<ShippingAddress, AddParams> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  load: async (context: Context, { customQuery }) => {
-    console.log('Mocked: useShipping.load');
-    return {};
+  provide() {
+    return {
+      useCart: useCart()
+    };
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  load: async (context: Context, { customQuery }) => {
+    try {
+      if (!context.useCart.cart) {
+        await context.useCart.load(customQuery);
+      }
+      const shippingAddress = context.useCart?.cart?.value?.postalAddress || {};
+
+      return shippingAddress;
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
+  },
+
   save: async (context: Context, { shippingDetails, customQuery }) => {
-    console.log('Mocked: useShipping.save');
-    return {};
+    try {
+      if (!context.useCart.cart) {
+        await context.useCart.load(customQuery);
+      }
+      const response = await context.$moqui.api.setCartShippingAddress({
+        addressId: shippingDetails.addressId
+      });
+      return response;
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 
