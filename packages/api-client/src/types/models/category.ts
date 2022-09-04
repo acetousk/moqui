@@ -5,9 +5,10 @@ type CategoryTranslatableFields = {
     description: string;
 }
 export type Category = CategoryTranslatableFields & {
-    productStoreId: string;
-    productCategoryId: string;
+    categoryId: string;
     slug: string;
+    categoryName: string;
+    description?: string;
     sequenceNum: string | null;
     translations?: {
         [TKey in keyof CategoryTranslatableFields]?: Translation[];

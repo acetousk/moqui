@@ -2,12 +2,14 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./lib",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "rootDir": "./src",
     "baseUrl": "./",
     "lib": [
       "DOM"
-    ]
+    ],
+    "types": ["@nuxt/types", "@nuxt/image"]
   },
   "include": [
     "src/**/*"

@@ -12,7 +12,6 @@ import type {
 const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
 
   load: async (context: Context) => {
-    console.log('###Run: useUser.load');
     try {
       const response = await context.$moqui.api.loadUser();
       return response;
@@ -27,7 +26,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   },
 
   logOut: async (context: Context /* , { currentUser } */) => {
-    console.log('###Run: useUser.logOut');
     try {
       context.$moqui.config.app.$cookies.remove('vsf-auth');
       await context.$moqui.api.logoutUser();
@@ -40,7 +38,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   },
 
   updateUser: async (context: Context, { /* currentUser, */ updatedUserData }) => {
-    console.log('###Run: useUser.updateUser');
     try {
       const response = await context.$moqui.api.updateUser({
         ...updatedUserData
@@ -56,7 +53,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   },
 
   register: async (context: Context, { email, password, firstName, lastName }) => {
-    console.log('###Run: useUser.register');
     try {
       const response = await context.$moqui.api.registerUser({
         emailAddress: email,
@@ -76,7 +72,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   },
 
   logIn: async (context: Context, { username, password }) => {
-    console.log('###Run: useUser.logIn');
     try {
       const response = await context.$moqui.api.loginUser({
         username,
@@ -100,7 +95,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   },
 
   changePassword: async (context: Context, { currentUser, currentPassword, newPassword }) => {
-    console.log('Run: useUser.changePassword');
     try {
       const response = await context.$moqui.api.changePassword({
         username: currentUser.emailAddress,
