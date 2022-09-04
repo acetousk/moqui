@@ -21,7 +21,7 @@
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
-        <ValidationProvider v-slot="{ errors }" rules="required|min:2" class="form__element">
+        <ValidationProvider v-slot="{ errors }" rules="required|password" class="form__element">
           <SfInput v-model="newPassword" type="password" name="newPassword" label="Password" required
             class="form__element" />
         </ValidationProvider>
@@ -35,7 +35,8 @@
 
 <script>
 import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver } from 'vee-validate';
+import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
+import { required, min, email, confirmed } from 'vee-validate/dist/rules';
 import {
   SfInput,
   SfAlert,
@@ -45,6 +46,37 @@ import {
   SfProductOption
 } from '@storefront-ui/vue';
 import { useUiNotification } from '~/composables';
+
+extend('email', {
+  ...email,
+  message: 'Invalid email'
+});
+
+extend('required', {
+  ...required,
+  message: 'This field is required'
+});
+
+extend('min', {
+  ...min,
+  message: 'The field should have at least {length} characters'
+});
+
+extend('password', {
+  validate: value => String(value).length >= 8,
+  message: 'Password must have at least 8 characters'
+});
+
+extend('confirmed', {
+  ...confirmed,
+  message: 'Passwords don\'t match'
+});
+
+extend('nothavenumber', {
+  validate: value => String(value).match(/^([^0-9]*)$/),
+  message: 'Bad format - Cannot contain a number'
+});
+
 export default defineComponent({
   name: 'CreateAccountForm',
   components: {

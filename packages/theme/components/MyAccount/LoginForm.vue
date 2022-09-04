@@ -24,7 +24,8 @@
 
 <script>
 import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver } from 'vee-validate';
+import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
+import { required, email } from 'vee-validate/dist/rules';
 import {
   SfLoader,
   SfAlert,
@@ -35,6 +36,17 @@ import {
   SfProductOption
 } from '@storefront-ui/vue';
 import { useUiNotification } from '~/composables';
+
+extend('email', {
+  ...email,
+  message: 'Invalid email'
+});
+
+extend('required', {
+  ...required,
+  message: 'This field is required'
+});
+
 export default defineComponent({
   name: 'LoginForm',
   components: {
