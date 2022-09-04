@@ -14,8 +14,8 @@ const params: UseReviewFactoryParams<Review, SearchParams, AddParams> = {
     try {
       const response = await context.$moqui.api.getReviews({
         productId: params.productId,
-        pageIndex: params.pageIndex,
-        pageSize: params.pageSize
+        page: params.page,
+        itemsPerPage: params.itemsPerPage
       });
       return response;
 

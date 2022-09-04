@@ -10,8 +10,8 @@ export default async function getReviews(context: Context, params: ReviewsGetPar
   // Add parameters passed from composable as query strings to the URL
   url.searchParams.set('productId', params.productId);
   url.searchParams.set('productStoreId', context.config.defaultStoreId);
-  params.pageIndex && url.searchParams.set('pageIndex', String(params.pageIndex - 1));
-  params.pageSize && url.searchParams.set('pageSize', String(params.pageSize));
+  params.page && url.searchParams.set('pageIndex', String(params.page - 1));
+  params.itemsPerPage && url.searchParams.set('pageSize', String(params.itemsPerPage));
 
   // Use axios to send a GET request
   const { data, headers } = await context.client.get<ReviewsGetResponse>(url.href, {

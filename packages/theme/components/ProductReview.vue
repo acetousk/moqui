@@ -82,11 +82,11 @@ export default {
     const pagination = computed(() => reviewGetters.getPagination(productReviews.value));
 
     onMounted(async () => {
-      await search({ productId: productId.value, pageSize: 2 });
+      await search({ productId: productId.value, page: 1, itemsPerPage: 2 });
     });
 
     const handleGetReview = async (pageNumber: number) => {
-      await search({ productId: productId.value, pageIndex: pageNumber, pageSize: 2 });
+      await search({ productId: productId.value, page: pageNumber, itemsPerPage: 2 });
     };
 
     const handleAddReview = async ({ form, onComplete, onError }) => {
