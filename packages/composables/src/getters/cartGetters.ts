@@ -8,80 +8,106 @@ import {
 } from '@vue-storefront/core';
 import type { Cart, CartItem } from '@vue-storefront/moqui-api';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItems(cart: Cart): CartItem[] {
-  return [
-    {}
-  ];
+  return cart?.orderItemProductList || [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemName(item: CartItem): string {
-  return 'Name';
+  return item?.itemDescription || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemImage(item: CartItem): string {
-  return 'https://s3-eu-west-1.amazonaws.com/commercetools-maximilian/products/081223_1_large.jpg';
+  return item?.product?.coverImageUrl || '/product_placeholder.svg';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getItemPrice(item: CartItem): AgnosticPrice {
-  return {
-    regular: 12,
-    special: 10
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getItemQty(item: CartItem): number {
-  return 1;
+  return item?.quantity || 1;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getItemAttributes(item: CartItem, filterByAttributeName?: Array<string>): Record<string, AgnosticAttribute | string> {
+function getItemPrice(item: CartItem): AgnosticPrice {
+  // eslint-disable-next-line eqeqeq
+  const hasSpecial = ((item?.unitListPrice != null) && (item?.unitAmount != null) && (item.unitListPrice != item.unitAmount));
   return {
-    color: 'red'
+    regular: ((item?.unitListPrice || item?.unitAmount) * item?.quantity) || 0,
+    special: hasSpecial ? (item?.unitAmount * item?.quantity) : null
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getItemAttributes(item: CartItem /* , filterByAttributeName?: Array<string> */): Record<string, AgnosticAttribute | string> {
+  if (!item) return {};
+
+  const attributes = {};
+  const featureNames = Object.keys(item.variantFeatures);
+
+  if (featureNames?.length) {
+    featureNames.forEach(attrName => {
+      attributes[attrName] = item.variantFeatures[attrName];
+    });
+  }
+  return attributes;
+}
+
 function getItemSku(item: CartItem): string {
-  return '';
+  return item?.product?.virtual?.productSku || item?.product?.productSku || '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotals(cart: Cart): AgnosticTotals {
+  let regularSubTotal = 0;
+  let specialSubTotal = 0;
+  cart?.orderItemProductList?.forEach((productItem) => {
+    const itemPrice = getItemPrice(productItem);
+    regularSubTotal = regularSubTotal + itemPrice.regular;
+    specialSubTotal = specialSubTotal + (itemPrice.special || itemPrice.regular);
+  });
+
+  const total = cart?.orderHeader.grandTotal || cart?.orderPart.partTotal || 0;
+  const taxTotal = cart?.orderItemTaxList?.reduce((prev, cur) => prev + ((cur.quantity || 1) * (cur.unitAmount || 0)), 0) || 0;
+  const discountTotal = cart?.orderItemDiscountList?.reduce((prev, cur) => prev + ((cur.quantity || 1) * (cur.unitAmount || 0)), 0) || 0;
+  const shippingTotal = getShippingPrice(cart);
+
   return {
-    total: 12,
-    subtotal: 12,
-    special: 10
+    total: total,
+    // total - discountTotal - taxTotal,
+    subtotal: regularSubTotal,
+    special: specialSubTotal,
+    tax: taxTotal,
+    shipping: shippingTotal,
+    discounts: discountTotal
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getShippingPrice(cart: Cart): number {
-  return 0;
+  return cart?.orderItemShippingList?.reduce((prev, cur) => prev + ((cur.quantity || 1) * (cur.unitAmount || 0)), 0) || 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getTotalItems(cart: Cart): number {
-  return 1;
+  return cart?.orderItemProductList?.length || 0;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getFormattedPrice(price: number): string {
-  return '';
+  return (price || 0).toFixed(2);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCoupons(cart: Cart): AgnosticCoupon[] {
-  return [];
+  return cart?.orderPromoCodeDetailList?.map(promoCode => {
+    return {
+      id: promoCode.promoCodeId,
+      name: promoCode.itemDescription,
+      code: promoCode.promoCode,
+      value: 0
+    };
+  }) || [];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getDiscounts(cart: Cart): AgnosticDiscount[] {
-  return [];
+  return cart?.orderItemDiscountList?.map((discountItem, i) => {
+    return {
+      id: `dis-${i}`,
+      name: discountItem.itemDescription,
+      description: discountItem.itemDescription,
+      value: discountItem.quantity * discountItem.unitAmount
+    };
+  });
 }
 
 export const cartGetters: CartGetters<Cart, CartItem> = {
