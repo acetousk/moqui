@@ -55,8 +55,7 @@ import {
   SfLink,
   SfLoader
 } from '@storefront-ui/vue';
-import { computed, ref, watch, useRouter } from '@nuxtjs/composition-api';
-import { onSSR } from '@vue-storefront/core';
+import { computed, ref, watch, useRouter, onMounted } from '@nuxtjs/composition-api';
 import { userShippingGetters, useUserShipping, useShipping } from '@vue-storefront/moqui';
 import UserShippingAddress from '~/components/UserShippingAddress';
 import ShippingAddressForm from '~/components/MyAccount/ShippingAddressForm.vue';
@@ -96,7 +95,7 @@ export default {
       }
     }, { immediate: true });
 
-    onSSR(async () => {
+    onMounted(async () => {
       await load();
       await loadCartShipping();
     });
