@@ -2,16 +2,33 @@ import { useShippingProviderFactory, UseShippingProviderParams, Context } from '
 import type { ShippingProvider, ShippingMethod } from '@vue-storefront/moqui-api';
 
 const params: UseShippingProviderParams<ShippingProvider, ShippingMethod> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  load: async (context: Context, { customQuery }) => {
-    console.log('Mocked: loadShippingProvider');
-    return {};
+  load: async (context: Context /* , {  customQuery } */) => {
+    try {
+      const response = await context.$moqui.api.getShippingProvider();
+      return response?.shippingOptions || [];
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  save: async (context: Context, { shippingMethod, customQuery }) => {
-    console.log('Mocked: saveShippingProvider');
-    return {};
+  save: async (context: Context, { shippingMethod /* , customQuery  */ }) => {
+    try {
+      const response = await context.$moqui.api.saveShippingProvider({
+        carrierId: shippingMethod.carrierId,
+        shipmentMethodId: shippingMethod.shipmentMethodId
+      });
+      return response?.shippingOptions || [];
+
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 

@@ -1,354 +1,245 @@
 <template>
-  <ValidationObserver v-slot="{ handleSubmit }">
-    <SfHeading
-      v-e2e="'shipping-heading'"
-      :level="3"
-      :title="$t('Shipping')"
-      class="sf-heading--left sf-heading--no-underline title"
-    />
-    <form @submit.prevent="handleSubmit(handleFormSubmit)">
+  <div class="sf-shipping">
+    <SfHeading :title="$t('Shipping')" :level="2" class="sf-heading--left sf-heading--no-underline title" />
+    <SfLoader :class="{ loading }" :loading="loading">
       <div class="form">
-        <ValidationProvider
-          name="firstName"
-          rules="required|min:2"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-firstName'"
-            v-model="form.firstName"
-            label="First name"
-            name="firstName"
-            class="form__element form__element--half"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="lastName"
-          rules="required|min:2"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-lastName'"
-            v-model="form.lastName"
-            label="Last name"
-            name="lastName"
-            class="form__element form__element--half form__element--half-even"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="streetName"
-          rules="required"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-streetName'"
-            v-model="form.streetName"
-            label="Street name"
-            name="streetName"
-            class="form__element form__element--half"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="apartment"
-          rules="required"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-apartment'"
-            v-model="form.apartment"
-            label="House/Apartment number"
-            name="apartment"
-            class="form__element form__element--half form__element--half-even"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="city"
-          rules="required"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-city'"
-            v-model="form.city"
-            label="City"
-            name="city"
-            class="form__element form__element--half"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="state"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-state'"
-            v-model="form.state"
-            label="State/Province"
-            name="state"
-            class="form__element form__element--half form__element--half-even"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="country"
-          rules="required|min:2"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfSelect
-            v-e2e="'shipping-country'"
-            v-model="form.country"
-            label="Country"
-            name="country"
-            class="form__element form__element--half form__select sf-select--underlined"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          >
-            <SfSelectOption
-              v-for="countryOption in countries"
-              :key="countryOption.key"
-              :value="countryOption.key"
-            >
-              {{ countryOption.label }}
-            </SfSelectOption>
-          </SfSelect>
-        </ValidationProvider>
-        <ValidationProvider
-          name="zipCode"
-          rules="required|min:2"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-zipcode'"
-            v-model="form.postalCode"
-            label="Zip-code"
-            name="zipCode"
-            class="form__element form__element--half form__element--half-even"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-        <ValidationProvider
-          name="phone"
-          rules="required|digits:9"
-          v-slot="{ errors }"
-          slim
-        >
-          <SfInput
-            v-e2e="'shipping-phone'"
-            v-model="form.phone"
-            label="Phone number"
-            name="phone"
-            class="form__element form__element--half"
-            required
-            :valid="!errors[0]"
-            :errorMessage="errors[0]"
-          />
-        </ValidationProvider>
-      </div>
-      <div class="form">
-        <div class="form__action">
-          <SfButton
-            v-if="!isFormSubmitted"
-            :disabled="loading"
-            class="form__action-button"
-            type="submit"
-          >
-            {{ $t('Select shipping method') }}
-          </SfButton>
+        <div class="form__radio-group" data-testid="shipping-method">
+          <ShippingProvider :shipping-methods="shippingMethods" :selected-method="selectedMethod"
+            @save="selectMethod" />
         </div>
       </div>
-      <VsfShippingProvider
-        v-if="isFormSubmitted"
-        @submit="router.push(localePath({ name: 'billing' }))"
-      />
-    </form>
-  </ValidationObserver>
+    </SfLoader>
+    <div class="summary__action">
+      <SfButton type="button" class="sf-button color-secondary summary__back-button" @click.prevent="$emit('go-back')">
+        {{ $t('Go back') }}
+      </SfButton>
+      <SfButton v-e2e="'continue-to-payment'" :disabled="!selectedMethod" type="button" @click="saveShippingMethod">
+        {{ $t('Continue to payment') }}
+      </SfButton>
+    </div>
+  </div>
 </template>
 
 <script>
-import {
-  SfHeading,
-  SfInput,
-  SfButton,
-  SfSelect
-} from '@storefront-ui/vue';
-import { ref, useRouter } from '@nuxtjs/composition-api';
+import { SfButton, SfRadio, SfLink, SfLoader, SfHeading } from '@storefront-ui/vue';
 import { onSSR } from '@vue-storefront/core';
-import { useShipping } from '@vue-storefront/moqui';
-import { required, min, digits } from 'vee-validate/dist/rules';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-
-const COUNTRIES = [
-  { key: 'US', label: 'United States' },
-  { key: 'UK', label: 'United Kingdom' },
-  { key: 'IT', label: 'Italy' },
-  { key: 'PL', label: 'Poland' }
-];
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
-extend('min', {
-  ...min,
-  message: 'The field should have at least {length} characters'
-});
-extend('digits', {
-  ...digits,
-  message: 'Please provide a valid phone number'
-});
+import { ref, computed, useRouter } from '@nuxtjs/composition-api';
+import { useShippingProvider, useCart } from '@vue-storefront/moqui';
+import { useUiNotification } from '~/composables';
+import ShippingProvider from '~/components/Checkout/ShippingProvider.vue';
 
 export default {
   name: 'Shipping',
   components: {
-    SfHeading,
-    SfInput,
     SfButton,
-    SfSelect,
-    ValidationProvider,
-    ValidationObserver,
-    VsfShippingProvider: () => import('~/components/Checkout/VsfShippingProvider')
+    SfRadio,
+    SfLink,
+    SfLoader,
+    SfHeading,
+    ShippingProvider
   },
-  setup () {
+  setup(props, context) {
     const router = useRouter();
-    const isFormSubmitted = ref(false);
-    const { load, save, loading } = useShipping();
+    const { send: sendNotification } = useUiNotification();
+    const { load: loadShippingProvider, state: shippingMethods, save, loading, error } = useShippingProvider();
+    const { cart } = useCart();
 
-    const form = ref({
-      firstName: '',
-      lastName: '',
-      streetName: '',
-      apartment: '',
-      city: '',
-      state: '',
-      country: '',
-      postalCode: '',
-      phone: null
-    });
+    const shippingProviderSaveError = computed(() => error.value.save);
+    const cartShipmentMethodRefId = computed(() => cart.value?.orderPart?.carrierPartyId && `${cart.value.orderPart.carrierPartyId}-${cart.value.orderPart.shipmentMethodEnumId}`);
 
-    const handleFormSubmit = async () => {
-      await save({ shippingDetails: form.value });
-      isFormSubmitted.value = true;
+    const selectedMethod = ref(cartShipmentMethodRefId.value || null);
+    const selectMethod = async (method) => {
+      selectedMethod.value = method.referenceId;
+    };
+
+    const saveShippingMethod = async () => {
+      const shipmentMethod = shippingMethods.value.find(method => method.referenceId === selectedMethod.value);
+      await save({ shippingMethod: { shipmentMethodId: shipmentMethod.shipmentMethodId, carrierId: shipmentMethod.carrierId } });
+
+      if (shippingProviderSaveError.value) {
+        sendNotification({
+          id: Symbol('shipping_address_update_failed'),
+          message: 'Shipping method was not selected. Please try again',
+          type: 'danger',
+          icon: 'cross',
+          persist: false,
+          title: 'Shipping Method'
+        });
+      } else {
+        sendNotification({
+          id: Symbol('shipping_address_updated'),
+          message: 'Shipping method selected successfully!',
+          type: 'success',
+          icon: 'check',
+          persist: false,
+          title: 'Shipping Method'
+        });
+        router.push(context.root.localePath({ name: 'payment' }));
+      }
     };
 
     onSSR(async () => {
-      await load();
+      await loadShippingProvider();
+      if (cartShipmentMethodRefId.value) {
+        selectedMethod.value = cartShipmentMethodRefId.value;
+      }
     });
 
     return {
-      router,
-      loading,
-      isFormSubmitted,
-      form,
-      countries: COUNTRIES,
-      handleFormSubmit
+      cartShipmentMethodRefId,
+      shippingMethods,
+      selectedMethod,
+      selectMethod,
+      saveShippingMethod,
+      loading
     };
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.form {
-  --button-width: 100%;
-  &__select {
-    display: flex;
-    align-items: center;
-    --select-option-font-size: var(--font-size--lg);
-    ::v-deep .sf-select__dropdown {
-      font-size: var(--font-size--lg);
-      margin: 0;
-      color: var(--c-text);
-      font-family: var(--font-family--secondary);
-      font-weight: var(--font-weight--normal);
+.sf-shipping {
+  .title {
+    --heading-padding: var(--spacer-xl) 0 var(--spacer-lg);
+    --heading-title-font-weight: var(--font-weight--bold);
+    --heading-title-font-size: var(--h3-font-size);
+
+    &:not(:first-of-type) {
+      --heading-padding: var(--spacer-base) 0;
     }
-  }
-  @include for-desktop {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    --button-width: auto;
-  }
-  &__element {
-    margin: 0 0 var(--spacer-xl) 0;
+
     @include for-desktop {
-      flex: 0 0 100%;
+      --heading-title-font-weight: var(--font-weight--semibold);
+      --heading-padding: var(--spacer-xl) 0;
     }
-    &--half {
-      @include for-desktop {
-        flex: 1 1 50%;
+  }
+
+  .form {
+    &__element {
+      margin: 0 0 var(--spacer-base) 0;
+
+      &:last-of-type {
+        margin: 0;
       }
-      &-even {
+    }
+
+    &__group {
+      display: flex;
+      align-items: center;
+    }
+
+    &__select {
+      display: flex;
+      align-items: center;
+      --select-option-font-size: var(--font-size--base);
+      --select-dropdown-color: blue;
+
+      ::v-deep .sf-select__dropdown {
+        margin: 0 0 2px 0;
+        font-size: var(--font-size--base);
+        font-family: var(--font-family--secondary);
+        color: var(--c-link);
+      }
+    }
+
+    &__radio {
+      margin: var(--spacer-xs) 0;
+
+      &:last-of-type {
+        margin: var(--spacer-xs) 0 var(--spacer-xl);
+      }
+
+      ::v-deep .sf-radio__container {
+        --radio-container-padding: var(--spacer-xs);
+
         @include for-desktop {
-          padding: 0 0 0 var(--spacer-xl);
+          --radio-container-padding: var(--spacer-xs) var(--spacer-xs) var(--spacer-xs) var(--spacer-sm);
         }
       }
     }
-  }
-  &__action {
+
     @include for-desktop {
-      flex: 0 0 100%;
       display: flex;
-    }
-  }
-  &__action-button {
-    &--secondary {
-      @include for-desktop {
-        order: -1;
-        text-align: left;
+      flex-wrap: wrap;
+      align-items: center;
+
+      &:last-of-type {
+        margin: 0 calc(var(--spacer-2xl) - var(--spacer-sm)) 0 0;
+      }
+
+      &__element {
+        margin: 0 0 var(--spacer-sm) 0;
+        flex: 0 0 100%;
+
+        &--half {
+          flex: 1 1 50%;
+
+          &-even {
+            padding: 0 0 0 var(--spacer-base);
+          }
+        }
+      }
+
+      &__radio-group {
+        flex: 0 0 calc(100% + var(--spacer-sm));
+        margin: 0 calc(-1 * var(--spacer-sm));
       }
     }
-    &--add-address {
-      width: 100%;
-      margin: 0;
+  }
+
+  .summary {
+    &__terms {
+      margin: var(--spacer-base) 0 0 0;
+    }
+
+    &__total {
+      margin: 0 0 var(--spacer-sm) 0;
+      flex: 0 0 16.875rem;
+    }
+
+    &__action {
       @include for-desktop {
-        margin: 0 0 var(--spacer-lg) 0;
+        display: flex;
+        margin: var(--spacer-xl) 0 0 0;
+      }
+    }
+
+    &__action-button {
+      margin: 0;
+      width: 100%;
+      margin: var(--spacer-sm) 0 0 0;
+
+      @include for-desktop {
+        margin: 0 var(--spacer-xl) 0 0;
         width: auto;
       }
-    }
-  }
-  &__back-button {
-    margin: var(--spacer-xl) 0 var(--spacer-sm);
-    &:hover {
-      color:  var(--c-white);
-    }
-    @include for-desktop {
-      margin: 0 var(--spacer-xl) 0 0;
-    }
-  }
-}
 
-.shipping {
-  &__label {
-    display: flex;
-    justify-content: space-between;
-  }
-  &__description {
-    --radio-description-margin: 0;
-    --radio-description-font-size: var(--font-xs);
-  }
-}
+      &--secondary {
+        @include for-desktop {
+          text-align: right;
+        }
+      }
+    }
 
-.title {
-  margin: var(--spacer-xl) 0 var(--spacer-base) 0;
+    &__back-button {
+      margin: var(--spacer-xl) 0 0 0;
+      width: 100%;
+
+      @include for-desktop {
+        margin: 0 var(--spacer-xl) 0 0;
+        width: auto;
+      }
+
+      color: var(--c-white);
+
+      &:hover {
+        color: var(--c-white);
+      }
+    }
+
+    &__property-total {
+      margin: var(--spacer-xl) 0 0 0;
+    }
+  }
 }
 </style>
