@@ -28,10 +28,11 @@ function getDefaultVarianId(product: Product): string {
 }
 
 function getPrice(product: Product, productVariant?: ProductVariant): AgnosticPrice {
+  const regularPrice = productVariant?.prices.price || product?.listPrice || product?.price || 0;
+  const specialPrice = productVariant?.prices.price || product?.price || product?.listPrice || 0;
   return {
-    regular: productVariant?.prices.price || product?.price || 0,
-    // TODO
-    special: productVariant?.prices.price || product?.listPrice || 0
+    regular: regularPrice,
+    special: (regularPrice !== specialPrice) ? specialPrice : null
   };
 }
 
@@ -51,7 +52,6 @@ function getCoverImage(product: Product): string {
     if (coverImage) return coverImage.small || '';
     else return product.imageList[0].small;
   }
-  // return '';
   return '/product_placeholder.svg';
 }
 
@@ -165,7 +165,8 @@ function getAttributes(product: Product, filterByAttributeName: string[] = [], q
             return {
               name: attrDetail.label || '',
               value: attrDetail.id,
-              label: attrDetail.label
+              label: attrDetail.label,
+              attrName: product.availableFeatures[attr].label
             };
           });
         }
@@ -176,7 +177,8 @@ function getAttributes(product: Product, filterByAttributeName: string[] = [], q
         return {
           name: attrDetail.label || '',
           value: attrDetail.id,
-          label: attrDetail.label
+          label: attrDetail.label,
+          attrName: product.availableFeatures[attr].label
         };
       });
     }

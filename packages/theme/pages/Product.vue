@@ -21,34 +21,38 @@
             <div class="product__rating">
               <SfRating :score="averageRating" :max="5" />
               <a v-if="!!totalReviews" href="#" class="product__count">
-                ({{  totalReviews  }})
+                ({{ totalReviews }})
               </a>
             </div>
             <SfButton class="sf-button--text" @click="scrollToReviews">{{
-               $t('Read all reviews')
-              }}</SfButton>
+            $t('Read all reviews')
+            }}</SfButton>
           </div>
         </div>
         <div>
           <p class="product__description desktop-only">
-            {{  productGetters.getShortDescription(product, productVariant)  }}
+            {{ productGetters.getShortDescription(product, productVariant) }}
           </p>
           <!-- <SfButton class="sf-button--text desktop-only product__guide">
             {{ $t('Size guide') }}
           </SfButton> -->
-          <SfSelect v-e2e="'size-select'" v-if="options.PftSize" :value="configuration.PftSize"
-            @input="(size) => updateFilter({ PftSize: size })" label="Size"
-            class="sf-select--underlined product__select-size" :required="true">
-            <SfSelectOption v-for="size in options.PftSize" :key="size.value" :value="size.value">
-              {{  size.label  }}
-            </SfSelectOption>
-          </SfSelect>
-          <div v-if="options.PftColor && options.PftColor.length > 1" class="product__colors desktop-only">
-            <p class="product__color-label">{{  $t('Color')  }}:</p>
+          <template v-for="optionKey in Object.keys(options)">
+            <SfSelect v-if="(optionKey !== 'PftColor') && options[optionKey].length" v-e2e="'size-select'"
+              :value="configuration[optionKey]" @input="(val) => updateFilter({ [optionKey]: val })"
+              :label="options[optionKey][0].attrName" class="sf-select--underlined product__select-size"
+              :required="true">
+              <SfSelectOption v-for="option in options[optionKey]" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </SfSelectOption>
+            </SfSelect>
+          </template>
+
+          <div v-if="options.PftColor && options.PftColor.length > 1" class="product__colors">
+            <p class="product__color-label">{{ $t('Color') }}:</p>
             <SfColor v-for="(color, i) in options.PftColor" :key="i" :color="color.name" class="product__color"
               @click="updateFilter({ PftColor: color.value })" :selected="configuration.PftColor === color.value" />
           </div>
-          {{  productVariant  }}
+
           <SfAddToCart v-e2e="'product_add-to-cart'" :stock="stock" v-model="qty" :disabled="loading"
             :canAddToCart="stock > 0" class="product__add-to-cart"
             @click="addItem({ product: { productId: productVariant ? productVariant.productId : product.productId }, quantity: parseInt(qty) })" />
@@ -58,34 +62,34 @@
           <SfTabs id="ProductTabs" :open-tab="currentTab" class="product__tabs">
             <SfTab title="Description">
               <div class="product__description">
-                {{  productGetters.getDescription(product, productVariant)  }}
+                {{ productGetters.getDescription(product, productVariant) }}
               </div>
               <SfProperty v-for="(stdAttribute, i) in standardAttributes" :key="i" :name="stdAttribute.name"
                 :value="stdAttribute.value" class="product__property">
                 <template v-if="stdAttribute.name === 'Category'" #value>
                   <SfButton class="product__property__button sf-button--text">
-                    {{  stdAttribute.value  }}
+                    {{ stdAttribute.value }}
                   </SfButton>
                 </template>
               </SfProperty>
             </SfTab>
             <SfTab title="Read reviews">
-              <ProductReview :product="product" />
+              <ProductReview :product-id="activeProductId" />
             </SfTab>
             <SfTab title="Additional Information" class="product__additional-info">
               <div class="product__additional-info">
-                <p class="product__additional-info__title">{{  $t('Brand')  }}</p>
-                <p>{{  brand  }}</p>
+                <p class="product__additional-info__title">{{ $t('Brand') }}</p>
+                <p>{{ brand }}</p>
                 <p class="product__additional-info__title">
-                  {{  $t('Instruction1')  }}
+                  {{ $t('Instruction1') }}
                 </p>
                 <p class="product__additional-info__paragraph">
-                  {{  $t('Instruction2')  }}
+                  {{ $t('Instruction2') }}
                 </p>
                 <p class="product__additional-info__paragraph">
-                  {{  $t('Instruction3')  }}
+                  {{ $t('Instruction3') }}
                 </p>
-                <p>{{  careInstructions  }}</p>
+                <p>{{ careInstructions }}</p>
               </div>
             </SfTab>
           </SfTabs>
@@ -138,11 +142,17 @@ export default {
   name: 'Product',
   transition: 'fade',
   setup(_props, context) {
-    const qty = ref(1);
-    const currentTab = ref(1);
     const route = useRoute();
     const router = useRouter();
-    const { products, search } = useProduct('products');
+    // route pattern: /p/:id/:slug/
+    // see: https://docs.vuestorefront.io/v2/getting-started/layouts-and-routing.html
+    // naming is not optimal, but let's assume id=VirtualProduct and slug=ProductVariant
+    const id = computed(() => route.value.params.id);
+    const slug = computed(() => route.value.params.slug);
+
+    const qty = ref(1);
+    const currentTab = ref(1);
+    const { products, search } = useProduct(`product-${slug.value}`);
     const {
       products: relatedProducts,
       search: searchRelatedProducts,
@@ -150,14 +160,8 @@ export default {
     } = useProduct('relatedProducts');
     const { addItem, loading } = useCart();
 
-    // route pattern: /p/:id/:slug/
-    // see: https://docs.vuestorefront.io/v2/getting-started/layouts-and-routing.html
-    // naming is not optimal, but let's assume id=VirtualProduct and slug=ProductVariant
-    const id = computed(() => route.value.params.id);
-    const slug = computed(() => route.value.params.slug);
-
     const options = computed(() =>
-      productGetters.getAttributes(products.value, ['PftColor', 'PftSize'], route.value.query)
+      productGetters.getAttributes(products.value, [], route.value.query)
     );
     const standardAttributes = computed(() =>
       productGetters.getStandardAttributes(products.value)
@@ -191,8 +195,6 @@ export default {
       productGetters.getCategoryIds(product.value)
     );
 
-    // TODO: Breadcrumbs are temporary disabled because productGetters return undefined. We have a mocks in data
-    // const breadcrumbs = computed(() => productGetters.getBreadcrumbs ? productGetters.getBreadcrumbs(product.value) : props.fallbackBreadcrumbs);
     const productGallery = computed(() =>
       productGetters.getGallery(product.value).map((img) => ({
         mobile: { url: addBasePath(img.small) },
@@ -206,7 +208,7 @@ export default {
       await search({ productId: id.value, variantId: slug.value, type: 'single' });
       await searchRelatedProducts({
         catId: [categories.value[0]],
-        productSlug: slug.value,
+        productSlug: id.value,
         limit: 8,
         type: 'related'
       });
@@ -236,6 +238,7 @@ export default {
     };
 
     return {
+      activeProductId: id,
       currentTab,
       updateFilter,
       configuration,
@@ -388,6 +391,7 @@ export default {
   }
 
   &__description {
+    overflow-wrap: anywhere;
     @include font(--product-description-font,
       var(--font-weight--light),
       var(--font-size--base),

@@ -4,7 +4,7 @@
       <div>
         <SfModal v-e2e="'add-review-modal'" :visible="isAddReviewModalOpen" class="modal" title="Add Review"
           @close="toggleAddReviewModalOpen">
-          <ReviewForm :productId="productGetters.getId(product)" @submit="handleAddReview" />
+          <ReviewForm :productId="productId" @submit="handleAddReview" />
         </SfModal>
       </div>
       <div>

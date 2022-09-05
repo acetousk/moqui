@@ -10,9 +10,6 @@ import type {
 
 const params: UseProductFactoryParams<Product, SearchParams> = {
   productsSearch: async (context: Context, params) => {
-    console.log('Run: useProduct.productsSearch');
-    console.log('params');
-    console.log(params);
     try {
       if (params.type === 'single') {
         const response = await context.$moqui.api.getProduct({
@@ -20,7 +17,6 @@ const params: UseProductFactoryParams<Product, SearchParams> = {
           variantSlug: params.variantId
         });
         return response;
-
       } else if (params.type === 'featured') {
         const response = await context.$moqui.api.getFeaturedProducts({
           pageSize: 10
