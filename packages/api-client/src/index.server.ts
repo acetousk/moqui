@@ -12,57 +12,39 @@ const init = (config: Config) => {
     withCredentials: true
   });
 
-  client.interceptors.request.use(
-    (axiosConfig) => {
-      console.log('client/interceptor/request');
-      // axiosConfig = {
-      //   ...axiosConfig,
-      //   headers: {
-      //     ...axiosConfig.headers
-      //   }
-      // };
+  client.interceptors.request.use((axiosConfig) => {
+    // axiosConfig = {
+    //   ...axiosConfig,
+    //   headers: {
+    //     ...axiosConfig.headers
+    //   }
+    // };
 
-      return axiosConfig;
-    });
+    return axiosConfig;
+  });
 
   client.interceptors.response.use(
     (response) => {
       // Any status code that lie within the range of 2xx cause this function to trigger
-      // console.log('client/interceptor/response');
       return response;
     },
     (error: AxiosError) => {
       // Any status codes that falls outside the range of 2xx cause this function to trigger
-      // Do something with response error
-      // if (!!error.response?.headers?.moquisessiontoken) {
-      //   LocalStorage.set(
-      //     'moquiSessionToken',
-      //     error.response.headers.moquisessiontoken
-      //   );
-      // }
-      // console.log(
-      //   `AXIOS.JS:::    ERROR_CODE  => ${String(error?.response?.status)}`
-      // );
-      // console.log(
-      //   `AXIOS.JS:::    ERROR_MSG   => ${String(error?.response?.data)}`
-      // );
-      // console.log(error?.response?.data)
-
       if (error?.response && [401, 403].includes(error.response.status)) {
         console.log(
-          `AXIOS.AUTH:::    ERROR_CODE  => ${String(error?.response?.status)}`
+          `api-client/axios-response/ ERROR_CODE  => ${String(
+            error?.response?.status
+          )}`
         );
-        console.log(
-          'AXIOS.JS:::    ERROR_MSG   => '
-        );
-        console.log(error?.response?.data);
-
-        // Not authrized, clear cookies?
-        // config.state.setCsrfToken(undefined);
-        // config.state.setSessionId(undefined);
+        config.state.setCustomerLoggedIn(false);
+        // // Not authrized, clear cookies
+        config.state.setCsrfToken(undefined);
+        config.state.setSessionId(undefined);
       }
       throw {
+        // @ts-expect-error error type
         message: error.response?.data?.errors || error.message,
+        // @ts-expect-error error type
         code: error.response?.data?.errorCode || error.code
       };
     }
@@ -74,7 +56,7 @@ const init = (config: Config) => {
   };
 };
 
-function onCreate(config: Config): { config: Config, client: AxiosInstance } {
+function onCreate(config: Config): { config: Config; client: AxiosInstance } {
   if (!config?.client) {
     return init(config);
   }
@@ -87,12 +69,7 @@ function onCreate(config: Config): { config: Config, client: AxiosInstance } {
 const { createApiClient } = apiClientFactory<Config, Endpoints>({
   onCreate,
   api,
-  extensions: [
-    forwardSetCookies
-  ]
+  extensions: [forwardSetCookies]
 });
 
-export {
-  createApiClient,
-  init
-};
+export { createApiClient, init };

@@ -10,7 +10,6 @@ import type {
 } from '../types';
 
 const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
-
   load: async (context: Context) => {
     try {
       const response = await context.$moqui.api.loadUser();
@@ -37,12 +36,14 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  updateUser: async (context: Context, { /* currentUser, */ updatedUserData }) => {
+  updateUser: async (
+    context: Context,
+    { /* currentUser, */ updatedUserData }
+  ) => {
     try {
       const response = await context.$moqui.api.updateUser({
         ...updatedUserData
       });
-
       return response;
     } catch (error) {
       throw {
@@ -52,7 +53,10 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  register: async (context: Context, { email, password, firstName, lastName }) => {
+  register: async (
+    context: Context,
+    { email, password, firstName, lastName }
+  ) => {
     try {
       const response = await context.$moqui.api.registerUser({
         emailAddress: email,
@@ -60,10 +64,10 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
         lastName,
         password
       });
-
       return response?.customerInfo;
-
     } catch (error) {
+      // If we run into a 401, we got to return null so that the user state is reset
+      if ((error.response?.data?.code || error.code) === 401) return null;
       throw {
         message: error.response?.data?.message || error.message,
         code: error.response?.data?.code || error.code
@@ -77,14 +81,12 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
         username,
         password
       });
-
-      if (response.forcePasswordChange) {
+      if (response?.forcePasswordChange) {
         throw {
           message: 'Your account requires a password change before login.',
           code: '403'
         };
       }
-
       return response?.customerInfo;
     } catch (error) {
       throw {
@@ -94,16 +96,17 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
     }
   },
 
-  changePassword: async (context: Context, { currentUser, currentPassword, newPassword }) => {
+  changePassword: async (
+    context: Context,
+    { currentUser, currentPassword, newPassword }
+  ) => {
     try {
       const response = await context.$moqui.api.changePassword({
         username: currentUser.emailAddress,
         oldPassword: currentPassword,
         newPassword
       });
-
       return response;
-
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -113,4 +116,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
   }
 };
 
-export const useUser = useUserFactory<User, UpdateParams, RegisterParams>(params);
+export const useUser = useUserFactory<User, UpdateParams, RegisterParams>(
+  params
+);

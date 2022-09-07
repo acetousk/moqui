@@ -30,3 +30,6 @@ export { default as getShippingProvider } from './getShippingProvider';
 export { default as saveShippingProvider } from './saveShippingProvider';
 export { default as getPaymentProviders } from './getPaymentProviders';
 export { default as getCustomerOrders } from './getCustomerOrders';
+export { default as makeOrder } from './makeOrder';
+export { default as getPaymobPaymentLink } from './getPaymobPaymentLink';
+export { default as getPaymobPaymentConfirmation } from './getPaymobPaymentConfirmation';

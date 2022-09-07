@@ -69,6 +69,7 @@ export type Cart = {
         telecomContactMechId?: string;
         postalContactMechId?: string;
         carrierPartyId?: string;
+        shipmentMethodEnumId?: string;
         shippingInstructions?: string;
         statusId: string;
         partTotal?: number;
