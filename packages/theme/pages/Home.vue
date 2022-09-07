@@ -31,46 +31,21 @@
       </SfBannerGrid>
     </LazyHydrate>
 
-    <LazyHydrate when-visible>
+    <!-- <LazyHydrate when-visible>
       <div class="similar-products">
-        <SfHeading title="Match with it" :level="2"/>
+        <SfHeading title="Match with it" :level="2" />
         <nuxt-link :to="localePath('/c/women')" class="smartphone-only">
           {{ $t('See all') }}
         </nuxt-link>
       </div>
-    </LazyHydrate>
+    </LazyHydrate> -->
 
     <LazyHydrate when-visible>
-        <SfCarousel class="carousel" :settings="{ peek: 16, breakpoints: { 1023: { peek: 0, perView: 2 } } }">
-          <template #prev="{go}">
-            <SfArrow
-              aria-label="prev"
-              class="sf-arrow--left sf-arrow--long"
-              @click="go('prev')"
-            />
-          </template>
-          <template #next="{go}">
-            <SfArrow
-              aria-label="next"
-              class="sf-arrow--right sf-arrow--long"
-              @click="go('next')"
-            />
-          </template>
-          <SfCarouselItem class="carousel__item" v-for="(product, i) in products" :key="i">
-            <SfProductCard
-              :title="product.title"
-              :image="product.image"
-              :regular-price="product.price.regular"
-              :max-rating="product.rating.max"
-              :score-rating="product.rating.score"
-              :show-add-to-cart-button="true"
-              :is-on-wishlist="product.isInWishlist"
-              :link="localePath({ name: 'home' })"
-              class="carousel__item__product"
-              @click:wishlist="toggleWishlist(i)"
-            />
-          </SfCarouselItem>
-        </SfCarousel>
+      <RelatedProducts
+        :products="products"
+        :loading="productsLoading"
+        title="Featured Products"
+      />
     </LazyHydrate>
 
     <LazyHydrate when-visible>
@@ -100,7 +75,6 @@
     <LazyHydrate when-visible>
       <InstagramFeed />
     </LazyHydrate>
-
   </div>
 </template>
 <script>
@@ -117,12 +91,14 @@ import {
   SfArrow,
   SfButton
 } from '@storefront-ui/vue';
-import { ref, useContext } from '@nuxtjs/composition-api';
+import { computed, useContext } from '@nuxtjs/composition-api';
 import InstagramFeed from '~/components/InstagramFeed.vue';
+import RelatedProducts from '~/components/RelatedProducts.vue';
 import NewsletterModal from '~/components/NewsletterModal.vue';
 import LazyHydrate from 'vue-lazy-hydration';
 import { useUiState } from '../composables';
-import { addBasePath } from '@vue-storefront/core';
+import { addBasePath, onSSR } from '@vue-storefront/core';
+import { useProduct, productGetters } from '@vue-storefront/moqui';
 
 export default {
   name: 'Home',
@@ -140,69 +116,21 @@ export default {
     SfArrow,
     SfButton,
     NewsletterModal,
-    LazyHydrate
+    LazyHydrate,
+    RelatedProducts
   },
   setup() {
     const { $config } = useContext();
     const { toggleNewsletterModal } = useUiState();
-    const products = ref([
-      {
-        title: 'Cream Beach Bag',
-        image: addBasePath('/homepage/productA.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: true
-      },
-      {
-        title: 'Cream Beach Bag 2',
-        image: addBasePath('/homepage/productB.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag 3',
-        image: addBasePath('/homepage/productC.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag RR',
-        image: addBasePath('/homepage/productA.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag',
-        image: addBasePath('/homepage/productB.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag',
-        image: addBasePath('/homepage/productC.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag',
-        image: addBasePath('/homepage/productA.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      },
-      {
-        title: 'Cream Beach Bag',
-        image: addBasePath('/homepage/productB.webp'),
-        price: { regular: '50.00 $' },
-        rating: { max: 5, score: 4 },
-        isInWishlist: false
-      }
-    ]);
+    const {
+      products,
+      search: productsSearch,
+      loading: productsLoading
+    } = useProduct('featuredProducts');
+
+    onSSR(async () => {
+      await productsSearch({ type: 'featured' });
+    });
     const heroes = [
       {
         title: 'Colorful summer dresses are already in store',
@@ -274,18 +202,19 @@ export default {
       toggleNewsletterModal();
     };
 
-    const toggleWishlist = (index) => {
-      products.value[index].isInWishlist = !products.value[index].isInWishlist;
-    };
+    // const toggleWishlist = (index) => {
+    //   products.value[index].isInWishlist = !products.value[index].isInWishlist;
+    // };
 
     return {
-      toggleWishlist,
+      // toggleWishlist,
       toggleNewsletterModal,
       onSubscribe,
       addBasePath,
       banners,
       heroes,
-      products
+      products: computed(() => productGetters.getFiltered(products.value)),
+      productsLoading
     };
   }
 };
@@ -323,7 +252,8 @@ export default {
     }
   }
   ::v-deep .sf-hero__control {
-    &--right, &--left {
+    &--right,
+    &--left {
       display: none;
     }
   }
@@ -378,7 +308,7 @@ export default {
 }
 
 .carousel {
-    margin: 0 calc(0 - var(--spacer-sm)) 0 0;
+  margin: 0 calc(0 - var(--spacer-sm)) 0 0;
   @include for-desktop {
     margin: 0;
   }
@@ -393,9 +323,8 @@ export default {
   }
   ::v-deep .sf-arrow--long .sf-arrow--right {
     --arrow-icon-transform: rotate(180deg);
-     -webkit-transform-origin: center;
-     transform-origin: center;
+    -webkit-transform-origin: center;
+    transform-origin: center;
   }
 }
-
 </style>

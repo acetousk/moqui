@@ -47,7 +47,9 @@ export default {
   },
   setup() {
     const { response } = useStore();
-    const categories = computed(() => response.value?.menuCategoryList);
+    const categories = computed(() =>
+      response.value?.menuCategoryList.slice(0, 3)
+    );
 
     const { isMobileMenuOpen, toggleMobileMenu } = useUiState();
 
@@ -66,10 +68,12 @@ export default {
     display: block;
   }
 }
+
 .sf-modal {
   ::v-deep &__bar {
     display: none;
   }
+
   ::v-deep &__content {
     padding: var(--modal-content-padding, var(--spacer-base) 0);
   }

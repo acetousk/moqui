@@ -5,22 +5,56 @@
         :settings="{ peek: 16, breakpoints: { 1023: { peek: 0, perView: 2 } } }"
         class="carousel"
       >
-        <SfCarouselItem class="carousel__item" v-for="(product, i) in products" :key="i">
+        <SfCarouselItem
+          class="carousel__item"
+          v-for="(product, i) in products"
+          :key="i"
+        >
           <SfProductCard
             :title="productGetters.getName(product)"
-            :image="addBasePath(product.images[0].url)"
-            :regular-price="$n(productGetters.getFormattedPrice(productGetters.getPrice(product).regular), 'currency')"
-            :special-price="productGetters.getPrice(product).special && $n(productGetters.getPrice(product).special, 'currency')"
+            :image="addBasePath(productGetters.getCoverImage(product))"
+            :regular-price="
+              $n(
+                productGetters.getFormattedPrice(
+                  productGetters.getPrice(product).regular
+                ),
+                'currency'
+              )
+            "
+            :special-price="
+              productGetters.getPrice(product).special &&
+              $n(productGetters.getPrice(product).special, 'currency')
+            "
             :max-rating="5"
             :score-rating="productGetters.getAverageRating(product)"
             :show-add-to-cart-button="true"
-            :is-in-wishlist="isInWishlist({ product })"
+            :show-add-to-wishlist-button="false"
             :is-added-to-cart="isInCart({ product })"
-            :link="localePath(`/p/${productGetters.getId(product)}/${productGetters.getSlug(product)}`)"
+            :link="
+              localePath(
+                `/p/${productGetters.getId(
+                  product
+                )}/${productGetters.getDefaultVariantSlug(product)}`
+              )
+            "
             class="product-card"
-            @click:wishlist="!isInWishlist({ product }) ? addItemToWishlist({ product }) : removeProductFromWishlist(product)"
             @click:add-to-cart="addItemToCart({ product, quantity: 1 })"
-          />
+          >
+            <template #image>
+              <nuxt-img
+                :src="addBasePath(productGetters.getCoverImage(product))"
+                width="214"
+                height="214"
+                sizes="sm:100vw md:50vw lg:400px"
+              />
+            </template>
+            <template #wishlist-icon>
+              <!-- Remove wishlisht -->
+              <div />
+            </template>
+          </SfProductCard>
+          <!-- :is-in-wishlist="isInWishlist({ product })" -->
+          <!-- @click:wishlist="!isInWishlist({ product }) ? addItemToWishlist({ product }) : removeProductFromWishlist(product)" -->
         </SfCarouselItem>
       </SfCarousel>
     </SfLoader>
@@ -34,8 +68,7 @@ import {
   SfSection,
   SfLoader
 } from '@storefront-ui/vue';
-import { productGetters, useWishlist, wishlistGetters, useCart } from '@vue-storefront/moqui';
-import { computed } from '@vue/composition-api';
+import { productGetters, useCart } from '@vue-storefront/moqui';
 import { addBasePath } from '@vue-storefront/core';
 
 export default {
@@ -53,17 +86,18 @@ export default {
   },
   setup() {
     const { addItem: addItemToCart, isInCart } = useCart();
-    const { addItem: addItemToWishlist, isInWishlist, removeItem: removeItemFromWishlist, wishlist } = useWishlist();
-    const removeProductFromWishlist = (productItem) => {
-      const productsInWhishlist = computed(() => wishlistGetters.getItems(wishlist.value));
-      const product = productsInWhishlist.value.find(wishlistProduct => wishlistProduct.variant.sku === productItem.sku);
-      removeItemFromWishlist({ product });
-    };
+    // Wishlist not supported at the moment. kept for future reference.
+    // const { addItem: addItemToWishlist, isInWishlist, removeItem: removeItemFromWishlist, wishlist } = useWishlist();
+    // const removeProductFromWishlist = (productItem) => {
+    // const productsInWhishlist = computed(() => wishlistGetters.getItems(wishlist.value));
+    // const product = productsInWhishlist.value.find(wishlistProduct => wishlistProduct.variant.sku === productItem.sku);
+    // removeItemFromWishlist({ product });
+    // };
     return {
+      // addItemToWishlist,
+      // isInWishlist,
+      // removeProductFromWishlist,
       productGetters,
-      addItemToWishlist,
-      isInWishlist,
-      removeProductFromWishlist,
       addItemToCart,
       isInCart,
       addBasePath
@@ -78,13 +112,14 @@ export default {
 }
 
 .carousel {
-    margin: 0 calc(0 - var(--spacer-sm)) 0 0;
+  margin: 0 calc(0 - var(--spacer-sm)) 0 0;
+
   @include for-desktop {
     margin: 0;
   }
+
   &__item {
     margin: 1.9375rem 0 2.4375rem 0;
   }
 }
-
 </style>

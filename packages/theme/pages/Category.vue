@@ -34,7 +34,7 @@
                           <nuxt-link :to="localePath(th.getCatLink(subCat))" :class="
                             subCat.isCurrent ? 'sidebar--cat-selected' : ''
                           ">
-                            {{  label  }}
+                            {{ label }}
                           </nuxt-link>
                         </template>
                       </SfMenuItem>
@@ -51,7 +51,9 @@
           <transition-group v-if="isCategoryGridView" appear name="products__slide" tag="div" class="products__grid">
             <SfProductCard v-e2e="'category-product-card'" v-for="(product, i) in products"
               :key="productGetters.getSlug(product)" :style="{ '--index': i }" :title="productGetters.getName(product)"
-              :image="addBasePath(productGetters.getCoverImage(product))"
+              :image="addBasePath(productGetters.getCoverImage(product))" :is-added-to-cart="isInCart({ product })"
+              :link="localePath(
+              `/p/${productGetters.getSlug(product)}/${productGetters.getDefaultVariantSlug(product)}`)"
               :regular-price="$n(productGetters.getPrice(product).regular, 'currency')" :special-price="
                 productGetters.getPrice(product).special &&
                 $n(productGetters.getPrice(product).special, 'currency')
@@ -64,18 +66,12 @@
               </template>
               <template #image>
                 <nuxt-img :src="addBasePath(productGetters.getCoverImage(product))" width="214" height="214"
-                  sizes="sm:100vw md:50vw lg:400px" :modifiers="{ grayscale: true, tint: '#00DC82' }" />
+                  sizes="sm:100vw md:50vw lg:400px" />
               </template>
             </SfProductCard>
           </transition-group>
           <!--
-            :is-in-wishlist="isInWishlist({ product })" :is-added-to-cart="isInCart({ product })" :link="
-                localePath(
-                  `/p/${productGetters.getSlug(product)}/${productGetters.getDefaultVariantSlug(
-                    product
-                  )}`
-                )
-              "
+            :is-in-wishlist="isInWishlist({ product })"
            -->
           <transition-group v-else appear name="products__slide" tag="div" class="products__list">
             <SfProductCardHorizontal v-e2e="'category-product-card'" v-for="(product, i) in products"
@@ -88,7 +84,7 @@
                   )}`
                 )
               " :regular-price="$n(productGetters.getPrice(product).regular, 'currency')" :special-price="productGetters.getPrice(product).special &&
-$n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
+              $n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
               :score-rating="productGetters.getAverageRating(product)" :qty="1" @click:add-to-cart="
                 addToCart({
                   product,
@@ -110,7 +106,7 @@ $n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
                   :name="stdAttribute.name" :value="stdAttribute.value" class="product__property">
                   <template v-if="stdAttribute.name === 'Category'" #value>
                     <SfButton class="product__property__button sf-button--text">
-                      {{  stdAttribute.value  }}
+                      {{ stdAttribute.value }}
                     </SfButton>
                   </template>
                 </SfProperty>
@@ -139,8 +135,8 @@ $n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
 
           <div v-show="pagination.totalPages > 1" class="products__show-on-page">
             <span class="products__show-on-page__label">{{
-               $t('Show on page')
-              }}</span>
+            $t('Show on page')
+            }}</span>
             <LazyHydrate on-interaction>
               <SfSelect :value="
                 pagination && pagination.itemsPerPage
@@ -149,7 +145,7 @@ $n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
               " class="products__items-per-page" @input="th.changeItemsPerPage">
                 <SfSelectOption v-for="option in pagination.pageOptions" :key="option" :value="option"
                   class="products__items-per-page__option">
-                  {{  option  }}
+                  {{ option }}
                 </SfSelectOption>
               </SfSelect>
             </LazyHydrate>
