@@ -10,6 +10,7 @@ const forwardSetCookies: ApiClientExtension = {
       beforeCreate: ({ configuration }) => {
         const sessionCookieName: string = configuration.cookies?.sessionCookieName || 'JSESSIONID';
         const xsrfCookieName: string = configuration.cookies?.xsrfCookieName || 'x-csrf-token';
+        const authCookieName: string = configuration.cookies?.authCookieName || 'vsf-auth';
 
         return {
           ...configuration,
@@ -29,7 +30,16 @@ const forwardSetCookies: ApiClientExtension = {
                 return;
               }
               res.cookie(xsrfCookieName, JSON.stringify(token));
+            },
+            getCustomerLoggedIn: () => req.cookies[authCookieName],
+            setCustomerLoggedIn: (state: boolean) => {
+              if (!state) {
+                delete req.cookies[authCookieName];
+                return;
+              }
+              res.cookie(authCookieName, JSON.stringify(state));
             }
+
           }
         };
       },
@@ -48,10 +58,11 @@ const forwardSetCookies: ApiClientExtension = {
         if (response?.headers?.['x-csrf-token'])
           res.setHeader('x-csrf-token', response?.headers?.['x-csrf-token']);
 
-        return {
-          ...(response.data ? response.data : response)
-        };
+        // return {
+        //   ...(response?.data ? response.data : response)
+        // };
 
+        return response;
       }
     };
   }
