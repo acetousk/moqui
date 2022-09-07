@@ -52,6 +52,15 @@ export function getRoutes(themeDir = __dirname) {
     name: 'reset-password',
     path: '/reset-password',
     component: path.resolve(themeDir, 'pages/ResetPassword.vue')
-  }
-  ];
+  },
+  {
+    name: 'pay',
+    path: '/gateway/pay',
+    component: path.resolve(themeDir, 'pages/Gateway/Pay.vue')
+  },
+  {
+    name: 'postpay',
+    path: '/gateway/postpay',
+    component: path.resolve(themeDir, 'pages/Gateway/Pay.vue')
+  }];
 }
