@@ -11,11 +11,11 @@ import type {
 const params: UseUserOrderFactoryParams<CustomerOrders, SearchParams> = {
   searchOrders: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.getCustomerOrders({
+      const { data } = await context.$moqui.api.getCustomerOrders({
         page: params.page || 1,
         itemsPerPage: params.itemsPerPage || 5
       });
-      return response;
+      return data;
 
     } catch (error) {
       throw {

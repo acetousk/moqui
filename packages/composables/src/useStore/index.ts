@@ -4,9 +4,9 @@ import { Context, useStoreFactory } from '@vue-storefront/core';
 export const useStore = useStoreFactory<Store>({
   async load(context: Context, params) {
 
-    const response = await context.$moqui.api.getStore(params);
+    const { data } = await context.$moqui.api.getStore(params);
 
-    return response;
+    return data;
   },
 
   // @ts-expect-error Not implemented atm.

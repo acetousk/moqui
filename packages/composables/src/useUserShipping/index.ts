@@ -11,7 +11,7 @@ import type {
 const params: UseUserShippingFactoryParams<Address, AddressItem> = {
   addAddress: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.createCustomerAddress({
+      const { data } = await context.$moqui.api.createCustomerAddress({
         alias: params.address.alias,
         address1: params.address.address1,
         address2: params.address.address2,
@@ -24,7 +24,7 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
         postalCode: params.address.postalCode
       });
 
-      return response.postalAddressList;
+      return data.postalAddressList;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -35,10 +35,10 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
 
   deleteAddress: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.deleteCustomerAddress({
+      const { data } = await context.$moqui.api.deleteCustomerAddress({
         addressId: params.address.addressId
       });
-      return response.postalAddressList;
+      return data.postalAddressList;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -49,7 +49,7 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
 
   updateAddress: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.updateCustomerAddress({
+      const { data } = await context.$moqui.api.updateCustomerAddress({
         addressId: params.address.addressId,
         alias: params.address.alias,
         address1: params.address.address1,
@@ -62,7 +62,7 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
         contactNumber: params.address.phone?.contactNumber,
         postalCode: params.address.postalCode
       });
-      return response.postalAddressList;
+      return data.postalAddressList;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -73,8 +73,8 @@ const params: UseUserShippingFactoryParams<Address, AddressItem> = {
 
   load: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.getCustomerAddresses(params);
-      return response.postalAddressList;
+      const { data } = await context.$moqui.api.getCustomerAddresses(params);
+      return data.postalAddressList;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,

@@ -12,22 +12,24 @@ const params: UseProductFactoryParams<Product, SearchParams> = {
   productsSearch: async (context: Context, params) => {
     try {
       if (params.type === 'single') {
-        const response = await context.$moqui.api.getProduct({
+        const { data } = await context.$moqui.api.getProduct({
           productSlug: params.productId,
           variantSlug: params.variantId
         });
-        return response;
+        return data;
       } else if (params.type === 'featured') {
-        const response = await context.$moqui.api.getFeaturedProducts({
+        const { data } = await context.$moqui.api.getFeaturedProducts({
           pageSize: 10
         });
-        return response.productList;
+        console.log('useFeature');
+        console.log(data);
+        return data.productList;
       } else if (params.type === 'related') {
-        const response = await context.$moqui.api.getRelatedProducts({
+        const { data } = await context.$moqui.api.getRelatedProducts({
           // categorySlug: params.categorySlug,
           productSlug: params.productSlug
         });
-        return response.productList;
+        return data.productList;
       } else return [];
     } catch (error) {
       throw {

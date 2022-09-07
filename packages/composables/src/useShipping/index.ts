@@ -37,10 +37,10 @@ const params: UseShippingParams<ShippingAddress, AddParams> = {
       if (!context.useCart.cart) {
         await context.useCart.load(customQuery);
       }
-      const response = await context.$moqui.api.setCartShippingAddress({
+      const { data } = await context.$moqui.api.setCartShippingAddress({
         addressId: shippingDetails.addressId
       });
-      return response;
+      return data;
 
     } catch (error) {
       throw {

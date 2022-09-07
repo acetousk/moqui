@@ -25,8 +25,8 @@ const factoryParams: UsePaymentFactoryParams<
     context: Context
   ): Promise<PaymentProvider[]> => {
     try {
-      const response = await context.$moqui.api.getPaymentProviders();
-      return response?.paymentOptions;
+      const { data } = await context.$moqui.api.getPaymentProviders();
+      return data?.paymentOptions;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -43,11 +43,11 @@ const factoryParams: UsePaymentFactoryParams<
           message: 'Invalid order.',
           code: 301
         };
-      const response = await context.$moqui.api.getPaymobPaymentLink({
+      const { data } = await context.$moqui.api.getPaymobPaymentLink({
         orderId: context.useCart.cart.value.orderHeader.orderId
       });
       // context.useCart.cart.value = data.paymentConfirmation;
-      return response;
+      return data;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -61,10 +61,10 @@ const factoryParams: UsePaymentFactoryParams<
     params
   ): Promise<PaymentConfirmationResponse> => {
     try {
-      const response = await context.$moqui.api.getPaymobPaymentConfirmation({
+      const { data } = await context.$moqui.api.getPaymobPaymentConfirmation({
         ...params
       });
-      return response;
+      return data;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,

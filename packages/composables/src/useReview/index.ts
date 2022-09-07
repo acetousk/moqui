@@ -12,12 +12,12 @@ import type {
 const params: UseReviewFactoryParams<Review, SearchParams, AddParams> = {
   searchReviews: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.getReviews({
+      const { data } = await context.$moqui.api.getReviews({
         productId: params.productId,
         page: params.page,
         itemsPerPage: params.itemsPerPage
       });
-      return response;
+      return data;
 
     } catch (error) {
       throw {
@@ -29,12 +29,12 @@ const params: UseReviewFactoryParams<Review, SearchParams, AddParams> = {
 
   addReview: async (context: Context, params) => {
     try {
-      const response = await context.$moqui.api.addReview({
+      const { data } = await context.$moqui.api.addReview({
         productId: params.productId,
         productRating: params.rating,
         productReview: params.review
       });
-      return response;
+      return data;
 
     } catch (error) {
       throw {

@@ -42,7 +42,7 @@ export const useFacet = useFacetFactory<SearchParams>({
   search: async (context: Context, params: FacetSearchResult<SearchParams>) => {
     try {
       if (params?.input?.searchType === 'instant-search') {
-        const response = await context.$moqui.api.getProductSearch({
+        const { data } = await context.$moqui.api.getProductSearch({
           term: params.input.term,
           page: params.input.page,
           pageSize: params.input.itemsPerPage,
@@ -50,22 +50,22 @@ export const useFacet = useFacetFactory<SearchParams>({
           filters: params.input.filters
         });
         return {
-          items: response?.productSearchResults?.productList || [],
-          categoryTree: response?.productSearchResults?.categoryTree || [],
-          availableFilters: response?.productSearchResults?.featureList,
+          items: data?.productSearchResults?.productList || [],
+          categoryTree: data?.productSearchResults?.categoryTree || [],
+          availableFilters: data?.productSearchResults?.featureList,
           category: { categorySlug: params.input.categorySlug },
           sortOptions: {
             options: availableSortingOptions,
             selected: availableSortingOptions.find(sortOption => sortOption.id === params.input.sort)?.id || 'default'
           },
           perPageOptions: [10, 20, 50],
-          total: response?.productSearchResults?.productListCount,
-          itemsPerPage: response?.productSearchResults?.productListPageSize,
-          currentPage: response?.productSearchResults?.productListPageIndex + 1,
-          totalPages: response?.productSearchResults?.productListPageMaxIndex + 1
+          total: data?.productSearchResults?.productListCount,
+          itemsPerPage: data?.productSearchResults?.productListPageSize,
+          currentPage: data?.productSearchResults?.productListPageIndex + 1,
+          totalPages: data?.productSearchResults?.productListPageMaxIndex + 1
         };
       }
-      const response = await context.$moqui.api.getCategoryProducts({
+      const { data } = await context.$moqui.api.getCategoryProducts({
         categorySlug: params.input.categorySlug,
         term: params.input.term,
         page: params.input.page,
@@ -74,19 +74,19 @@ export const useFacet = useFacetFactory<SearchParams>({
         filters: params.input.filters
       });
       return {
-        items: response?.productList || [],
-        categoryTree: response?.categoryTree || [],
-        availableFilters: response?.featureList,
+        items: data?.productList || [],
+        categoryTree: data?.categoryTree || [],
+        availableFilters: data?.featureList,
         category: { categorySlug: params.input.categorySlug },
         sortOptions: {
           options: availableSortingOptions,
           selected: availableSortingOptions.find(sortOption => sortOption.id === params.input.sort)?.id || 'default'
         },
         perPageOptions: [10, 20, 50],
-        total: response?.productListCount,
-        itemsPerPage: response?.productListPageSize,
-        currentPage: response?.productListPageIndex + 1,
-        totalPages: response?.productListPageMaxIndex + 1
+        total: data?.productListCount,
+        itemsPerPage: data?.productListPageSize,
+        currentPage: data?.productListPageIndex + 1,
+        totalPages: data?.productListPageMaxIndex + 1
       };
     } catch (error) {
       throw {

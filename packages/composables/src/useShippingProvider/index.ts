@@ -4,8 +4,8 @@ import type { ShippingProvider, ShippingMethod } from '@vue-storefront/moqui-api
 const params: UseShippingProviderParams<ShippingProvider, ShippingMethod> = {
   load: async (context: Context /* , {  customQuery } */) => {
     try {
-      const response = await context.$moqui.api.getShippingProvider();
-      return response?.shippingOptions || [];
+      const { data } = await context.$moqui.api.getShippingProvider();
+      return data?.shippingOptions || [];
 
     } catch (error) {
       throw {
@@ -17,11 +17,11 @@ const params: UseShippingProviderParams<ShippingProvider, ShippingMethod> = {
 
   save: async (context: Context, { shippingMethod /* , customQuery  */ }) => {
     try {
-      const response = await context.$moqui.api.saveShippingProvider({
+      const { data } = await context.$moqui.api.saveShippingProvider({
         carrierId: shippingMethod.carrierId,
         shipmentMethodId: shippingMethod.shipmentMethodId
       });
-      return response?.shippingOptions || [];
+      return data?.shippingOptions || [];
 
     } catch (error) {
       throw {

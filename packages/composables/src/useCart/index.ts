@@ -12,9 +12,9 @@ import type {
 const params: UseCartFactoryParams<Cart, CartItem, Product> = {
   load: async (context: Context /* , { customQuery }*/) => {
     try {
-      const response = await context.$moqui.api.getCart();
-      if (!response?.orderHeader?.orderId) return null;
-      return response;
+      const { data } = await context.$moqui.api.getCart();
+      if (!data?.orderHeader?.orderId) return null;
+      return data;
 
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
@@ -28,11 +28,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
 
   addItem: async (context: Context, { product, quantity /* , currentCart, customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.addItemToCart({
+      const { data } = await context.$moqui.api.addItemToCart({
         productId: product.productId,
         quantity: quantity
       });
-      return response;
+      return data;
 
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
@@ -46,10 +46,10 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
 
   removeItem: async (context: Context, { product /* , currentCart, customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.removeCartItem({
+      const { data } = await context.$moqui.api.removeCartItem({
         productId: product?.product.productId
       });
-      return response;
+      return data;
 
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
@@ -63,11 +63,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
 
   updateItemQty: async (context: Context, { product, quantity /* ,currentCart , customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.updateCartItemQty({
+      const { data } = await context.$moqui.api.updateCartItemQty({
         productId: product.product.productId,
         quantity
       });
-      return response;
+      return data;
 
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
@@ -81,11 +81,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
 
   applyCoupon: async (context: Context, { couponCode /* , currentCart, customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.addCartPromo({
+      const { data } = await context.$moqui.api.addCartPromo({
         promoCode: couponCode
       });
       return {
-        updatedCart: response,
+        updatedCart: data,
         updatedCoupon: {}
       };
 
@@ -99,11 +99,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
 
   removeCoupon: async (context: Context, { couponCode /* , currentCart, customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.removeCartPromo({
+      const { data } = await context.$moqui.api.removeCartPromo({
         promoCodeId: couponCode
       });
       return {
-        updatedCart: response
+        updatedCart: data
       };
 
     } catch (error) {

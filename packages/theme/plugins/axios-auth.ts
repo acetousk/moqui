@@ -25,6 +25,7 @@ export default (context) => {
         $cookies.remove('JSESSIONID');
         return Promise.reject(error);
       }
+      return Promise.reject(error);
     }
   );
 };

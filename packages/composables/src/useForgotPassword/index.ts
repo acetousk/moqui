@@ -7,11 +7,11 @@ import {
 const factoryParams: UseForgotPasswordFactoryParams<any> = {
   resetPassword: async (context: Context, { email /* , customQuery */ }) => {
     try {
-      const response = await context.$moqui.api.resetPassword({
+      const { data } = await context.$moqui.api.resetPassword({
         email
       });
 
-      return response;
+      return data;
 
     } catch (error) {
       throw {
@@ -23,13 +23,13 @@ const factoryParams: UseForgotPasswordFactoryParams<any> = {
 
   setNewPassword: async (context: Context, { tokenValue, newPassword, customQuery }) => {
     try {
-      const response = await context.$moqui.api.setNewPassword({
+      const { data } = await context.$moqui.api.setNewPassword({
         token: tokenValue,
         email: customQuery.email,
         newPassword: newPassword
       });
 
-      return response;
+      return data;
 
     } catch (error) {
       throw {
