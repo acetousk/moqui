@@ -2,13 +2,14 @@ import { Cart } from '@vue-storefront/moqui-api';
 
 const canEnterCheckout = (cart: Cart) => cart?.orderItemProductList?.length > 0;
 const canEnterShipping = (cart: Cart) => canEnterCheckout(cart) && cart?.postalAddress?.addressId;
-const canEnterPayment = (cart: Cart) => canEnterShipping(cart) && cart?.orderPart.carrierPartyId && cart.orderPart.carrierPartyId !== '_NA_';
+const canEnterPayment = (cart: Cart) => canEnterShipping(cart) && cart?.orderPart && (cart.orderPart.carrierPartyId && cart.orderPart.shipmentMethodEnumId);
 
 export default async ({ app, $vsf }) => {
 
   const homepage = app.context.localeRoute({ name: 'home' });
   const currentPath = app.context.route.fullPath.split('/checkout/')[1];
-  if (!currentPath) return;
+
+  if (!currentPath || currentPath.startsWith('thank-you')) return;
 
   const cart = await $vsf.$moqui.api.getCart();
   if (!cart?.orderHeader?.orderId) {

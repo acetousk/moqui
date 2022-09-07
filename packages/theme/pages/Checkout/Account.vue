@@ -115,7 +115,6 @@ export default {
       } else {
         onComplete();
         await loadUser();
-        // $router.push(context.root.localePath({ name: 'shipping' }));
       }
     };
 
