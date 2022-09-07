@@ -2,12 +2,14 @@
   <div>
     <SfHeading
       :level="3"
-      title="Payment"
+      title="Review & Pay"
       class="sf-heading--left sf-heading--no-underline title"
     />
     <SfTable class="sf-table--bordered table desktop-only">
       <SfTableHeading class="table__row">
-        <SfTableHeader class="table__header table__image">{{ $t('Item') }}</SfTableHeader>
+        <SfTableHeader class="table__header table__image">{{
+          $t('Item')
+        }}</SfTableHeader>
         <SfTableHeader
           v-for="tableHeader in tableHeaders"
           :key="tableHeader"
@@ -23,23 +25,46 @@
         class="table__row"
       >
         <SfTableData class="table__image">
-          <SfImage :src="addBasePath(cartGetters.getItemImage(product))" :alt="cartGetters.getItemName(product)" />
+          <SfImage
+            :src="addBasePath(cartGetters.getItemImage(product))"
+            :alt="cartGetters.getItemName(product)"
+            height="80px"
+          />
         </SfTableData>
         <SfTableData class="table__data table__description table__data">
-          <div class="product-title">{{ cartGetters.getItemName(product) }}</div>
+          <div class="product-title">
+            {{ cartGetters.getItemName(product) }}
+          </div>
           <div class="product-sku">{{ cartGetters.getItemSku(product) }}</div>
         </SfTableData>
-        <SfTableData
-          class="table__data" v-for="(value, key) in cartGetters.getItemAttributes(product, ['size', 'color'])"
-          :key="key"
-        >
-          {{ value }}
+        <SfTableData class="table__data">
+          <template
+            v-if="
+              Object.keys(cartGetters.getItemAttributes(product, [])).length > 0
+            "
+          >
+            <div
+              class="product-feature"
+              v-for="(value, key) in cartGetters.getItemAttributes(product, [])"
+              :key="key"
+            >
+              {{ key }}: {{ value }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="product-feature">Standard</div>
+          </template>
         </SfTableData>
-        <SfTableData class="table__data">{{ cartGetters.getItemQty(product) }}</SfTableData>
-        <SfTableData class="table__data price">
+        <SfTableData class="table__data">{{
+          cartGetters.getItemQty(product)
+        }}</SfTableData>
+        <SfTableData class="table__data">
           <SfPrice
             :regular="$n(cartGetters.getItemPrice(product).regular, 'currency')"
-            :special="cartGetters.getItemPrice(product).special && $n(cartGetters.getItemPrice(product).special, 'currency')"
+            :special="
+              cartGetters.getItemPrice(product).special &&
+              $n(cartGetters.getItemPrice(product).special, 'currency')
+            "
             class="product-price"
           />
         </SfTableData>
@@ -50,25 +75,60 @@
         <div class="summary__total">
           <SfProperty
             name="Subtotal"
-            :value="$n(totals.special > 0 ? totals.special : totals.subtotal, 'currency')"
+            :value="
+              $n(
+                totals.special > 0 ? totals.special : totals.subtotal,
+                'currency'
+              )
+            "
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            name="Discounts"
+            :value="$n(totals.discounts, 'currency')"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            name="Shipping"
+            :value="$n(totals.shipping, 'currency')"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            name="Tax"
+            :value="$n(totals.tax, 'currency')"
             class="sf-property--full-width property"
           />
         </div>
-
-        <SfDivider />
-
         <SfProperty
           name="Total price"
           :value="$n(totals.total, 'currency')"
           class="sf-property--full-width sf-property--large summary__property-total"
         />
+        <SfDivider />
 
-        <VsfPaymentProvider @status="isPaymentReady = true"/>
+        <SfHeading
+          :level="3"
+          title="Payment"
+          class="sf-heading--left sf-heading--no-underline title"
+        />
 
-        <SfCheckbox v-e2e="'terms'" v-model="terms" name="terms" class="summary__terms">
+        <PaymentProvider
+          :payment-methods="paymentMethods"
+          :selected-method="selectedMethod"
+          :loading="paymentsLoading"
+          @save="selectMethod"
+        />
+
+        <SfCheckbox
+          v-e2e="'terms'"
+          v-model="terms"
+          name="terms"
+          class="summary__terms"
+        >
           <template #label>
             <div class="sf-checkbox__label">
-              {{ $t('I agree to') }} <SfLink href="#"> {{ $t('Terms and conditions') }}</SfLink>
+              {{ $t('I agree to') }}
+              <SfLink href="#"> {{ $t('Terms and conditions') }}</SfLink>
             </div>
           </template>
         </SfCheckbox>
@@ -77,7 +137,7 @@
           <SfButton
             type="button"
             class="sf-button color-secondary summary__back-button"
-            @click="router.push('/checkout/billing')"
+            @click="router.push('/checkout/shipping')"
           >
             {{ $t('Go back') }}
           </SfButton>
@@ -110,8 +170,16 @@ import {
 } from '@storefront-ui/vue';
 import { onSSR } from '@vue-storefront/core';
 import { ref, computed, useRouter } from '@nuxtjs/composition-api';
-import { useMakeOrder, useCart, cartGetters, orderGetters } from '@vue-storefront/moqui';
+import {
+  useMakeOrder,
+  useCart,
+  usePayment,
+  cartGetters,
+  orderGetters
+} from '@vue-storefront/moqui';
 import { addBasePath } from '@vue-storefront/core';
+import PaymentProvider from '~/components/Checkout/PaymentProvider';
+import { useUiNotification } from '~/composables';
 
 export default {
   name: 'ReviewOrder',
@@ -127,38 +195,93 @@ export default {
     SfProperty,
     SfAccordion,
     SfLink,
-    VsfPaymentProvider: () => import('~/components/Checkout/VsfPaymentProvider')
+    PaymentProvider
   },
   setup(props, context) {
     const router = useRouter();
-    const { cart, load, setCart } = useCart();
-    const { order, make, loading } = useMakeOrder();
-
+    const { send: sendNotification } = useUiNotification();
+    const { cart, load, setCart, loading: cartLoading } = useCart();
+    const {
+      getPaymentProviderList,
+      providerList,
+      loading: paymentsLoading
+    } = usePayment();
+    const selectedMethod = ref(null);
+    const { order, make, loading, error: makeOrderError } = useMakeOrder();
     const isPaymentReady = ref(false);
     const terms = ref(false);
 
+    const selectMethod = (paymentMethodId) => {
+      selectedMethod.value = paymentMethodId;
+      isPaymentReady.value = true;
+    };
+
     onSSR(async () => {
       await load();
+      await getPaymentProviderList();
     });
 
     const processOrder = async () => {
-      await make();
-      const thankYouPath = { name: 'thank-you', query: { order: orderGetters.getId(order.value) }};
-      router.push(context.root.localePath(thankYouPath));
-      setCart(null);
+      await make({
+        customQuery: {
+          paymentMethodId: selectedMethod.value
+        }
+      });
+      if (makeOrderError.value.make) {
+        console.error(makeOrderError.value.make);
+        sendNotification({
+          id: Symbol('order_place_failed'),
+          message: 'Your order could not be processed. Please try again',
+          type: 'danger',
+          icon: 'cross',
+          persist: false,
+          title: 'Order'
+        });
+        return;
+      }
+
+      if (!order.value.requiresPayment && order.value.statusChanged) {
+        const thankYouPath = {
+          name: 'thank-you',
+          query: { order: orderGetters.getId(order.value) }
+        };
+        router.push(context.root.localePath(thankYouPath));
+        setCart(null);
+      } else if (!order.value.requiresPayment && !order.value.statusChanged) {
+        sendNotification({
+          id: Symbol('order_place_failed'),
+          message: 'Your order could not be processed. Please try again',
+          type: 'danger',
+          icon: 'cross',
+          persist: false,
+          title: 'Order'
+        });
+      } else if (order.value.requiresPayment) {
+        const paymentGatewayPath = {
+          name: 'pay',
+          query: { order: orderGetters.getId(order.value) }
+        };
+        router.push(context.root.localePath(paymentGatewayPath));
+      }
     };
 
     return {
-      addBasePath,
-      router,
+      tableHeaders: ['Description', 'Features', 'Quantity', 'Amount'],
+      paymentMethods: providerList,
+      selectedMethod,
       isPaymentReady,
       terms,
-      loading,
+      paymentsLoading,
+      loading: computed(
+        () => cartLoading.value || paymentsLoading.value || loading.value
+      ),
       products: computed(() => cartGetters.getItems(cart.value)),
       totals: computed(() => cartGetters.getTotals(cart.value)),
-      tableHeaders: ['Description', 'Size', 'Color', 'Quantity', 'Amount'],
+      router,
       cartGetters,
-      processOrder
+      selectMethod,
+      processOrder,
+      addBasePath
     };
   }
 };
@@ -168,25 +291,32 @@ export default {
 .title {
   margin: var(--spacer-xl) 0 var(--spacer-base) 0;
 }
+
 .table {
   margin: 0 0 var(--spacer-base) 0;
+
   &__row {
     justify-content: space-between;
   }
+
   @include for-desktop {
     &__header {
       text-align: center;
+
       &:last-child {
         text-align: right;
       }
     }
+
     &__data {
       text-align: center;
     }
+
     &__description {
       text-align: left;
       flex: 0 0 12rem;
     }
+
     &__image {
       --image-width: 5.125rem;
       text-align: left;
@@ -194,87 +324,115 @@ export default {
     }
   }
 }
+
 .product-sku {
   color: var(--c-text-muted);
   font-size: var(--font-size--sm);
 }
-.price {
+
+.product-feature {
+  color: var(--c-text-muted);
+  font-size: var(--font-size--sm);
+}
+
+.sf-price {
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
 }
+
 .product-price {
   --price-font-size: var(--font-size--base);
 }
+
 .summary {
   &__terms {
     margin: var(--spacer-base) 0 0 0;
   }
+
   &__total {
     margin: 0 0 var(--spacer-sm) 0;
     flex: 0 0 16.875rem;
   }
+
   &__action {
     @include for-desktop {
       display: flex;
       margin: var(--spacer-xl) 0 0 0;
     }
   }
+
   &__action-button {
     margin: 0;
     width: 100%;
     margin: var(--spacer-sm) 0 0 0;
+
     @include for-desktop {
       margin: 0 var(--spacer-xl) 0 0;
       width: auto;
     }
+
     &--secondary {
       @include for-desktop {
         text-align: right;
       }
     }
   }
+
   &__back-button {
     margin: var(--spacer-xl) 0 0 0;
     width: 100%;
+
     @include for-desktop {
       margin: 0 var(--spacer-xl) 0 0;
       width: auto;
     }
-    color:  var(--c-white);
+
+    color: var(--c-white);
+
     &:hover {
-      color:  var(--c-white);
+      color: var(--c-white);
     }
   }
+
   &__property-total {
     margin: var(--spacer-xl) 0 0 0;
   }
 }
+
 .property {
   margin: 0 0 var(--spacer-sm) 0;
+
   &__name {
     color: var(--c-text-muted);
   }
 }
+
 .accordion {
   margin: 0 0 var(--spacer-xl) 0;
+
   &__item {
     display: flex;
     align-items: flex-start;
   }
+
   &__content {
     flex: 1;
   }
+
   &__edit {
     flex: unset;
   }
 }
+
 .content {
   margin: 0 0 var(--spacer-xl) 0;
   color: var(--c-text);
+
   &:last-child {
     margin: 0;
   }
+
   &__label {
     font-weight: var(--font-weight--normal);
   }
