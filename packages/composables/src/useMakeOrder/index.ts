@@ -6,10 +6,19 @@ import {
 import type { Order } from '@vue-storefront/moqui-api';
 
 const factoryParams: UseMakeOrderFactoryParams<Order> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   make: async (context: Context, { customQuery }) => {
-    console.log('Mocked: useMakeOrder.make');
-    return {};
+    try {
+      const response = await context.$moqui.api.makeOrder({
+        paymentMethodId: customQuery.paymentMethodId
+      });
+
+      return response;
+    } catch (error) {
+      throw {
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code || error.code
+      };
+    }
   }
 };
 
