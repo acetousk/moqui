@@ -11,7 +11,7 @@
 
       <BottomNavigation />
       <CartSidebar />
-      <WishlistSidebar />
+      <!-- <WishlistSidebar /> -->
       <LoginModal />
       <Notification />
     </div>
@@ -27,7 +27,7 @@ import BottomNavigation from '~/components/BottomNavigation.vue';
 import AppFooter from '~/components/AppFooter.vue';
 import TopBar from '~/components/TopBar.vue';
 import CartSidebar from '~/components/CartSidebar.vue';
-import WishlistSidebar from '~/components/WishlistSidebar.vue';
+// import WishlistSidebar from '~/components/WishlistSidebar.vue';
 import LoginModal from '~/components/LoginModal.vue';
 import LazyHydrate from 'vue-lazy-hydration';
 import Notification from '~/components/Notification';
@@ -46,7 +46,7 @@ export default {
     BottomNavigation,
     AppFooter,
     CartSidebar,
-    WishlistSidebar,
+    // WishlistSidebar,
     LoginModal,
     Notification
   },
@@ -155,5 +155,4 @@ h4 {
   line-height: 1.6;
   margin: 0;
 }
-
 </style>
