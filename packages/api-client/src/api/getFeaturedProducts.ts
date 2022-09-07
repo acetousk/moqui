@@ -11,7 +11,6 @@ export default async function getFeaturedProducts(context: Context, params: Feat
   url.searchParams.set('productStoreId', context.config.defaultStoreId);
   params.pageSize && url.searchParams.set('pageSize', String(params.pageSize));
 
-  console.log(`api-client/getFeaturedProducts => ${url.href}`);
   // Use axios to send a GET request
   const { data, headers } = await context.client.get<FeaturedProductsGetResponse>(url.href, {
     headers: getHeaders(context)

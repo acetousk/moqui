@@ -52,7 +52,6 @@ function getCategoryTree(params: FacetSearchResult<Facet>): AgnosticCategoryTree
 }
 
 function getProducts(params: FacetSearchResult<Facet>): any {
-  console.log('getProducts/params');
   return params.data?.items || [];
 }
 

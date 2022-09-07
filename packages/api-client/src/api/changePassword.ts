@@ -7,7 +7,6 @@ export default async function changePassword(context: Context, params: UserChang
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/customer/updatePassword', context.config.api);
 
-  console.log(`api-client/loadUser => ${url.href}`);
   // Use axios to send a GET request
   const { data, headers } = await context.client.put<UserChangePasswordResponse>(url.href, { ...params }, {
     headers: getHeaders(context)

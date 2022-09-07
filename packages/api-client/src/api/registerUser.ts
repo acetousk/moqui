@@ -7,7 +7,6 @@ export default async function registerUser(context: Context, params: UserRegiste
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/register', context.config.api);
 
-  console.log(`api-client/registerUser => ${url.href}`);
   // Use axios to send a GET request
   const { data, headers } = await context.client.post<UserRegisterResponse>(url.href, {
     emailAddress: params.emailAddress,

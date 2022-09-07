@@ -89,8 +89,6 @@ const params: UseUserFactoryParams<User, UpdateParams, RegisterParams> = {
       }
       return data?.customerInfo;
     } catch (error) {
-      console.log('logIn');
-      console.log(error);
       throw {
         message: error.response?.data?.message || error.message,
         code: error.response?.data?.code || error.code

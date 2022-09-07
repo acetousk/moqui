@@ -21,8 +21,6 @@ const params: UseProductFactoryParams<Product, SearchParams> = {
         const { data } = await context.$moqui.api.getFeaturedProducts({
           pageSize: 10
         });
-        console.log('useFeature');
-        console.log(data);
         return data.productList;
       } else if (params.type === 'related') {
         const { data } = await context.$moqui.api.getRelatedProducts({

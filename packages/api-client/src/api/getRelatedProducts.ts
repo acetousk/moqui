@@ -12,7 +12,6 @@ export default async function getRelatedProducts(context: Context, params: Relat
   url.searchParams.set('productSlug', params.productSlug);
   url.searchParams.set('pageSize', String(params?.pageSize || 10));
 
-  console.log(`api-client/getRelatedProducts => ${url.href}`);
   // Use axios to send a GET request
   const { data, headers } = await context.client.get<RelatedProductsGetResponse>(url.href, {
     headers: getHeaders(context)

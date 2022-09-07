@@ -11,7 +11,6 @@ export default async function getProduct(context: Context, params: ProductGetPar
   url.searchParams.set('productSlug', params.productSlug);
   url.searchParams.set('productStoreId', context.config.defaultStoreId);
 
-  console.log(`api-client/getProduct => ${url.href}`);
   // Use axios to send a GET request
   const { data, headers } = await context.client.get<ProductGetResponse>(url.href, {
     headers: getHeaders(context)

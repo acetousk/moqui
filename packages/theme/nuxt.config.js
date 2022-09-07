@@ -1,5 +1,6 @@
 import webpack from 'webpack';
 import theme from './themeConfig';
+import { getRoutes } from './routes';
 
 export default {
   server: {
@@ -37,7 +38,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '@/plugins/forward-set-cookies.ts', mode: 'server' },
+    { src: '@/plugins/set-cookie.ts', mode: 'server' },
+    { src: '@/plugins/axios-auth.ts' },
   ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -68,7 +70,8 @@ export default {
           apiClient: '@vue-storefront/moqui-api',
           composables: '@vue-storefront/moqui'
         }
-      }
+      },
+      routes: false
     }],
     // @core-development-only-end
     /* project-only-start
@@ -84,25 +87,27 @@ export default {
     }],
     'cookie-universal-nuxt',
     'vue-scrollto/nuxt',
-    '@vue-storefront/middleware/nuxt'
+    '@vue-storefront/middleware/nuxt',
+    '@nuxt/image'
   ],
 
   i18n: {
-    currency: 'USD',
-    country: 'US',
+    currency: 'EGP',
+    country: 'EG',
     countries: [
+      { name: 'EG', label: 'Egypt' },
       { name: 'US', label: 'United States', states: ['California', 'Nevada'] },
-      { name: 'AT', label: 'Austria' },
       { name: 'DE', label: 'Germany' },
       { name: 'NL', label: 'Netherlands' }
     ],
     currencies: [
-      { name: 'EUR', label: 'Euro' },
-      { name: 'USD', label: 'Dollar' }
+      { name: 'USD', label: 'Dollar' },
+      { name: 'EGP', label: 'Egyptian Pound' }
     ],
     locales: [
-      { code: 'en', label: 'English', file: 'en.js', iso: 'en' },
-      { code: 'de', label: 'German', file: 'de.js', iso: 'de' }
+      { code: 'en', label: 'English', file: 'en.js', iso: 'en', dir: 'ltr' },
+      { code: 'de', label: 'German', file: 'de.js', iso: 'de', dir: 'ltr' },
+      { code: 'ar', label: 'Arabic', file: 'ar.js', iso: 'ar', dir: 'rtl' }
     ],
     defaultLocale: 'en',
     lazy: true,
@@ -133,7 +138,8 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: [
-      'vee-validate/dist/rules'
+      'vee-validate/dist/rules',
+      '@storefront-ui'
     ],
     plugins: [
       new webpack.DefinePlugin({
@@ -147,14 +153,25 @@ export default {
   },
 
   router: {
-    middleware: ['checkout']
+    extendRoutes(routes) {
+      getRoutes(`${__dirname}/_theme`)
+        .forEach((route) => routes.unshift(route));
+    },
+    middleware: ['checkout'],
+    scrollBehavior(_to, _from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      } else {
+        return { x: 0, y: 0 };
+      }
+    }
   },
   publicRuntimeConfig: {
     theme
   },
   pwa: {
     meta: {
-      theme_color: '#5ECE7B'
+      theme_color: '#AF8936'
     }
   }
 };
