@@ -8,9 +8,12 @@ const forwardSetCookies: ApiClientExtension = {
   hooks: (req: Request, res: Response) => {
     return {
       beforeCreate: ({ configuration }) => {
-        const sessionCookieName: string = configuration.cookies?.sessionCookieName || 'JSESSIONID';
-        const xsrfCookieName: string = configuration.cookies?.xsrfCookieName || 'x-csrf-token';
-        const authCookieName: string = configuration.cookies?.authCookieName || 'vsf-auth';
+        const sessionCookieName: string =
+          configuration.cookies?.sessionCookieName || 'JSESSIONID';
+        const xsrfCookieName: string =
+          configuration.cookies?.xsrfCookieName || 'x-csrf-token';
+        const authCookieName: string =
+          configuration.cookies?.authCookieName || 'vsf-auth';
 
         return {
           ...configuration,
@@ -39,7 +42,6 @@ const forwardSetCookies: ApiClientExtension = {
               }
               res.cookie(authCookieName, JSON.stringify(state));
             }
-
           }
         };
       },
@@ -62,7 +64,7 @@ const forwardSetCookies: ApiClientExtension = {
         //   ...(response?.data ? response.data : response)
         // };
 
-        return response;
+        return { data: response?.data };
       }
     };
   }

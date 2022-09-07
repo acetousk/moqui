@@ -6,7 +6,7 @@
       title="Thank you for your order!"
       :image="{
         mobile: addBasePath('/thankyou/bannerM.png'),
-        desktop: addBasePath('/thankyou/bannerD.png'),
+        desktop: addBasePath('/thankyou/bannerD.png')
       }"
     >
       <template #description>
@@ -39,9 +39,9 @@
             <p class="contact__email">{{ companyDetails.email }}</p>
           </div>
         </div>
-        <SfButton class="order__notifications-button button-size"
-          >{{ $t('Allow order notifications') }}</SfButton
-        >
+        <SfButton class="order__notifications-button button-size">{{
+          $t('Allow order notifications')
+        }}</SfButton>
       </div>
       <div class="additional-info">
         <div>
@@ -70,15 +70,15 @@
         </div>
       </div>
     </section>
-    <SfButton class="back-button color-secondary button-size"
-      >{{ $t('Go back to shop') }}</SfButton
-    >
+    <SfButton class="back-button color-secondary button-size">{{
+      $t('Go back to shop')
+    }}</SfButton>
   </div>
 </template>
 
 <script>
 import { SfHeading, SfButton, SfCallToAction } from '@storefront-ui/vue';
-import { ref } from '@nuxtjs/composition-api';
+import { ref, computed, useRoute } from '@nuxtjs/composition-api';
 import { addBasePath } from '@vue-storefront/core';
 
 export default {
@@ -88,6 +88,7 @@ export default {
     SfCallToAction
   },
   setup(props, context) {
+    const route = useRoute();
     context.emit('changeStep', 4);
 
     const companyDetails = ref({
@@ -96,7 +97,7 @@ export default {
       city: 'Wroclaw, Poland',
       email: 'demo@vuestorefront.io'
     });
-    const orderNumber = ref('80932031-030-00');
+    const orderNumber = computed(() => route.value.query.order);
 
     return {
       addBasePath,

@@ -13,6 +13,7 @@ export type OrderItem = {
 
 export type Order = {
     orderId: string;
+    externalId: string;
     entryDate: string;
     placedDate?: string;
     statusDescription: string;

@@ -19,23 +19,22 @@ export default ({ $vsf, $cookies }) => {
     return response;
   });
 
-  // NOTE: No longer need this, since cookies should be sent out automatically assuming the host matches (client & express server).
-  // $vsf.$moqui?.client?.interceptors.request.use((config) => {
-  //   // similarily, on each request going out, we want to add session id & csrf-token to the Cookie header, if they exist.
-  //   config = {
-  //     ...config,
-  //     headers: {
-  //       ...($cookies.get('JSESSIONID') && {
-  //         Cookie:
-  //           'JSESSIONID=' +
-  //           $cookies.get('JSESSIONID') +
-  //           '; ' +
-  //           ($cookies.get('x-csrf-token')
-  //             ? 'x-csrf-token=' + $cookies.get('x-csrf-token') + ';'
-  //             : '')
-  //       })
-  //     }
-  //   };
-  //   return config;
-  // });
+  $vsf.$moqui?.client?.interceptors.request.use((config) => {
+    // similarily, on each request going out, we want to add session id & csrf-token to the Cookie header, if they exist.
+    config = {
+      ...config,
+      headers: {
+        ...($cookies.get('JSESSIONID') && {
+          Cookie:
+            'JSESSIONID=' +
+            $cookies.get('JSESSIONID') +
+            '; ' +
+            ($cookies.get('x-csrf-token')
+              ? 'x-csrf-token=' + $cookies.get('x-csrf-token') + ';'
+              : '')
+        })
+      }
+    };
+    return config;
+  });
 };

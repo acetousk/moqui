@@ -38,8 +38,8 @@ const init = (config: Config) => {
         );
         config.state.setCustomerLoggedIn(false);
         // // Not authrized, clear cookies
-        config.state.setCsrfToken(undefined);
-        config.state.setSessionId(undefined);
+        // config.state.setCsrfToken(undefined);
+        // config.state.setSessionId(undefined);
       }
       throw {
         // @ts-expect-error error type

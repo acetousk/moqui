@@ -89,7 +89,7 @@ export default {
   'Cookies Policy': 'Cookies Policy',
   'Commercial information': 'and agree to receive personalized commercial information from Brand name by email',
   'Feel free to edit': 'Feel free to edit any of your details below so your account is always up to date',
-  'Use your personal data': 'At Atiiq, we attach great importance to privacy issues and are committed to protecting the personal data of our users. Learn more about how we care and use your personal data in the',
+  'Use your personal data': 'At Brand Name, we attach great importance to privacy issues and are committed to protecting the personal data of our users. Learn more about how we care and use your personal data in the',
   'Privacy Policy': 'Privacy Policy',
   'Change password your account': 'If you want to change the password to access your account, enter the following information',
   'Your current email address is': 'Your current email address is',

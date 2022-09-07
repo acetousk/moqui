@@ -15,14 +15,14 @@ export default (context) => {
     },
     (error) => {
       if (error?.response && [401, 403].includes(error.response.status)) {
-        console.error(
-          `PLUGIN/AXIOS.AUTH:::ERROR_CODE  => ${String(
-            error?.response?.status
-          )}`
-        );
+        // console.error(
+        //   `PLUGIN/AXIOS.AUTH:::ERROR_CODE  => ${String(
+        //     error?.response?.status
+        //   )}`
+        // );
         $cookies.remove('vsf-auth');
-        $cookies.remove('x-csrf-token');
-        $cookies.remove('JSESSIONID');
+        // $cookies.remove('x-csrf-token');
+        // $cookies.remove('JSESSIONID');
         return Promise.reject(error);
       }
       return Promise.reject(error);

@@ -3,11 +3,7 @@ import {
   useCartFactory,
   UseCartFactoryParams
 } from '@vue-storefront/core';
-import type {
-  Cart,
-  CartItem,
-  Product
-} from '@vue-storefront/moqui-api';
+import type { Cart, CartItem, Product } from '@vue-storefront/moqui-api';
 
 const params: UseCartFactoryParams<Cart, CartItem, Product> = {
   load: async (context: Context /* , { customQuery }*/) => {
@@ -15,7 +11,6 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
       const { data } = await context.$moqui.api.getCart();
       if (!data?.orderHeader?.orderId) return null;
       return data;
-
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
       if ((error.response?.data?.code || error.code) === 401) return null;
@@ -26,14 +21,16 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     }
   },
 
-  addItem: async (context: Context, { product, quantity /* , currentCart, customQuery */ }) => {
+  addItem: async (
+    context: Context,
+    { product, quantity /* , currentCart, customQuery */ }
+  ) => {
     try {
       const { data } = await context.$moqui.api.addItemToCart({
         productId: product.productId,
         quantity: quantity
       });
       return data;
-
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
       if ((error.response?.data?.code || error.code) === 401) return null;
@@ -44,13 +41,15 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     }
   },
 
-  removeItem: async (context: Context, { product /* , currentCart, customQuery */ }) => {
+  removeItem: async (
+    context: Context,
+    { product /* , currentCart, customQuery */ }
+  ) => {
     try {
       const { data } = await context.$moqui.api.removeCartItem({
         productId: product?.product.productId
       });
       return data;
-
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
       if ((error.response?.data?.code || error.code) === 401) return null;
@@ -61,14 +60,16 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     }
   },
 
-  updateItemQty: async (context: Context, { product, quantity /* ,currentCart , customQuery */ }) => {
+  updateItemQty: async (
+    context: Context,
+    { product, quantity /* ,currentCart , customQuery */ }
+  ) => {
     try {
       const { data } = await context.$moqui.api.updateCartItemQty({
         productId: product.product.productId,
         quantity
       });
       return data;
-
     } catch (error) {
       // If we run into a 401, we got to return null so that the cart state is reset
       if ((error.response?.data?.code || error.code) === 401) return null;
@@ -79,7 +80,10 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     }
   },
 
-  applyCoupon: async (context: Context, { couponCode /* , currentCart, customQuery */ }) => {
+  applyCoupon: async (
+    context: Context,
+    { couponCode /* , currentCart, customQuery */ }
+  ) => {
     try {
       const { data } = await context.$moqui.api.addCartPromo({
         promoCode: couponCode
@@ -88,7 +92,6 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
         updatedCart: data,
         updatedCoupon: {}
       };
-
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -97,7 +100,10 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
     }
   },
 
-  removeCoupon: async (context: Context, { couponCode /* , currentCart, customQuery */ }) => {
+  removeCoupon: async (
+    context: Context,
+    { couponCode /* , currentCart, customQuery */ }
+  ) => {
     try {
       const { data } = await context.$moqui.api.removeCartPromo({
         promoCodeId: couponCode
@@ -105,7 +111,6 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
       return {
         updatedCart: data
       };
-
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -115,7 +120,11 @@ const params: UseCartFactoryParams<Cart, CartItem, Product> = {
   },
 
   isInCart: (context: Context, { currentCart, product }) => {
-    return ((currentCart?.orderItemProductList?.findIndex(item => item.product.productId === product.productId) !== -1) || false);
+    const productList = currentCart?.orderItemProductList;
+    const itemIndex = productList?.findIndex(
+      (item) => item.product.productId === product.productId
+    );
+    return (itemIndex && itemIndex !== -1) || false;
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

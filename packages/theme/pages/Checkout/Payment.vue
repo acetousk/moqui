@@ -228,7 +228,6 @@ export default {
         }
       });
       if (makeOrderError.value.make) {
-        console.error(makeOrderError.value.make);
         sendNotification({
           id: Symbol('order_place_failed'),
           message: 'Your order could not be processed. Please try again',
@@ -258,8 +257,7 @@ export default {
         });
       } else if (order.value.requiresPayment) {
         const paymentGatewayPath = {
-          name: 'pay',
-          query: { order: orderGetters.getId(order.value) }
+          name: 'pay'
         };
         router.push(context.root.localePath(paymentGatewayPath));
       }

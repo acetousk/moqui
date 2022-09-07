@@ -6,6 +6,7 @@ import getHeaders from './helpers/getHeaders';
 export default async function getShippingProvider(context: Context, params: ShippingProviderGetParams) {
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/cart/shippingOptions', context.config.api);
+  url.searchParams.set('productStoreId', context.config.defaultStoreId);
 
   // Use axios to send a GET request
   const response = await context.client.get<ShippingProviderGetResponse>(url.href, { headers: getHeaders(context) });
