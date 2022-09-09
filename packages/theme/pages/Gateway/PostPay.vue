@@ -15,8 +15,7 @@
             />
           </div>
           <div>
-            Something went wrong. Please check your internet connection and
-            refresh this page. If this issue persists, please contact us.
+            {{ $t('Payment something went wrong') }}
           </div>
         </template>
         <template v-else>
@@ -29,7 +28,7 @@
                 style="margin: auto"
               />
             </div>
-            We're verifying your transaction. Please wait..
+            {{ $t('Were verifying your transaction') }}
           </div>
           <div v-if="status == 'success'">
             <div class="icon-container">
@@ -40,12 +39,11 @@
                 style="margin: auto"
               />
             </div>
-            Your payment #{{ transactionId }} has been accepted. You will be
-            redirected to the confirmation page shortly.
+            {{ $t('Payment accepted', transactionId) }}
             <br />
             <br />
             <div style="text-align: center">
-              Thank you for choosing Company Name.
+              {{ $t('Thank you for choosing') }}
             </div>
           </div>
           <div v-if="status == 'failed'">
@@ -57,10 +55,8 @@
                 style="margin: auto"
               />
             </div>
-            Thank you for using the online payment service. The transaction you
-            have attempted to make has been declined. This is most likely an
-            issue with your issuing bank.
-            <div>You will be redirected back to checkout shortly...</div>
+            {{ $t('Thank you for using the online payment service') }}
+            <div>{{ $t('You will be redirected') }}</div>
           </div>
         </template>
         <div>

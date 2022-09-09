@@ -33,7 +33,7 @@ import LazyHydrate from 'vue-lazy-hydration';
 import Notification from '~/components/Notification';
 import { onSSR } from '@vue-storefront/core';
 import { useRoute } from '@nuxtjs/composition-api';
-import { useCart, useStore, useUser, useWishlist } from '@vue-storefront/moqui';
+import { useCart, useStore, useUser } from '@vue-storefront/moqui';
 import { watch } from '@nuxtjs/composition-api';
 
 export default {
@@ -56,23 +56,29 @@ export default {
     const { load: loadStores } = useStore();
     const { load: loadUser, isAuthenticated } = useUser();
     const { load: loadCart, clear: clearCart, cart } = useCart();
-    const { load: loadWishlist } = useWishlist();
+    // const { load: loadWishlist } = useWishlist();
 
     watch(isAuthenticated, (newVal, oldVal) => {
-      if (!oldVal && (newVal === true)) {
+      if (!oldVal && newVal === true) {
         try {
           Promise.resolve(loadCart());
         } catch (e) {
           console.error(e);
         }
       }
-      if ((oldVal === true) && (!newVal)) {
+      if (oldVal === true && !newVal) {
         clearCart();
       }
     });
 
     onSSR(async () => {
-      await Promise.all([loadStores(), loadUser(), loadCart(), loadWishlist()]);
+      await Promise.all([
+        loadStores(),
+        loadUser(),
+        loadCart()
+
+        /* loadWishlist() */
+      ]);
     });
 
     return {

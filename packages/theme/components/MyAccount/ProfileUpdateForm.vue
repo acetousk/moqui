@@ -10,7 +10,7 @@
           <SfInput
             v-model="form.firstName"
             name="firstName"
-            label="First Name"
+            :label="$t('First Name')"
             required
             :valid="!errors[0]"
             :error-message="errors[0]"
@@ -24,7 +24,7 @@
           <SfInput
             v-model="form.lastName"
             name="lastName"
-            label="Last Name"
+            :label="$t('Last Name')"
             required
             :valid="!errors[0]"
             :error-message="errors[0]"
@@ -37,7 +37,7 @@
           rules="required"
           class="form__element"
         >
-          <SfSelect v-model="form.gender" label="Gender">
+          <SfSelect v-model="form.gender" :label="$t('Gender')">
             <SfSelectOption
               v-for="option of genderOptions"
               :key="option.value"
@@ -56,7 +56,7 @@
             v-model="form.email"
             type="email"
             name="email"
-            label="Your e-mail"
+            :label="$t('Your e-mail')"
             required
             :valid="!errors[0]"
             :error-message="errors[0]"

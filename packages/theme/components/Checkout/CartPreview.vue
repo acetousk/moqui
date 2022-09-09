@@ -1,39 +1,80 @@
 <template>
   <div>
     <div class="highlighted">
-      <SfHeading :level="3" :title="$t('Order summary')" class="sf-heading--left sf-heading--no-underline title" />
+      <SfHeading
+        :level="3"
+        :title="$t('Order summary')"
+        class="sf-heading--left sf-heading--no-underline title"
+      />
     </div>
     <div class="highlighted">
-      <SfProperty :name="$t('Products')" :value="totalItems"
-        class="sf-property--full-width sf-property--large property" />
-      <SfProperty :name="$t('Subtotal')" :value="$n(totals.special, 'currency')"
-        :class="['sf-property--full-width', 'sf-property--large property']" />
-      <SfProperty v-if="hasDiscounts" :name="$t('Discount')" :value="$n(discountsAmount, 'currency')"
-        class="sf-property--full-width sf-property--small property" />
-      <SfProperty :name="$t('VAT (14%)')" :value="$n(totals.tax, 'currency')"
-        class="sf-property--full-width sf-property--small property" />
-      <SfProperty :name="$t('Total')" :value="$n(totals.total, 'currency')"
-        class="sf-property--full-width sf-property--large property-total" />
+      <SfProperty
+        :name="$t('Products')"
+        :value="totalItems"
+        class="sf-property--full-width sf-property--large property"
+      />
+      <SfProperty
+        :name="$t('Subtotal')"
+        :value="$n(totals.special, 'currency')"
+        :class="['sf-property--full-width', 'sf-property--large property']"
+      />
+      <SfProperty
+        v-if="hasDiscounts"
+        :name="$t('Discount')"
+        :value="$n(discountsAmount, 'currency')"
+        class="sf-property--full-width sf-property--small property"
+      />
+      <SfProperty
+        :name="$t('VAT (14%)')"
+        :value="$n(totals.tax, 'currency')"
+        class="sf-property--full-width sf-property--small property"
+      />
+      <SfProperty
+        :name="$t('Total')"
+        :value="$n(totals.total, 'currency')"
+        class="sf-property--full-width sf-property--large property-total"
+      />
     </div>
     <SfLoader :class="{ loading }" :loading="loading">
       <div class="highlighted sf-order-summary__promo-code">
-        <SfInput v-model="promoCode" :disabled="Boolean(appliedPromoCode && appliedPromoCode.id)" name="promoCode"
-          label="Enter promo code" class="sf-input--filled sf-order-summary__promo-code-input"
-          :icon='{ "icon": "check", "size": "xs", "color": "#ff0000" }' />
-        <SfButton class="sf-order-summary__promo-code-button" data-testid="apply-button" @click="handlePromoCodeAction">
-          {{ appliedPromoCode ? 'Remove' : 'Apply' }}
+        <SfInput
+          v-model="promoCode"
+          :disabled="Boolean(appliedPromoCode && appliedPromoCode.id)"
+          name="promoCode"
+          :label="$t('Enter promo code')"
+          class="sf-input--filled sf-order-summary__promo-code-input"
+          :icon="{ icon: 'check', size: 'xs', color: '#ff0000' }"
+        />
+        <SfButton
+          class="sf-order-summary__promo-code-button"
+          data-testid="apply-button"
+          @click="handlePromoCodeAction"
+        >
+          {{ appliedPromoCode ? $t('Remove') : $t('Apply') }}
         </SfButton>
       </div>
     </SfLoader>
     <div class="highlighted">
-      <SfCharacteristic v-for="characteristic in characteristics" :key="characteristic.title"
-        :title="characteristic.title" :description="characteristic.description" :icon="characteristic.icon"
-        class="characteristic" />
+      <SfCharacteristic
+        v-for="characteristic in characteristics"
+        :key="characteristic.title"
+        :title="characteristic.title"
+        :description="characteristic.description"
+        :icon="characteristic.icon"
+        class="characteristic"
+      />
     </div>
   </div>
 </template>
 <script>
-import { SfHeading, SfProperty, SfCharacteristic, SfInput, SfButton, SfLoader } from '@storefront-ui/vue';
+import {
+  SfHeading,
+  SfProperty,
+  SfCharacteristic,
+  SfInput,
+  SfButton,
+  SfLoader
+} from '@storefront-ui/vue';
 import { computed, ref, watch, defineComponent } from '@nuxtjs/composition-api';
 import { useCart, cartGetters } from '@vue-storefront/moqui';
 import useUiNotification from '~/composables/useUiNotification';
@@ -67,7 +108,15 @@ export default defineComponent({
     SfLoader
   },
   setup() {
-    const { cart, removeItem, updateItemQty, applyCoupon, removeCoupon, error, loading } = useCart();
+    const {
+      cart,
+      removeItem,
+      updateItemQty,
+      applyCoupon,
+      removeCoupon,
+      error,
+      loading
+    } = useCart();
     const { send: sendNotification } = useUiNotification();
     const listIsHidden = ref(false);
 
@@ -77,21 +126,27 @@ export default defineComponent({
     const totals = computed(() => cartGetters.getTotals(cart.value));
     const discounts = computed(() => cartGetters.getDiscounts(cart.value));
     const hasDiscounts = computed(() => discounts.value?.length > 0);
-    const discountsAmount = computed(
-      () => discounts.value.reduce((a, el) => el.value + a, 0)
+    const discountsAmount = computed(() =>
+      discounts.value.reduce((a, el) => el.value + a, 0)
     );
-    const appliedPromoCode = computed(() => cartGetters.getCoupons(cart.value)?.[0]);
+    const appliedPromoCode = computed(
+      () => cartGetters.getCoupons(cart.value)?.[0]
+    );
 
     const applyCouponError = computed(() => error.value.applyCoupon);
     const removeCouponError = computed(() => error.value.removeCoupon);
 
-    watch(appliedPromoCode, (newVal) => {
-      if (newVal) {
-        promoCode.value = newVal.code;
-      }
-    }, { immediate: true });
+    watch(
+      appliedPromoCode,
+      (newVal) => {
+        if (newVal) {
+          promoCode.value = newVal.code;
+        }
+      },
+      { immediate: true }
+    );
 
-    const handleApplyCoupon = (async () => {
+    const handleApplyCoupon = async () => {
       await applyCoupon({
         couponCode: promoCode.value
       });
@@ -115,9 +170,9 @@ export default defineComponent({
           title: 'Promotion'
         });
       }
-    });
+    };
 
-    const handleRemoveCoupon = (async () => {
+    const handleRemoveCoupon = async () => {
       await removeCoupon({
         couponCode: appliedPromoCode.value.id
       });
@@ -132,13 +187,11 @@ export default defineComponent({
           title: 'Promotion'
         });
       }
-    });
+    };
 
     const handlePromoCodeAction = () => {
-      if (appliedPromoCode.value)
-        handleRemoveCoupon();
-      else
-        handleApplyCoupon();
+      if (appliedPromoCode.value) handleRemoveCoupon();
+      else handleApplyCoupon();
     };
     return {
       loading,

@@ -1,6 +1,9 @@
 <template>
   <div id="product">
-    <SfBreadcrumbs class="breadcrumbs desktop-only" :breadcrumbs="breadcrumbs" />
+    <SfBreadcrumbs
+      class="breadcrumbs desktop-only"
+      :breadcrumbs="breadcrumbs"
+    />
     <div class="product">
       <LazyHydrate when-idle>
         <SfGallery :images="productGallery" class="product__gallery" />
@@ -8,15 +11,29 @@
 
       <div class="product__info">
         <div class="product__header">
-          <SfHeading :title="productGetters.getName(product, productVariant)" :level="3"
-            class="sf-heading--no-underline sf-heading--left" />
-          <SfIcon icon="drag" size="xxl" color="var(--c-text-disabled)" class="product__drag-icon smartphone-only" />
+          <SfHeading
+            :title="productGetters.getName(product, productVariant)"
+            :level="3"
+            class="sf-heading--no-underline sf-heading--left"
+          />
+          <SfIcon
+            icon="drag"
+            size="xxl"
+            color="var(--c-text-disabled)"
+            class="product__drag-icon smartphone-only"
+          />
         </div>
         <div class="product__price-and-rating">
-          <SfPrice :regular="$n(productGetters.getPrice(product).regular, 'currency')" :special="
-            productGetters.getPrice(product, productVariant).special &&
-            $n(productGetters.getPrice(product, productVariant).special, 'currency')
-          " />
+          <SfPrice
+            :regular="$n(productGetters.getPrice(product).regular, 'currency')"
+            :special="
+              productGetters.getPrice(product, productVariant).special &&
+              $n(
+                productGetters.getPrice(product, productVariant).special,
+                'currency'
+              )
+            "
+          />
           <div>
             <div class="product__rating">
               <SfRating :score="averageRating" :max="5" />
@@ -25,7 +42,7 @@
               </a>
             </div>
             <SfButton class="sf-button--text" @click="scrollToReviews">{{
-            $t('Read all reviews')
+              $t('Read all reviews')
             }}</SfButton>
           </div>
         </div>
@@ -37,35 +54,79 @@
             {{ $t('Size guide') }}
           </SfButton> -->
           <template v-for="optionKey in Object.keys(options)">
-            <SfSelect v-if="(optionKey !== 'PftColor') && options[optionKey].length" v-e2e="'size-select'"
-              :value="configuration[optionKey]" @input="(val) => updateFilter({ [optionKey]: val })"
-              :label="options[optionKey][0].attrName" class="sf-select--underlined product__select-size"
-              :required="true">
-              <SfSelectOption v-for="option in options[optionKey]" :key="option.value" :value="option.value">
-                {{ option.label }}
+            <SfSelect
+              v-if="optionKey !== 'PftColor' && options[optionKey].length"
+              v-e2e="'size-select'"
+              :value="configuration[optionKey]"
+              @input="(val) => updateFilter({ [optionKey]: val })"
+              :label="$t(options[optionKey][0].attrName)"
+              class="sf-select--underlined product__select-size"
+              :required="true"
+            >
+              <SfSelectOption
+                v-for="option in options[optionKey]"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ $t(option.label) }}
               </SfSelectOption>
             </SfSelect>
           </template>
 
-          <div v-if="options.PftColor && options.PftColor.length > 1" class="product__colors">
+          <div
+            v-if="options.PftColor && options.PftColor.length > 1"
+            class="product__colors"
+          >
             <p class="product__color-label">{{ $t('Color') }}:</p>
-            <SfColor v-for="(color, i) in options.PftColor" :key="i" :color="color.name" class="product__color"
-              @click="updateFilter({ PftColor: color.value })" :selected="configuration.PftColor === color.value" />
+            <SfColor
+              v-for="(color, i) in options.PftColor"
+              :key="i"
+              :color="color.name"
+              class="product__color"
+              @click="updateFilter({ PftColor: color.value })"
+              :selected="configuration.PftColor === color.value"
+            />
           </div>
 
-          <SfAddToCart v-e2e="'product_add-to-cart'" :stock="stock" v-model="qty" :disabled="loading"
-            :canAddToCart="stock > 0" class="product__add-to-cart"
-            @click="addItem({ product: { productId: productVariant ? productVariant.productId : product.productId }, quantity: parseInt(qty) })" />
+          <SfAddToCart
+            v-e2e="'product_add-to-cart'"
+            :stock="stock"
+            v-model="qty"
+            :disabled="loading"
+            :canAddToCart="stock > 0"
+            class="product__add-to-cart"
+            @click="
+              addItem({
+                product: {
+                  productId: productVariant
+                    ? productVariant.productId
+                    : product.productId
+                },
+                quantity: parseInt(qty)
+              })
+            "
+          >
+            <template #add-to-cart-btn>
+              <SfButton class="sf-add-to-cart__button sf-button">
+                {{ $t('Add to cart') }}
+              </SfButton>
+            </template>
+          </SfAddToCart>
         </div>
 
         <LazyHydrate when-idle>
           <SfTabs id="ProductTabs" :open-tab="currentTab" class="product__tabs">
-            <SfTab title="Description">
+            <SfTab :title="$t('Description')">
               <div class="product__description">
                 {{ productGetters.getDescription(product, productVariant) }}
               </div>
-              <SfProperty v-for="(stdAttribute, i) in standardAttributes" :key="i" :name="stdAttribute.name"
-                :value="stdAttribute.value" class="product__property">
+              <SfProperty
+                v-for="(stdAttribute, i) in standardAttributes"
+                :key="i"
+                :name="$t(stdAttribute.name)"
+                :value="$t(stdAttribute.value)"
+                class="product__property"
+              >
                 <template v-if="stdAttribute.name === 'Category'" #value>
                   <SfButton class="product__property__button sf-button--text">
                     {{ stdAttribute.value }}
@@ -73,10 +134,13 @@
                 </template>
               </SfProperty>
             </SfTab>
-            <SfTab title="Read reviews">
+            <SfTab :title="$t('Read reviews')">
               <ProductReview :product-id="activeProductId" />
             </SfTab>
-            <SfTab title="Additional Information" class="product__additional-info">
+            <SfTab
+              :title="$t('Additional Information')"
+              class="product__additional-info"
+            >
               <div class="product__additional-info">
                 <p class="product__additional-info__title">{{ $t('Brand') }}</p>
                 <p>{{ brand }}</p>
@@ -98,7 +162,11 @@
     </div>
 
     <LazyHydrate when-visible>
-      <RelatedProducts :products="relatedProducts" :loading="relatedLoading" :title="$t('You might also like')" />
+      <RelatedProducts
+        :products="relatedProducts"
+        :loading="relatedLoading"
+        :title="$t('You might also like')"
+      />
     </LazyHydrate>
 
     <!-- <LazyHydrate when-visible>
@@ -129,11 +197,7 @@ import {
 import RelatedProducts from '~/components/RelatedProducts.vue';
 import ProductReview from '~/components/ProductReview.vue';
 import { ref, computed, useRoute, useRouter } from '@nuxtjs/composition-api';
-import {
-  useProduct,
-  useCart,
-  productGetters
-} from '@vue-storefront/moqui';
+import { useProduct, useCart, productGetters } from '@vue-storefront/moqui';
 import { onSSR } from '@vue-storefront/core';
 import LazyHydrate from 'vue-lazy-hydration';
 import { addBasePath } from '@vue-storefront/core';
@@ -167,28 +231,31 @@ export default {
       productGetters.getStandardAttributes(products.value)
     );
 
-    const breadcrumbs = computed(() =>
-      [{
+    const breadcrumbs = computed(() => [
+      {
         text: 'Home',
         link: '/'
-      }, ...productGetters.getBreadCrumbs(products.value)]
-    );
+      },
+      ...productGetters.getBreadCrumbs(products.value)
+    ]);
 
     const configuration = computed(() =>
-      productGetters.getSelectedAttributes(products.value, slug.value, route.value.query)
+      productGetters.getSelectedAttributes(
+        products.value,
+        slug.value,
+        route.value.query
+      )
     );
 
-    const product = computed(
-      () =>
-        productGetters.getFilteredVariants(products.value, {
-          master: true,
-          attributes: configuration.value
-        })
+    const product = computed(() =>
+      productGetters.getFilteredVariants(products.value, {
+        master: true,
+        attributes: configuration.value
+      })
     );
 
-    const productVariant = computed(
-      () =>
-        productGetters.getProductVariantFromUrlSlug(products.value, slug.value)
+    const productVariant = computed(() =>
+      productGetters.getProductVariantFromUrlSlug(products.value, slug.value)
     );
 
     const categories = computed(() =>
@@ -205,7 +272,11 @@ export default {
     );
 
     onSSR(async () => {
-      await search({ productId: id.value, variantId: slug.value, type: 'single' });
+      await search({
+        productId: id.value,
+        variantId: slug.value,
+        type: 'single'
+      });
       await searchRelatedProducts({
         catId: [categories.value[0]],
         productSlug: id.value,
@@ -215,11 +286,18 @@ export default {
     });
 
     const updateFilter = (filter) => {
-      const matchedVariant = productGetters.getProductVariantFromFilters(products.value, slug.value, filter);
+      const matchedVariant = productGetters.getProductVariantFromFilters(
+        products.value,
+        slug.value,
+        filter
+      );
       // If we match a variant, change the slug, which represents the slug of product variant – see note above
       if (matchedVariant) {
         router.push({
-          path: route.value.path.substring(0, route.value.path.lastIndexOf('/')) + '/' + matchedVariant
+          path:
+            route.value.path.substring(0, route.value.path.lastIndexOf('/')) +
+            '/' +
+            matchedVariant
         });
       } else {
         // Otherwise, set the filter as an intermediate attribute in the query params
@@ -380,11 +458,13 @@ export default {
   }
 
   &__count {
-    @include font(--count-font,
+    @include font(
+      --count-font,
       var(--font-weight--normal),
       var(--font-size--sm),
       1.4,
-      var(--font-family--secondary));
+      var(--font-family--secondary)
+    );
     color: var(--c-text);
     text-decoration: none;
     margin: 0 0 0 var(--spacer-xs);
@@ -392,11 +472,13 @@ export default {
 
   &__description {
     overflow-wrap: anywhere;
-    @include font(--product-description-font,
+    @include font(
+      --product-description-font,
       var(--font-weight--light),
       var(--font-size--base),
       1.6,
-      var(--font-family--primary));
+      var(--font-family--primary)
+    );
   }
 
   &__select-size {
@@ -408,11 +490,13 @@ export default {
   }
 
   &__colors {
-    @include font(--product-color-font,
+    @include font(
+      --product-color-font,
       var(--font-weight--normal),
       var(--font-size--lg),
       1.6,
-      var(--font-family--secondary));
+      var(--font-family--secondary)
+    );
     display: flex;
     align-items: center;
     margin-top: var(--spacer-xl);
@@ -472,11 +556,13 @@ export default {
 
   &__additional-info {
     color: var(--c-link);
-    @include font(--additional-info-font,
+    @include font(
+      --additional-info-font,
       var(--font-weight--light),
       var(--font-size--sm),
       1.6,
-      var(--font-family--primary));
+      var(--font-family--primary)
+    );
 
     &__title {
       font-weight: var(--font-weight--normal);

@@ -14,7 +14,7 @@
               style="margin: auto"
             />
           </div>
-          You payment link has expired. Please try again.
+          {{ $t('Your payment link has expired') }}
         </div>
         <div></div>
       </div>

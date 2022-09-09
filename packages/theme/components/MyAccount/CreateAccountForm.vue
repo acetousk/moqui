@@ -6,23 +6,23 @@
       </div>
       <div class="form__horizontal">
         <ValidationProvider v-slot="{ errors }" rules="required|min:2|nothavenumber" class="form__element">
-          <SfInput v-model="form.firstName" name="firstName" label="First Name" required :valid="!errors[0]"
+          <SfInput v-model="form.firstName" name="firstName" :label="$t('First Name')" required :valid="!errors[0]"
             :error-message="errors[0]" />
         </ValidationProvider>
         <ValidationProvider v-slot="{ errors }" rules="required|min:2|nothavenumber" class="form__element">
-          <SfInput v-model="form.lastName" name="lastName" label="Last Name" required :valid="!errors[0]"
+          <SfInput v-model="form.lastName" name="lastName" :label="$t('Last Name')" required :valid="!errors[0]"
             :error-message="errors[0]" />
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
         <ValidationProvider v-slot="{ errors }" rules="required|email" class="form__element">
-          <SfInput v-model="form.email" type="email" name="email" label="Your e-mail" required :valid="!errors[0]"
+          <SfInput v-model="form.email" type="email" name="email" :label="$t('Your e-mail')" required :valid="!errors[0]"
             :error-message="errors[0]" />
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
         <ValidationProvider v-slot="{ errors }" rules="required|password" class="form__element">
-          <SfInput v-model="newPassword" type="password" name="newPassword" label="Password" required
+          <SfInput v-model="newPassword" type="password" name="newPassword" :label="$t('Password')" required
             class="form__element" />
         </ValidationProvider>
       </div>

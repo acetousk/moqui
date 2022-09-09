@@ -6,38 +6,38 @@
     />
     <SfContentPages
       v-e2e="'my-account-content-pages'"
-      title="My Account"
+      :title="$t('My Account')"
       :active="activePage"
       class="my-account"
       @click:change="changeActivePage"
     >
-      <SfContentCategory title="Personal Details">
-        <SfContentPage title="My profile">
+      <SfContentCategory :title="$t('Personal details')">
+        <SfContentPage :title="$t('My profile')">
           <MyProfile />
         </SfContentPage>
 
-        <SfContentPage title="Shipping details">
+        <SfContentPage :title="$t('Shipping details')">
           <ShippingDetails />
         </SfContentPage>
 
         <!--
-          <SfContentPage title="Billing details">
+          <SfContentPage :title="$t('Billing details')">
           <BillingDetails />
         </SfContentPage>
 
-        <SfContentPage title="My newsletter">
+        <SfContentPage :title="$t('My newsletter')">
           <MyNewsletter />
         </SfContentPage>
         -->
       </SfContentCategory>
 
-      <SfContentCategory title="Order details">
-        <SfContentPage title="Order history">
+      <SfContentCategory :title="$t('Order details')">
+        <SfContentPage :title="$t('Order history')">
           <OrderHistory />
         </SfContentPage>
       </SfContentCategory>
 
-      <SfContentPage title="Log out" />
+      <SfContentPage :title="$t('Logout')" />
     </SfContentPages>
   </div>
 </template>
@@ -45,6 +45,8 @@
 import { SfBreadcrumbs, SfContentPages } from '@storefront-ui/vue';
 import {
   computed,
+  ref,
+  onMounted,
   onBeforeUnmount,
   useRoute,
   useRouter
@@ -73,6 +75,7 @@ export default {
   setup(props, context) {
     const route = useRoute();
     const router = useRouter();
+    const breadcrumbs = ref([]);
 
     const { logout } = useUser();
     const isMobile = computed(() => mapMobileObserver().isMobile.get());
@@ -85,14 +88,14 @@ export default {
           ' '
         );
       } else if (!isMobile.value) {
-        return 'My profile';
+        return context.root.$t('My profile');
       } else {
         return '';
       }
     });
 
     const changeActivePage = async (title) => {
-      if (title === 'Log out') {
+      if (title === context.root.$t('Logout')) {
         await logout();
         router.push(context.root.localePath({ name: 'home' }));
         return;
@@ -105,26 +108,24 @@ export default {
       router.push(localeTransformedPath);
     };
 
+    onMounted(() => {
+      breadcrumbs.value = [
+        {
+          text: context.root.$t('Home'),
+          route: { link: context.root.localePath({ name: 'home' }) }
+        },
+        {
+          text: context.root.$t('My Account'),
+          route: { link: '#' }
+        }
+      ];
+    });
+
     onBeforeUnmount(() => {
       unMapMobileObserver();
     });
 
-    return { changeActivePage, activePage };
-  },
-
-  data() {
-    return {
-      breadcrumbs: [
-        {
-          text: 'Home',
-          route: { link: '#' }
-        },
-        {
-          text: 'My Account',
-          route: { link: '#' }
-        }
-      ]
-    };
+    return { breadcrumbs, changeActivePage, activePage };
   }
 };
 </script>

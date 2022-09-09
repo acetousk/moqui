@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <SfTabs v-if="editingAddress" key="edit-address" :open-tab="1" class="tab-orphan">
-      <SfTab :title="isNewAddress ? 'Add the address' : 'Update the address'">
+      <SfTab :title="isNewAddress ? $t('Add address') : $t('Edit address')">
         <p class="message">
           {{ $t('Contact details updated') }}
         </p>
@@ -11,7 +11,7 @@
     </SfTabs>
 
     <SfTabs v-else :open-tab="1" key="address-list" class="tab-orphan">
-      <SfTab title="Shipping details">
+      <SfTab :title="$t('Shipping details')">
         <p class="message">
           {{ $t('Manage shipping addresses') }}
         </p>

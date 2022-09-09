@@ -1,7 +1,7 @@
 <template>
   <div id="static">
     <SfBreadcrumbs class="breadcrumbs desktop-only" :breadcrumbs="breadcrumbs" />
-    <SfContentPages :active="activePage" title="Help" @click:change="updateActive">
+    <SfContentPages :active="activePage" :title="$t('Help')" @click:change="updateActive">
       <SfContentPage v-for="(page, key) in pages" :key="key" :title="page.title">
         <template v-if="page.content[0] && typeof page.content[0] === 'string'">
           <p v-for="(paragraph, index) in page.content" :key="index" class="paragraph paragraph--without-tab">

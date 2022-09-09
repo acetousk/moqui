@@ -6,21 +6,50 @@
     <div v-if="!isPasswordChanged">
       <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
         <form class="form" @submit.prevent="handleSubmit(setNewPassword)">
-          <ValidationProvider rules="required|password" vid="password" v-slot="{ errors }">
-            <SfInput v-e2e="'reset-password-modal-password'" v-model="form.password" :valid="!errors[0]"
-              :errorMessage="errors[0]" :label="$t('Password')" name="password" type="password" class="form__element" />
+          <ValidationProvider
+            rules="required|password"
+            vid="password"
+            v-slot="{ errors }"
+          >
+            <SfInput
+              v-e2e="'reset-password-modal-password'"
+              v-model="form.password"
+              :valid="!errors[0]"
+              :errorMessage="errors[0]"
+              :label="$t('Password')"
+              name="password"
+              type="password"
+              class="form__element"
+            />
           </ValidationProvider>
-          <ValidationProvider rules="required|password|confirmed:password" v-slot="{ errors }">
-            <SfInput v-e2e="'reset-password-modal-password-repeat'" v-model="form.repeatPassword" :valid="!errors[0]"
-              :errorMessage="errors[0]" :label="$t('Repeat Password')" name="repeat-password" type="password"
-              class="form__element" />
+          <ValidationProvider
+            rules="required|password|confirmed:password"
+            v-slot="{ errors }"
+          >
+            <SfInput
+              v-e2e="'reset-password-modal-password-repeat'"
+              v-model="form.repeatPassword"
+              :valid="!errors[0]"
+              :errorMessage="errors[0]"
+              :label="$t('Repeat Password')"
+              name="repeat-password"
+              type="password"
+              class="form__element"
+            />
           </ValidationProvider>
           <div v-if="passwordMatchError || forgotPasswordError.setNew">
             {{ passwordMatchError || forgotPasswordError.setNew.message }}
           </div>
-          <SfButton v-e2e="'reset-password-modal-submit'" type="submit" class="sf-button--full-width form__button"
-            :disabled="forgotPasswordLoading">
-            <SfLoader :class="{ loader: forgotPasswordLoading }" :loading="forgotPasswordLoading">
+          <SfButton
+            v-e2e="'reset-password-modal-submit'"
+            type="submit"
+            class="sf-button--full-width form__button"
+            :disabled="forgotPasswordLoading"
+          >
+            <SfLoader
+              :class="{ loader: forgotPasswordLoading }"
+              :loading="forgotPasswordLoading"
+            >
               <div>{{ $t('Save Password') }}</div>
             </SfLoader>
           </SfButton>
@@ -150,9 +179,10 @@ export default {
   align-items: center;
   justify-content: center;
   margin: var(--spacer-xl) 0 var(--spacer-xl) 0;
-  font: var(--font-weight--light) var(--font-size--base) / 1.6 var(--font-family--secondary);
+  font: var(--font-weight--light) var(--font-size--base) / 1.6
+    var(--font-family--secondary);
 
-  &>* {
+  & > * {
     margin: 0 0 0 var(--spacer-xs);
   }
 }

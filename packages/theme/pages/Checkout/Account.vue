@@ -1,14 +1,21 @@
 <template>
   <div>
     <div v-if="!isAuthenticated">
-      <SfHeading v-e2e="'account-heading'" :level="3" :title="$t('Sign In to Continue')"
-        class="sf-heading--left sf-heading--no-underline title" />
+      <SfHeading
+        v-e2e="'account-heading'"
+        :level="3"
+        :title="$t('Sign In to Continue')"
+        class="sf-heading--left sf-heading--no-underline title"
+      />
       <div class="account-step-header">
         <!-- Create an account subtitle -->
         <template v-if="currentAccountStep === 'login'">
           <p class="subtitle">
-            {{ $t('Don\'t have an account?') }}
-            <SfButton class="sf-button--text" @click="handleAccountStep('register')">
+            {{ $t('No account') }}
+            <SfButton
+              class="sf-button--text"
+              @click="handleAccountStep('register')"
+            >
               {{ $t('Register') }}
             </SfButton>
           </p>
@@ -17,7 +24,10 @@
         <template v-if="currentAccountStep === 'register'">
           <p class="subtitle">
             {{ $t('Already have an account?') }}
-            <SfButton class="sf-button--text" @click="handleAccountStep('login')">
+            <SfButton
+              class="sf-button--text"
+              @click="handleAccountStep('login')"
+            >
               {{ $t('Sign in') }}
             </SfButton>
           </p>
@@ -26,31 +36,42 @@
       <div>
         <!-- Login form -->
         <template v-if="currentAccountStep === 'login'">
-          <LoginForm :error="loginError" :loading="loading" @submit="handleLogin" />
+          <LoginForm
+            :error="loginError"
+            :loading="loading"
+            @submit="handleLogin"
+          />
         </template>
         <!-- Register form -->
         <template v-else-if="currentAccountStep === 'register'">
-          <CreateAccountForm :error="registerError" :loading="loading" @submit="handleRegister" />
+          <CreateAccountForm
+            :error="registerError"
+            :loading="loading"
+            @submit="handleRegister"
+          />
         </template>
       </div>
     </div>
     <div v-else>
       <div class="account-step-header">
-        <SfHeading v-e2e="'account-heading'" :level="3" :title="$t('Select a Shipping Address')"
-          class="sf-heading--left sf-heading--no-underline title" />
+        <SfHeading
+          v-e2e="'account-heading'"
+          :level="3"
+          :title="$t('Select a Shipping Address')"
+          class="sf-heading--left sf-heading--no-underline title"
+        />
         <p class="subtitle__standout">
           {{ $t('Welcome back') }},&nbsp;{{ userFullName }}!
           <span class="subtitle">
-            Not {{ userFirstName }}?
+            {{ $t('Not') }} {{ userFirstName }}?
             <SfLink @click="handleLogout"> {{ $t('Logout') }}</SfLink>
           </span>
         </p>
       </div>
       <AddressSelector>
-        <template #heading>
-        </template>
+        <template #heading> </template>
         <template #custom-action-text>
-          {{ $t('Continue to Shipping') }}
+          {{ $t('Continue to shipping') }}
         </template>
       </AddressSelector>
     </div>
@@ -91,11 +112,24 @@ export default {
     AddressSelector
   },
   setup() {
-    const { isAuthenticated, load: loadUser, user, loading, login, logout, register, error: userError } = useUser();
+    const {
+      isAuthenticated,
+      load: loadUser,
+      user,
+      loading,
+      login,
+      logout,
+      register,
+      error: userError
+    } = useUser();
 
     const currentAccountStep = ref('login');
-    const currentAccountStepIndex = computed(() => Object.keys(ACCOUNT_STEPS).findIndex(s => s === currentAccountStep.value));
-    const handleAccountStep = (step) => currentAccountStep.value = step;
+    const currentAccountStepIndex = computed(() =>
+      Object.keys(ACCOUNT_STEPS).findIndex(
+        (s) => s === currentAccountStep.value
+      )
+    );
+    const handleAccountStep = (step) => (currentAccountStep.value = step);
 
     const loginError = computed(() => userError.value.login);
     const registerError = computed(() => userError.value.register);
@@ -118,9 +152,12 @@ export default {
       }
     };
 
-    const handleRegister = ({ form, onComplete, onError }) => formHandler(() => register({ user: form.value }), onComplete, onError);
-    const handleLogin = ({ form, onComplete, onError }) => formHandler(() => login({ user: form.value }), onComplete, onError);
-    const handleLogout = ({ /* form ,*/ onComplete, onError }) => formHandler(() => logout(), onComplete, onError);
+    const handleRegister = ({ form, onComplete, onError }) =>
+      formHandler(() => register({ user: form.value }), onComplete, onError);
+    const handleLogin = ({ form, onComplete, onError }) =>
+      formHandler(() => login({ user: form.value }), onComplete, onError);
+    const handleLogout = ({ /* form ,*/ onComplete, onError }) =>
+      formHandler(() => logout(), onComplete, onError);
     return {
       currentAccountStep,
       currentAccountStepIndex,

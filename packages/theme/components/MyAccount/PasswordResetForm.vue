@@ -10,7 +10,7 @@
           v-model="form.currentPassword"
           type="password"
           name="currentPassword"
-          label="Current Password"
+          :label="$t('Current Password')"
           required
           :valid="!errors[0]"
           :error-message="errors[0]"
@@ -27,7 +27,7 @@
             v-model="form.newPassword"
             type="password"
             name="newPassword"
-            label="New Password"
+            :label="$t('New Password')"
             required
             :valid="!errors[0]"
             :error-message="errors[0]"
@@ -42,7 +42,7 @@
             v-model="form.repeatPassword"
             type="password"
             name="repeatPassword"
-            label="Repeat Password"
+            :label="$t('Repeat Password')"
             required
             :valid="!errors[0]"
             :error-message="errors[0]"

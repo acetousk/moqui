@@ -2,7 +2,7 @@
   <div id="filters">
     <SfSidebar
       :visible="isFilterSidebarOpen"
-      title="Filters"
+      :title="$t('Filters')"
       class="sidebar-filters"
       @close="toggleFilterSidebar"
     >
@@ -10,7 +10,7 @@
         <div v-for="(facet, i) in facets" :key="i">
           <SfHeading
             :level="4"
-            :title="facet.label"
+            :title="$t(facet.label)"
             class="filters__title sf-heading--left"
             :key="`filter-title-${facet.id}`"
           />
@@ -32,7 +32,9 @@
             <SfFilter
               v-for="option in facet.options"
               :key="`${facet.id}-${option.value}`"
-              :label="option.value + `${option.count ? ` (${option.count})` : ''}`"
+              :label="
+                $t(option.value) + `${option.count ? ` (${option.count})` : ''}`
+              "
               :selected="isFilterSelected(facet, option)"
               class="filters__item"
               @change="() => selectFilter(facet, option)"
@@ -44,13 +46,13 @@
         <div v-for="(facet, i) in facets" :key="i">
           <SfAccordionItem
             :key="`filter-title-${facet.id}`"
-            :header="facet.label"
+            :header="$t(facet.label)"
             class="filters__accordion-item"
           >
             <SfFilter
               v-for="option in facet.options"
               :key="`${facet.id}-${option.id}`"
-              :label="option.value"
+              :label="$t(option.value)"
               :selected="isFilterSelected(facet, option)"
               class="filters__item"
               @change="() => selectFilter(facet, option)"

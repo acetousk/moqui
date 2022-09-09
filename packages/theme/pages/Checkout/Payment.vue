@@ -16,7 +16,7 @@
           class="table__header"
           :class="{ table__description: tableHeader === 'Description' }"
         >
-          {{ tableHeader }}
+          {{ $t(tableHeader) }}
         </SfTableHeader>
       </SfTableHeading>
       <SfTableRow
@@ -52,7 +52,7 @@
             </div>
           </template>
           <template v-else>
-            <div class="product-feature">Standard</div>
+            <div class="product-feature">{{ $t('Standard') }}</div>
           </template>
         </SfTableData>
         <SfTableData class="table__data">{{
@@ -74,7 +74,7 @@
       <div class="summary__group">
         <div class="summary__total">
           <SfProperty
-            name="Subtotal"
+            :name="$t('Subtotal')"
             :value="
               $n(
                 totals.special > 0 ? totals.special : totals.subtotal,
@@ -84,23 +84,23 @@
             class="sf-property--full-width property"
           />
           <SfProperty
-            name="Discounts"
+            :name="$t('Discounts')"
             :value="$n(totals.discounts, 'currency')"
             class="sf-property--full-width property"
           />
           <SfProperty
-            name="Shipping"
+            :name="$t('Shipping')"
             :value="$n(totals.shipping, 'currency')"
             class="sf-property--full-width property"
           />
           <SfProperty
-            name="Tax"
+            :name="$t('VAT (14%)')"
             :value="$n(totals.tax, 'currency')"
             class="sf-property--full-width property"
           />
         </div>
         <SfProperty
-          name="Total price"
+          :name="$t('Total price')"
           :value="$n(totals.total, 'currency')"
           class="sf-property--full-width sf-property--large summary__property-total"
         />
@@ -108,7 +108,7 @@
 
         <SfHeading
           :level="3"
-          title="Payment"
+          :title="$t('Payment')"
           class="sf-heading--left sf-heading--no-underline title"
         />
 

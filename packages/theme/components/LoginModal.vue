@@ -1,29 +1,55 @@
 <template>
-  <SfModal v-e2e="'login-modal'" :visible="isLoginModalOpen" class="modal" @close="closeModal">
+  <SfModal
+    v-e2e="'login-modal'"
+    :visible="isLoginModalOpen"
+    class="modal"
+    @close="closeModal"
+  >
     <template #modal-bar>
-      <SfBar class="sf-modal__bar smartphone-only" :close="true" :title="$t(barTitle)" @click:close="closeModal" />
+      <SfBar
+        class="sf-modal__bar smartphone-only"
+        :close="true"
+        :title="$t(barTitle)"
+        @click:close="closeModal"
+      />
     </template>
     <transition name="sf-fade" mode="out-in">
       <div v-if="currentScreen === SCREEN_LOGIN">
         <div class="form-title">{{ $t('Log into your account') }}</div>
         <div class="form-subtile">
-          {{
-              $t(
-                'View orders and update your details. Make your checkout fast and easy!',
-              )
-          }}
+          {{ $t('View orders and update your details') }}
         </div>
         <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
           <form class="form" @submit.prevent="handleSubmit(handleLogin)">
             <ValidationProvider rules="required|email" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-email'" v-model="form.username" :valid="!errors[0]" :errorMessage="errors[0]"
-                name="email" label="Your email" class="form__element" />
+              <SfInput
+                v-e2e="'login-modal-email'"
+                v-model="form.username"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="email"
+                :label="$t('Your e-mail')"
+                class="form__element"
+              />
             </ValidationProvider>
             <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-password'" v-model="form.password" :valid="!errors[0]"
-                :errorMessage="errors[0]" name="password" label="Password" class="form__element" type:icon="text"
-                :icon="{ icon: 'show_password' }" @click:icon="{ showPassword = !showPassword }"
-                :type="showPassword ? 'text' : 'password'" />
+              <SfInput
+                v-e2e="'login-modal-password'"
+                v-model="form.password"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="password"
+                :label="$t('Password')"
+                class="form__element"
+                type:icon="text"
+                :icon="{ icon: 'show_password' }"
+                @click:icon="
+                  {
+                    showPassword = !showPassword;
+                  }
+                "
+                :type="showPassword ? 'text' : 'password'"
+              />
             </ValidationProvider>
             <!--
               <SfCheckbox v-e2e="'login-modal-remember-me'" v-model="rememberMe" name="remember-me" label="Remember me"
@@ -32,8 +58,12 @@
             <div v-if="error.login">
               <SfAlert :message="error.login" type="danger" />
             </div>
-            <SfButton v-e2e="'login-modal-submit'" type="submit" class="sf-button--full-width form__button"
-              :disabled="loading">
+            <SfButton
+              v-e2e="'login-modal-submit'"
+              type="submit"
+              class="sf-button--full-width form__button"
+              :disabled="loading"
+            >
               <SfLoader :class="{ loader: loading }" :loading="loading">
                 <div>{{ $t('Login') }}</div>
               </SfLoader>
@@ -41,14 +71,19 @@
           </form>
         </ValidationObserver>
         <div class="forgot-password-action">
-          <SfButton class="sf-button--text" @click="setCurrentScreen(SCREEN_FORGOTTEN)">
-            {{ $t('I forgot my password?') }}
+          <SfButton
+            class="sf-button--text"
+            @click="setCurrentScreen(SCREEN_FORGOTTEN)"
+          >
+            {{ $t('I forgot my password...') }}
           </SfButton>
         </div>
         <div class="action">
           <p class="action__paragraph">{{ $t('No account') }}</p>
-          <SfButton class="sf-button--full-width sf-button--outline sf-button--se form__button mt-4"
-            @click="setCurrentScreen(SCREEN_REGISTER)">
+          <SfButton
+            class="sf-button--full-width sf-button--outline sf-button--se form__button mt-4"
+            @click="setCurrentScreen(SCREEN_REGISTER)"
+          >
             {{ $t('Register today') }}
           </SfButton>
         </div>
@@ -56,26 +91,37 @@
       <div v-else-if="currentScreen === SCREEN_FORGOTTEN">
         <div class="form-title">{{ $t('Reset your password') }}.</div>
         <div class="form-subtile">
-          {{
-              $t(
-                'Enter the email address associated with your account, and we will send you a link to reset\
-                    your password.'
-              )
-          }}
+          {{ $t('forgotPasswordExplainer') }}
         </div>
         <ValidationObserver v-slot="{ handleSubmit }" key="log-in">
           <form class="form" @submit.prevent="handleSubmit(handleForgotten)">
             <ValidationProvider rules="required|email" v-slot="{ errors }">
-              <SfInput v-e2e="'forgot-modal-email'" v-model="form.username" :valid="!errors[0]"
-                :errorMessage="errors[0]" name="email" :label="$t('Forgot Password Modal Email')"
-                class="form__element" />
+              <SfInput
+                v-e2e="'forgot-modal-email'"
+                v-model="form.username"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="email"
+                :label="$t('Forgot Password Modal Email')"
+                class="form__element"
+              />
             </ValidationProvider>
             <div v-if="forgotPasswordError.request">
-              <SfAlert :message="forgotPasswordError.request.message" type="danger" />
+              <SfAlert
+                :message="forgotPasswordError.request.message"
+                type="danger"
+              />
             </div>
-            <SfButton v-e2e="'forgot-modal-submit'" type="submit" class="sf-button--full-width form__button"
-              :disabled="forgotPasswordLoading">
-              <SfLoader :class="{ loader: forgotPasswordLoading }" :loading="forgotPasswordLoading">
+            <SfButton
+              v-e2e="'forgot-modal-submit'"
+              type="submit"
+              class="sf-button--full-width form__button"
+              :disabled="forgotPasswordLoading"
+            >
+              <SfLoader
+                :class="{ loader: forgotPasswordLoading }"
+                :loading="forgotPasswordLoading"
+              >
                 <div>{{ $t('Reset Password') }}</div>
               </SfLoader>
             </SfButton>
@@ -83,17 +129,23 @@
         </ValidationObserver>
         <div class="action">
           <p class="action__paragraph">{{ $t('or') }}</p>
-          <SfButton data-cy="login-btn_submit"
+          <SfButton
+            data-cy="login-btn_submit"
             class="sf-button--full-width sf-button--outline sf-button--se form__button mt-4"
-            @click="setCurrentScreen(SCREEN_REGISTER)">
+            @click="setCurrentScreen(SCREEN_REGISTER)"
+          >
             <div>
-              {{ $t('Create new account') }}
+              {{ $t('Create an account') }}
             </div>
           </SfButton>
         </div>
       </div>
       <div v-else-if="currentScreen === SCREEN_THANK_YOU" class="thank-you">
-        <i18n tag="p" class="thank-you__paragraph" path="forgotPasswordConfirmation">
+        <i18n
+          tag="p"
+          class="thank-you__paragraph"
+          path="forgotPasswordConfirmation"
+        >
           <span class="thank-you__paragraph--bold">{{ userEmail }}</span>
         </i18n>
         <p class="thank-you__paragraph">{{ $t('Thank You Inbox') }}</p>
@@ -102,30 +154,61 @@
         <div class="form-title">{{ $t('Create your new account') }}!</div>
         <div class="form-subtile">
           {{
-              $t(
-                'Find your favorite products and brands. Add favorites and make your checkout fast and easy!',
-              )
+            $t(
+              'Find your favorite products'
+            )
           }}
         </div>
         <ValidationObserver v-slot="{ handleSubmit }" key="sign-up">
-          <form class="form" @submit.prevent="handleSubmit(handleRegister)" autocomplete="off">
+          <form
+            class="form"
+            @submit.prevent="handleSubmit(handleRegister)"
+            autocomplete="off"
+          >
             <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-firstName'" v-model="form.firstName" :valid="!errors[0]"
-                :errorMessage="errors[0]" name="first-name" label="First Name"
-                class="form__element form__element--half" />
+              <SfInput
+                v-e2e="'login-modal-firstName'"
+                v-model="form.firstName"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="first-name"
+                :label="$t('First Name')"
+                class="form__element form__element--half"
+              />
             </ValidationProvider>
             <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-lastName'" v-model="form.lastName" :valid="!errors[0]"
-                :errorMessage="errors[0]" name="last-name" label="Last Name"
-                class="form__element form__element--half form__element--half-even" />
+              <SfInput
+                v-e2e="'login-modal-lastName'"
+                v-model="form.lastName"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="last-name"
+                :label="$t('Last Name')"
+                class="form__element form__element--half form__element--half-even"
+              />
             </ValidationProvider>
             <ValidationProvider rules="required|email" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-email'" v-model="form.email" :valid="!errors[0]" :errorMessage="errors[0]"
-                name="email" label="Your email" class="form__element" />
+              <SfInput
+                v-e2e="'login-modal-email'"
+                v-model="form.email"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="email"
+                :label="$t('Your e-mail')"
+                class="form__element"
+              />
             </ValidationProvider>
             <ValidationProvider rules="required" v-slot="{ errors }">
-              <SfInput v-e2e="'login-modal-password'" v-model="form.password" :valid="!errors[0]"
-                :errorMessage="errors[0]" name="password" label="Password" type="password" class="form__element" />
+              <SfInput
+                v-e2e="'login-modal-password'"
+                v-model="form.password"
+                :valid="!errors[0]"
+                :errorMessage="errors[0]"
+                name="password"
+                :label="$t('Password')"
+                type="password"
+                class="form__element"
+              />
             </ValidationProvider>
             <!-- <ValidationProvider :rules="{ required: { allowFalse: false } }" v-slot="{ errors }">
               <SfCheckbox v-e2e="'login-modal-create-account'" v-model="createAccount" :valid="!errors[0]"
@@ -135,7 +218,11 @@
             <div v-if="error.register">
               <SfAlert :message="error.register" type="danger" />
             </div>
-            <SfButton type="submit" class="sf-button--full-width form__button" :disabled="loading">
+            <SfButton
+              type="submit"
+              class="sf-button--full-width form__button"
+              :disabled="loading"
+            >
               <SfLoader :class="{ loader: loading }" :loading="loading">
                 <div>{{ $t('Create an account') }}</div>
               </SfLoader>
@@ -143,21 +230,35 @@
           </form>
         </ValidationObserver>
         <div class="action">
-          <p class="action__paragraph"> {{ $t('or') }}</p>
-          <SfButton class="sf-button--full-width sf-button--outline sf-button--se form__button mt-4"
-            @click="setCurrentScreen(SCREEN_LOGIN)">
-            {{ $t('Login in to your account') }}
+          <p class="action__paragraph">{{ $t('or') }}</p>
+          <SfButton
+            class="sf-button--full-width sf-button--outline sf-button--se form__button mt-4"
+            @click="setCurrentScreen(SCREEN_LOGIN)"
+          >
+            {{ $t('login in to your account') }}
           </SfButton>
         </div>
         <div class="bottom">
-          <p class="bottom__enjoy">{{ $t('Enjoy these perks with your free account') }}!</p>
+          <p class="bottom__enjoy">
+            {{ $t('Enjoy these perks with your free account') }}!
+          </p>
           <div class="bottom__items">
             <div class="bottom__items--item">
-              <SfIcon icon="clock" size="sm" viewBox="0 0 12 12" :coverage="1" />
+              <SfIcon
+                icon="clock"
+                size="sm"
+                viewBox="0 0 12 12"
+                :coverage="1"
+              />
               <p>{{ $t('Faster checkout') }}</p>
             </div>
             <div class="bottom__items--item">
-              <SfIcon icon="shipping" size="sm" viewBox="0 0 12 12" :coverage="1" />
+              <SfIcon
+                icon="shipping"
+                size="sm"
+                viewBox="0 0 12 12"
+                :coverage="1"
+              />
               <p>{{ $t('Track your orders') }}</p>
             </div>
             <!-- <div class="bottom__items--item">
@@ -449,7 +550,6 @@ export default {
 }
 
 .bottom {
-
   @include for-desktop {
     text-align: center;
   }

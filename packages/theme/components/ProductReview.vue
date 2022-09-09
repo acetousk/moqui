@@ -2,20 +2,20 @@
   <SfLoader :class="{ loading }" :loading="loading">
     <div>
       <div>
-        <SfModal v-e2e="'add-review-modal'" :visible="isAddReviewModalOpen" class="modal" title="Add Review"
+        <SfModal v-e2e="'add-review-modal'" :visible="isAddReviewModalOpen" class="modal" :title="$t('Add Review')"
           @close="toggleAddReviewModalOpen">
           <ReviewForm :productId="productId" @submit="handleAddReview" />
         </SfModal>
       </div>
       <div>
         <div v-if="!reviews.length" class="info-text">
-          {{ $t('This product has no reviews yet. Be the first to add one!') }}
+          {{ $t('This product has no reviews yet') }}
         </div>
         <SfReview v-for="review in reviews" :key="reviewGetters.getReviewId(review)"
           :author="reviewGetters.getReviewAuthor(review)" :date="reviewGetters.getReviewDate(review)"
           :message="reviewGetters.getReviewMessage(review)" :max-rating="5"
-          :rating="reviewGetters.getReviewRating(review)" :char-limit="250" read-more-text="Read more"
-          hide-full-text="Read less" />
+          :rating="reviewGetters.getReviewRating(review)" :char-limit="250" :read-more-text="$t('Read more')"
+          :hide-full-text="$t('Read less')" />
       </div>
       <div>
         <LazyHydrate on-interaction>

@@ -1,32 +1,63 @@
 <template>
   <SfTabs :open-tab="1">
-    <SfTab title="My orders">
+    <SfTab :title="$t('My orders')">
       <div v-if="currentOrder">
-        <SfButton class="sf-button--text all-orders" @click="currentOrder = null">All Orders</SfButton>
+        <SfButton
+          class="sf-button--text all-orders"
+          @click="currentOrder = null"
+        >
+          {{ $t('All Orders') }}
+        </SfButton>
         <div class="highlighted highlighted--total">
-          <SfProperty name="Order ID" :value="orderGetters.getId(currentOrder)"
-            class="sf-property--full-width property" />
-          <SfProperty name="Date" :value="orderGetters.getDate(currentOrder)"
-            class="sf-property--full-width property" />
-          <SfProperty name="Status" :value="orderGetters.getStatus(currentOrder)"
-            class="sf-property--full-width property" />
-          <SfProperty name="Total" :value="$n(orderGetters.getPrice(currentOrder), 'currency')"
-            class="sf-property--full-width property" />
+          <SfProperty
+            :name="$t('Order No.')"
+            :value="orderGetters.getId(currentOrder)"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            :name="$t('Date')"
+            :value="orderGetters.getDate(currentOrder)"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            :name="$t('Status')"
+            :value="orderGetters.getStatus(currentOrder)"
+            class="sf-property--full-width property"
+          />
+          <SfProperty
+            :name="$t('Total')"
+            :value="$n(orderGetters.getPrice(currentOrder), 'currency')"
+            class="sf-property--full-width property"
+          />
         </div>
         <SfTable class="products">
           <SfTableHeading>
-            <SfTableHeader class="products__name">{{ $t('Product') }}</SfTableHeader>
+            <SfTableHeader class="products__name">{{
+              $t('Product')
+            }}</SfTableHeader>
             <SfTableHeader>{{ $t('Quantity') }}</SfTableHeader>
             <SfTableHeader>{{ $t('Price') }}</SfTableHeader>
           </SfTableHeading>
-          <SfTableRow v-for="(item, i) in orderGetters.getItems(currentOrder)" :key="i">
+          <SfTableRow
+            v-for="(item, i) in orderGetters.getItems(currentOrder)"
+            :key="i"
+          >
             <SfTableData class="products__name">
-              <nuxt-link :to="'/p/' + orderGetters.getItemSku(item) + '/' + orderGetters.getItemSku(item)">
+              <nuxt-link
+                :to="
+                  '/p/' +
+                  orderGetters.getItemSku(item) +
+                  '/' +
+                  orderGetters.getItemSku(item)
+                "
+              >
                 {{ orderGetters.getItemName(item) }}
               </nuxt-link>
             </SfTableData>
             <SfTableData>{{ orderGetters.getItemQty(item) }}</SfTableData>
-            <SfTableData>{{ $n(orderGetters.getItemPrice(item), 'currency') }}</SfTableData>
+            <SfTableData>{{
+              $n(orderGetters.getItemPrice(item), 'currency')
+            }}</SfTableData>
           </SfTableRow>
         </SfTable>
         <div>
@@ -48,7 +79,7 @@
           </div>
           <div class="totals">
             <span class="totals__headline">
-              {{ $t('VAT') }}
+              {{ $t('VAT (14%)') }}
             </span>
             <span class="totals__value">
               {{ $n(orderGetters.getTaxTotal(currentOrder), 'currency') }}
@@ -61,26 +92,47 @@
           {{ $t('Details and status orders') }}
         </p>
         <div v-if="totalOrders === 0" class="no-orders">
-          <p class="no-orders__title">{{ $t('You currently have no orders') }}</p>
-          <SfButton class="no-orders__button">{{ $t('Start shopping') }}</SfButton>
+          <p class="no-orders__title">
+            {{ $t('You currently have no orders') }}
+          </p>
+          <SfButton class="no-orders__button">{{
+            $t('Start shopping')
+          }}</SfButton>
         </div>
         <div v-else>
           <SfLoader :class="{ loader: loading }" :loading="loading">
             <SfTable class="orders">
               <SfTableHeading>
-                <SfTableHeader v-for="tableHeader in tableHeaders" :key="tableHeader">{{ tableHeader }}</SfTableHeader>
+                <SfTableHeader
+                  v-for="tableHeader in tableHeaders"
+                  :key="tableHeader"
+                >
+                  {{ $t(tableHeader) }}
+                </SfTableHeader>
                 <SfTableHeader class="orders__element--right" />
               </SfTableHeading>
 
-              <SfTableRow v-for="order in orders" :key="orderGetters.getId(order)">
-                <SfTableData v-e2e="'order-number'">{{ orderGetters.getId(order) }}</SfTableData>
+              <SfTableRow
+                v-for="order in orders"
+                :key="orderGetters.getId(order)"
+              >
+                <SfTableData v-e2e="'order-number'">{{
+                  orderGetters.getId(order)
+                }}</SfTableData>
                 <SfTableData>{{ orderGetters.getDate(order) }}</SfTableData>
-                <SfTableData>{{ $n(orderGetters.getPrice(order), 'currency') }}</SfTableData>
+                <SfTableData>{{
+                  $n(orderGetters.getPrice(order), 'currency')
+                }}</SfTableData>
                 <SfTableData>
-                  <span :class="getStatusTextClass(order)">{{ orderGetters.getStatus(order) }}</span>
+                  <span :class="getStatusTextClass(order)">{{
+                    orderGetters.getStatus(order)
+                  }}</span>
                 </SfTableData>
                 <SfTableData class="orders__view orders__element--right">
-                  <SfButton class="sf-button--text desktop-only" @click="currentOrder = order">
+                  <SfButton
+                    class="sf-button--text desktop-only"
+                    @click="currentOrder = order"
+                  >
                     {{ $t('View details') }}
                   </SfButton>
                 </SfTableData>
@@ -88,11 +140,18 @@
             </SfTable>
           </SfLoader>
         </div>
-        <p>Total orders - {{ totalOrders }}</p>
+        <p>{{$t('Total orders')}} - {{ totalOrders }}</p>
         <div>
           <LazyHydrate on-interaction>
-            <BasicPagination v-if="!loading" class="pagination desktop-only" v-show="pagination.totalPages > 1"
-              :current="pagination.currentPage" :total="pagination.totalPages" :visible="5" @click="handleGetOrders" />
+            <BasicPagination
+              v-if="!loading"
+              class="pagination desktop-only"
+              v-show="pagination.totalPages > 1"
+              :current="pagination.currentPage"
+              :total="pagination.totalPages"
+              :visible="5"
+              @click="handleGetOrders"
+            />
           </LazyHydrate>
         </div>
       </div>
@@ -141,7 +200,9 @@ export default {
     const currentOrder = ref(null);
 
     const orders = computed(() => orderGetters.getOrders(userOrders.value));
-    const pagination = computed(() => orderGetters.getPagination(userOrders.value));
+    const pagination = computed(() =>
+      orderGetters.getPagination(userOrders.value)
+    );
 
     const handleGetOrders = async (pageNumber: number) => {
       await search({ page: pageNumber, itemsPerPage: 5 });
@@ -151,12 +212,7 @@ export default {
       await search({ page: 1, itemsPerPage: 5 });
     });
 
-    const tableHeaders = [
-      'Order ID',
-      'Payment date',
-      'Amount',
-      'Status'
-    ];
+    const tableHeaders = ['Order No.', 'Payment date', 'Amount', 'Status'];
 
     const getStatusTextClass = (order) => {
       const status = orderGetters.getStatus(order);
@@ -174,7 +230,9 @@ export default {
       tableHeaders,
       orders,
       loading,
-      totalOrders: computed(() => orderGetters.getOrdersTotalCount(userOrders.value)),
+      totalOrders: computed(() =>
+        orderGetters.getOrdersTotalCount(userOrders.value)
+      ),
       getStatusTextClass,
       orderGetters,
       currentOrder,
@@ -185,11 +243,12 @@ export default {
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .no-orders {
   &__title {
     margin: 0 0 var(--spacer-lg) 0;
-    font: var(--font-weight--normal) var(--font-size--base) / 1.6 var(--font-family--primary);
+    font: var(--font-weight--normal) var(--font-size--base) / 1.6
+      var(--font-family--primary);
   }
 
   &__button {
@@ -218,7 +277,8 @@ export default {
 
 .message {
   margin: 0 0 var(--spacer-xl) 0;
-  font: var(--font-weight--light) var(--font-size--base) / 1.6 var(--font-family--primary);
+  font: var(--font-weight--light) var(--font-size--base) / 1.6
+    var(--font-family--primary);
 
   &__link {
     color: var(--c-primary);

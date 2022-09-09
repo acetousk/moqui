@@ -3,41 +3,71 @@
     <slot name="heading"></slot>
     <SfLoader :class="{ loading }" :loading="loading">
       <SfAddressPicker v-model="selectedAddress" class="address-picker">
-        <div v-if="!addressFormVisibility" v-for="address in addressesList" :key="userShippingGetters.getId(address)">
-          <sf-address :name="userShippingGetters.getId(address)" class="address-picker__item">
-            <UserShippingAddress class="address-picker__item__info" :address="address" />
+        <div
+          v-if="!addressFormVisibility"
+          v-for="address in addressesList"
+          :key="userShippingGetters.getId(address)"
+        >
+          <sf-address
+            :name="userShippingGetters.getId(address)"
+            class="address-picker__item"
+          >
+            <UserShippingAddress
+              class="address-picker__item__info"
+              :address="address"
+            />
             <div class="address-picker__item__actions">
               <SfLink @click.prevent="editAddress(address)">
-                {{ $t("Edit") }}
+                {{ $t('Edit') }}
               </SfLink>
               <span>&nbsp;</span>
               <SfLink @click.prevent="removeAddress(address)">
-                {{ $t("Delete") }}
+                {{ $t('Delete') }}
               </SfLink>
             </div>
           </sf-address>
         </div>
-        <div v-if="!addressFormVisibility && !(addressesList && addressesList.length)">
+        <div
+          v-if="
+            !addressFormVisibility && !(addressesList && addressesList.length)
+          "
+        >
           <p class="address-picker__empty">
-            You have no saved addresses. Add a new one below!
+            {{ $t('No saved addresses') }}
           </p>
         </div>
       </SfAddressPicker>
     </SfLoader>
-    <ShippingAddressForm v-if="addressFormVisibility" :isNew="isNew" :address="addressForEdit"
-      @cancel="toggleAddressFormVisibility" @submit="handleSaveAddressSubmit" />
-    <form v-if="!addressFormVisibility" @submit.prevent="handleSelectedAddressSubmit">
+    <ShippingAddressForm
+      v-if="addressFormVisibility"
+      :isNew="isNew"
+      :address="addressForEdit"
+      @cancel="toggleAddressFormVisibility"
+      @submit="handleSaveAddressSubmit"
+    />
+    <form
+      v-if="!addressFormVisibility"
+      @submit.prevent="handleSelectedAddressSubmit"
+    >
       <div class="form">
-        <div class='form__action'>
+        <div class="form__action">
           <slot name="add-new-address">
-            <SfButton v-e2e="'add-new-address'" :disabled="loading || cartShippingLoading"
-              class="form__action-button color-secondary" @click='addNewAddress'>
+            <SfButton
+              v-e2e="'add-new-address'"
+              :disabled="loading || cartShippingLoading"
+              class="form__action-button color-secondary"
+              @click="addNewAddress"
+            >
               {{ $t('Add new address') }}
             </SfButton>
           </slot>
           <slot name="custom-action">
-            <SfButton v-e2e="'custom-action'" :disabled="loading || cartShippingLoading || !selectedAddress"
-              class="form__action-button" type="submit">
+            <SfButton
+              v-e2e="'custom-action'"
+              :disabled="loading || cartShippingLoading || !selectedAddress"
+              class="form__action-button"
+              type="submit"
+            >
               <slot name="custom-action-text" />
             </SfButton>
           </slot>
@@ -55,8 +85,18 @@ import {
   SfLink,
   SfLoader
 } from '@storefront-ui/vue';
-import { computed, ref, watch, useRouter, onMounted } from '@nuxtjs/composition-api';
-import { userShippingGetters, useUserShipping, useShipping } from '@vue-storefront/moqui';
+import {
+  computed,
+  ref,
+  watch,
+  useRouter,
+  onMounted
+} from '@nuxtjs/composition-api';
+import {
+  userShippingGetters,
+  useUserShipping,
+  useShipping
+} from '@vue-storefront/moqui';
 import UserShippingAddress from '~/components/UserShippingAddress';
 import ShippingAddressForm from '~/components/MyAccount/ShippingAddressForm.vue';
 import useUiNotification from '~/composables/useUiNotification';
@@ -75,8 +115,22 @@ export default {
   setup(_props, context) {
     const router = useRouter();
     const { send: sendNotification } = useUiNotification();
-    const { shipping, load, loading, addAddress, updateAddress, deleteAddress, error } = useUserShipping();
-    const { shipping: cartShipping, loading: cartShippingLoading, load: loadCartShipping, save: saveCartShipping, error: cartShippingError } = useShipping();
+    const {
+      shipping,
+      load,
+      loading,
+      addAddress,
+      updateAddress,
+      deleteAddress,
+      error
+    } = useUserShipping();
+    const {
+      shipping: cartShipping,
+      loading: cartShippingLoading,
+      load: loadCartShipping,
+      save: saveCartShipping,
+      error: cartShippingError
+    } = useShipping();
 
     const selectedAddress = ref(null);
     const addressFormVisibility = ref(false);
@@ -86,21 +140,30 @@ export default {
     const addAddressError = computed(() => error.value.addAddress);
     const updateAddressError = computed(() => error.value.updateAddress);
     const deleteAddressError = computed(() => error.value.deleteAddress);
-    const saveShippingAddressError = computed(() => cartShippingError.value.save);
-    const addressesList = computed(() => userShippingGetters.getAddresses(shipping.value));
+    const saveShippingAddressError = computed(
+      () => cartShippingError.value.save
+    );
+    const addressesList = computed(() =>
+      userShippingGetters.getAddresses(shipping.value)
+    );
 
-    watch(cartShipping, (newVal) => {
-      if (newVal && newVal.addressId) {
-        selectedAddress.value = newVal.addressId;
-      }
-    }, { immediate: true });
+    watch(
+      cartShipping,
+      (newVal) => {
+        if (newVal && newVal.addressId) {
+          selectedAddress.value = newVal.addressId;
+        }
+      },
+      { immediate: true }
+    );
 
     onMounted(async () => {
       await load();
       await loadCartShipping();
     });
 
-    const toggleAddressFormVisibility = () => addressFormVisibility.value = !addressFormVisibility.value;
+    const toggleAddressFormVisibility = () =>
+      (addressFormVisibility.value = !addressFormVisibility.value);
 
     const isSelectedAddress = (id) => {
       if (selectedAddress.value && id === selectedAddress.value) {
@@ -147,9 +210,7 @@ export default {
 
     const handleSaveAddressSubmit = async ({ form, onComplete, onError }) => {
       const actionMethod = isNew.value ? addAddress : updateAddress;
-      const actionError = isNew.value
-        ? addAddressError
-        : updateAddressError;
+      const actionError = isNew.value ? addAddressError : updateAddressError;
       await actionMethod({
         address: {
           ...form.value,
@@ -171,19 +232,19 @@ export default {
     };
 
     const handleSelectedAddressSubmit = async () => {
-      await saveCartShipping({ shippingDetails: { addressId: selectedAddress.value } });
+      await saveCartShipping({
+        shippingDetails: { addressId: selectedAddress.value }
+      });
       if (!saveShippingAddressError.value) {
         sendNotification({
           id: Symbol('shipping_address_updated'),
-          message:
-            'Your shipping address was set!',
+          message: 'Your shipping address was set!',
           type: 'success',
           icon: 'check',
           persist: false,
           title: 'Shipping Address'
         });
         router.push(context.root.localePath({ name: 'shipping' }));
-
       } else {
         sendNotification({
           id: Symbol('shipping_address_update_failed'),
@@ -194,7 +255,6 @@ export default {
           title: 'Shipping Address'
         });
       }
-
     };
 
     return {
@@ -307,7 +367,7 @@ export default {
   margin: var(--spacer-xl) 0 var(--spacer-base) 0;
 }
 
-.form__action>* {
+.form__action > * {
   margin-right: 1rem;
 }
 

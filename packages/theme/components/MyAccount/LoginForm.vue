@@ -6,11 +6,11 @@
       </div>
       <ValidationProvider rules="required|email" v-slot="{ errors }">
         <SfInput v-e2e="'login-form-email'" v-model="form.username" :valid="!errors[0]" :errorMessage="errors[0]"
-          name="email" label="Your email" class="form__element" />
+          name="email" :label="$t('Your email')" class="form__element" />
       </ValidationProvider>
       <ValidationProvider rules="required" v-slot="{ errors }">
         <SfInput v-e2e="'login-form-password'" v-model="form.password" :valid="!errors[0]" :errorMessage="errors[0]"
-          name="password" label="Password" type="password" class="form__element" />
+          name="password" :label="$t('Password')" type="password" class="form__element" />
       </ValidationProvider>
       <SfButton v-e2e="'login-form-submit'" type="submit" class="sf-button--full-width form__button"
         :disabled="loading">

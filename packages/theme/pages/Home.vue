@@ -44,15 +44,14 @@
       <RelatedProducts
         :products="products"
         :loading="productsLoading"
-        title="Featured Products"
+        :title="$t('Featured Products')"
       />
     </LazyHydrate>
 
     <LazyHydrate when-visible>
       <SfCallToAction
-        title="Subscribe to Newsletters"
-        button-text="Subscribe"
-        description="Be aware of upcoming sales and events. Receive gifts and special offers!"
+        :title="$t('Subscribe to Newsletters')"
+        :description="$t('Be aware of upcoming sales')"
         :image="addBasePath('/homepage/newsletter.webp')"
         class="call-to-action"
       >
