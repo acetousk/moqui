@@ -61,6 +61,14 @@ export default {
           '@vue-storefront/moqui',
           '@vue-storefront/core'
         ]
+      },
+      performance: {
+        purgeCSS: {
+          enabled: process.env.NODE_ENV === 'production',
+          paths: [
+            '**/*.vue'
+          ]
+        }
       }
     }],
     // @core-development-only-start
