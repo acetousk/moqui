@@ -1,6 +1,19 @@
 /* eslint-disable  */
 
+
+
+
 export default {
+  validations: {
+    required: 'This field is required',
+    email: 'Invalid email',
+    min: 'The field should have at least {length} characters',
+    password: 'Password must have at least 8 characters including one letter, a number and a special character',
+    confirmed: 'Passwords don\'t match',
+    nothavenumber: 'Bad format - Cannot contain a number',
+    phone: 'Invalid phone number',
+    phonecountrycode: 'Phone number must start with a country code (Ex: +2 for Egypt)'
+  },
   'My Cart': 'My Cart',
   'Total items': 'Total items',
   'Categories': 'Categories',
@@ -243,5 +256,23 @@ export default {
   'All Orders': 'All Orders',
   'Status': 'Status',
   'Payment date': 'Payment date',
-  'Date': 'Date'
+  'Date': 'Date',
+  'Review added successfully': 'Your review has been successfully added!',
+  'Unable to add a review': 'Unable to add a review.',
+  'Address failed to delete': 'Address failed to delete. Please try again',
+  'Address deleted successfully': 'Address deleted successfully!',
+  'Your shipping address was set': 'Your shipping address was set!',
+  'Your shipping address was not set': 'Your shipping address was not set. Please try again',
+  'Invalid Promo Code': 'Invalid Promo Code',
+  'Promo Code Applied': 'Promo Code Applied!',
+  'Could not create an account': 'Could not create an account. Please check your email & password.',
+  'Login failed': 'Login failed',
+  'Your password was updated': 'Your password was updated successfully!',
+  'Your password was not updated': 'We were unable to update your password',
+  'Your account was updated': 'Your profile was successfully updated!',
+  'Your account was not updated': 'We were unable to update your profile',
+  'Your address was updated': 'Your shipping address was successfully updated!',
+  'Your address was not updated': 'We were unable to update your shipping address',
+  'Shipping method set': 'Shipping method set successfully!',
+  'Shipping method not set': 'Shipping method was not set. Please try again',
 };

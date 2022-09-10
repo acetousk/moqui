@@ -70,7 +70,7 @@ export default defineComponent({
     ValidationProvider,
     ValidationObserver
   },
-  setup(_, { emit }) {
+  setup(_, { emit, $t }) {
     const { user } = useUser();
     const { send: sendNotification } = useUiNotification();
 
@@ -87,11 +87,10 @@ export default defineComponent({
     }));
 
     const submitForm = (resetValidationFn) => () => {
-      const onComplete = (data) => {
+      const onComplete = () => {
         sendNotification({
           id: Symbol('password_updated'),
-          message:
-            data?.message || 'Your password was updated successfully updated!',
+          message: $t('Your password was updated'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -99,11 +98,10 @@ export default defineComponent({
         });
         resetValidationFn();
       };
-      const onError = (error) => {
+      const onError = () => {
         sendNotification({
           id: Symbol('password_not_updated'),
-          message:
-            error?.message || 'It was not possible to update your password.',
+          message: $t('Your password was not updated'),
           type: 'danger',
           icon: 'cross',
           persist: false,

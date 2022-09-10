@@ -230,7 +230,7 @@ export default {
       if (makeOrderError.value.make) {
         sendNotification({
           id: Symbol('order_place_failed'),
-          message: 'Your order could not be processed. Please try again',
+          message: context.root.$t('Your order could not be processed'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -249,7 +249,7 @@ export default {
       } else if (!order.value.requiresPayment && !order.value.statusChanged) {
         sendNotification({
           id: Symbol('order_place_failed'),
-          message: 'Your order could not be processed. Please try again',
+          message: context.root.$t('Your order could not be processed'),
           type: 'danger',
           icon: 'cross',
           persist: false,

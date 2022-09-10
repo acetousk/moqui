@@ -1,6 +1,16 @@
 /* eslint-disable  */
 
 export default {
+  validations: {
+    required: 'هذه الخانة مطلوبه',
+    email: 'بريد إلكتروني خاطئ',
+    min: 'يجب أن يحتوي الحقل على {length} من الأحرف على الأقل',
+    password: 'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل بما في ذلك حرف واحد ورقم وحرف خاص',
+    confirmed: 'كلمات المرور غير متطابقة',
+    nothavenumber: 'تنسيق غير صالح - لا يمكن أن يحتوي على رقم',
+    phone: 'رقم الهاتف غير صالحr',
+    phonecountrycode: 'يجب أن يبدأ رقم الهاتف برمز الدولة (على سبيل المثال: +2 لمصر)'
+  },
   'My Cart': 'عربة التسوق',
   'Total items': 'عدد المنتجات',
   'Categories': 'الاقسام',
@@ -242,5 +252,23 @@ export default {
   'All Orders': 'جميع الطلبات',
   'Status': 'الحالة',
   'Payment date': 'تاريخ الدفع',
-  'Date': 'التاريخ'
+  'Date': 'التاريخ',
+  'Review added successfully': 'تمت إضافة مراجعتك بنجاح!',
+  'Unable to add a review': 'لم نتمكن من إضافة مراجعة.',
+  'Address failed to delete': 'فشل حذف العنوان. حاول مرة اخرى',
+  'Address deleted successfully': 'تم حذف العنوان بنجاح!',
+  'Your shipping address was set': 'تم تعيين عنوان الشحن الخاص بك!',
+  'Your shipping address was not set': 'لم يتم تعيين عنوان الشحن الخاص بك. حاول مرة اخرى',
+  'Invalid Promo Code': 'الرمز الترويجي غير صالح',
+  'Promo Code Applied': 'تم تطبيق الرمز الترويجي!',
+  'Could not create an account': 'تعذر إنشاء حساب. يرجى التحقق من بريدك الإلكتروني وكلمة المرور.',
+  'Login failed': 'فشل تسجيل الدخول',
+  'Your password was updated': 'تم تحديث كلمة المرور الخاصة بك بنجاح!',
+  'Your password was not updated': 'لم نتمكن من تحديث كلمة المرور الخاصة بك',
+  'Your account was updated': 'تم تحديث ملفك الشخصي بنجاح!',
+  'Your account was not updated': 'لم نتمكن من تحديث ملف التعريف الخاص بك',
+  'Your address was updated': 'تم تحديث عنوان الشحن الخاص بك بنجاح!',
+  'Your address was not updated': 'لم نتمكن من تحديث عنوان الشحن الخاص بك',
+  'Shipping method set': 'تم تعيين طريقة الشحن بنجاح!',
+  'Shipping method not set': 'لم يتم تعيين طريقة الشحن. حاول مرة اخرى',
 };

@@ -40,6 +40,7 @@ export default {
   plugins: [
     { src: '@/plugins/set-cookie.ts', mode: 'server' },
     { src: '@/plugins/axios-auth.ts' },
+    { src: '@/plugins/vee-validate.js' },
   ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules

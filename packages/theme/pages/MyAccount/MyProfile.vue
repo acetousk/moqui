@@ -19,7 +19,9 @@
       <p class="message">
         {{ $t('Change password your account') }}:<br />
         {{ $t('Your current email address is') }}
-        <span class="message__label">{{ userGetters.getEmailAddress(user) }}</span>
+        <span class="message__label">{{
+          userGetters.getEmailAddress(user)
+        }}</span>
       </p>
 
       <PasswordResetForm :loading="loading" @submit="updatePassword" />
@@ -28,48 +30,12 @@
 </template>
 
 <script>
-import { extend } from 'vee-validate';
-import { email, required, min, confirmed } from 'vee-validate/dist/rules';
 import ProfileUpdateForm from '~/components/MyAccount/ProfileUpdateForm';
 import PasswordResetForm from '~/components/MyAccount/PasswordResetForm';
 import { SfTabs, SfInput, SfButton } from '@storefront-ui/vue';
 import { useUser, userGetters } from '@vue-storefront/moqui';
 import { onMounted, computed, ref, useRouter } from '@nuxtjs/composition-api';
 
-extend('email', {
-  ...email,
-  message: 'Invalid email'
-});
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
-
-extend('min', {
-  ...min,
-  message: 'The field should have at least {length} characters'
-});
-
-extend('password', {
-  validate: (value) =>
-    String(value).length >= 8 &&
-    String(value).match(/[A-Za-z]/gi) &&
-    String(value).match(/[0-9]/gi) &&
-    String(value).match(/[#?!@$%^&*-]/gi),
-  message:
-    'Password must have at least 8 characters including one letter, a number and a special character'
-});
-
-extend('confirmed', {
-  ...confirmed,
-  message: 'Passwords don\'t match'
-});
-
-extend('nothavenumber', {
-  validate: (value) => String(value).match(/^([^0-9]*)$/),
-  message: 'This field should not have a number'
-});
 export default {
   name: 'PersonalDetails',
 
@@ -83,7 +49,8 @@ export default {
 
   setup(_props, context) {
     const router = useRouter();
-    const { user, load, updateUser, changePassword, error, loading, setUser } = useUser();
+    const { user, load, updateUser, changePassword, error, loading, setUser } =
+      useUser();
     const openTab = ref(1);
     onMounted(() => {
       load();

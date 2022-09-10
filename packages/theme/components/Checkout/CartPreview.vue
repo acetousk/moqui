@@ -107,7 +107,7 @@ export default defineComponent({
     SfButton,
     SfLoader
   },
-  setup() {
+  setup(_, context) {
     const {
       cart,
       removeItem,
@@ -154,7 +154,7 @@ export default defineComponent({
       if (applyCouponError.value) {
         sendNotification({
           id: Symbol('coupon_apply_failed'),
-          message: 'Invalid Promo Code',
+          message: context.root.$t('Invalid Promo Code'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -163,7 +163,7 @@ export default defineComponent({
       } else {
         sendNotification({
           id: Symbol('coupon_apply_success'),
-          message: 'Promo Code Applied!',
+          message: context.root.$t('Promo Code Applied'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -180,7 +180,7 @@ export default defineComponent({
       if (removeCouponError.value) {
         sendNotification({
           id: Symbol('coupon_apply_failed'),
-          message: 'Invalid Promo Code',
+          message: context.root.$t('Invalid Promo Code'),
           type: 'danger',
           icon: 'cross',
           persist: false,

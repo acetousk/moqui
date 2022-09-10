@@ -59,7 +59,7 @@ export default {
       if (shippingProviderSaveError.value) {
         sendNotification({
           id: Symbol('shipping_address_update_failed'),
-          message: 'Shipping method was not selected. Please try again',
+          message: context.root.$t('Shipping method not set'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -68,7 +68,7 @@ export default {
       } else {
         sendNotification({
           id: Symbol('shipping_address_updated'),
-          message: 'Shipping method selected successfully!',
+          message: context.root.$t('Shipping method set'),
           type: 'success',
           icon: 'check',
           persist: false,

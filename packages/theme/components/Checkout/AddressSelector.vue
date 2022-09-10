@@ -190,7 +190,7 @@ export default {
       if (deleteAddressError.value) {
         sendNotification({
           id: Symbol('shipping_address_update_failed'),
-          message: 'Address failed to delete. Please try again.',
+          message: context.root.$t('Address failed to delete'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -199,7 +199,7 @@ export default {
       } else {
         sendNotification({
           id: Symbol('shipping_address_updated'),
-          message: 'Address deleted successfully!',
+          message: context.root.$t('Address deleted successfully'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -238,7 +238,7 @@ export default {
       if (!saveShippingAddressError.value) {
         sendNotification({
           id: Symbol('shipping_address_updated'),
-          message: 'Your shipping address was set!',
+          message: context.root.$t('Your shipping address was set'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -248,7 +248,7 @@ export default {
       } else {
         sendNotification({
           id: Symbol('shipping_address_update_failed'),
-          message: 'Your shipping address was not set. Please try again.',
+          message: context.root.$t('Your shipping address was not set'),
           type: 'danger',
           icon: 'cross',
           persist: false,

@@ -109,7 +109,7 @@ export default defineComponent({
     }
   },
   emits: ['submit'],
-  setup(props, { emit }) {
+  setup(props, { emit, $t }) {
     // const { app: { i18n } } = useContext();
     const { user } = useUser();
     const { send: sendNotification } = useUiNotification();
@@ -127,11 +127,10 @@ export default defineComponent({
     }));
 
     const submitForm = (resetValidationFn) => () => {
-      const onComplete = (data) => {
+      const onComplete = () => {
         sendNotification({
           id: Symbol('user_updated'),
-          message:
-            data?.message || 'The user account data was successfully updated!',
+          message: $t('Your account was updated'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -139,10 +138,10 @@ export default defineComponent({
         });
         resetValidationFn();
       };
-      const onError = (error) => {
+      const onError = () => {
         sendNotification({
           id: Symbol('user_updated'),
-          message: error?.message || 'Your profile failed to update.',
+          message: $t('Your account was not updated'),
           type: 'danger',
           icon: 'cross',
           persist: false,

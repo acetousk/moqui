@@ -5,15 +5,34 @@
         <SfAlert :message="error.message" type="danger" />
       </div>
       <ValidationProvider rules="required|email" v-slot="{ errors }">
-        <SfInput v-e2e="'login-form-email'" v-model="form.username" :valid="!errors[0]" :errorMessage="errors[0]"
-          name="email" :label="$t('Your email')" class="form__element" />
+        <SfInput
+          v-e2e="'login-form-email'"
+          v-model="form.username"
+          :valid="!errors[0]"
+          :errorMessage="errors[0]"
+          name="email"
+          :label="$t('Your email')"
+          class="form__element"
+        />
       </ValidationProvider>
       <ValidationProvider rules="required" v-slot="{ errors }">
-        <SfInput v-e2e="'login-form-password'" v-model="form.password" :valid="!errors[0]" :errorMessage="errors[0]"
-          name="password" :label="$t('Password')" type="password" class="form__element" />
+        <SfInput
+          v-e2e="'login-form-password'"
+          v-model="form.password"
+          :valid="!errors[0]"
+          :errorMessage="errors[0]"
+          name="password"
+          :label="$t('Password')"
+          type="password"
+          class="form__element"
+        />
       </ValidationProvider>
-      <SfButton v-e2e="'login-form-submit'" type="submit" class="sf-button--full-width form__button"
-        :disabled="loading">
+      <SfButton
+        v-e2e="'login-form-submit'"
+        type="submit"
+        class="sf-button--full-width form__button"
+        :disabled="loading"
+      >
         <SfLoader :class="{ loader: loading }" :loading="loading">
           <div>{{ $t('Login') }}</div>
         </SfLoader>
@@ -24,8 +43,7 @@
 
 <script>
 import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required, email } from 'vee-validate/dist/rules';
+import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import {
   SfLoader,
   SfAlert,
@@ -36,16 +54,6 @@ import {
   SfProductOption
 } from '@storefront-ui/vue';
 import { useUiNotification } from '~/composables';
-
-extend('email', {
-  ...email,
-  message: 'Invalid email'
-});
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
 
 export default defineComponent({
   name: 'LoginForm',
@@ -80,19 +88,17 @@ export default defineComponent({
       email: '',
       password: ''
     });
-    const {
-      send: sendNotification
-    } = useUiNotification();
+    const { send: sendNotification } = useUiNotification();
     const form = ref(resetForm());
     const submitForm = (resetValidationFn) => () => {
       const onComplete = () => {
         form.value = resetForm();
         resetValidationFn();
       };
-      const onError = (error) => {
+      const onError = () => {
         sendNotification({
           id: Symbol('user_update_failed'),
-          message: error?.message ? error?.message : 'Login failed.',
+          message: context.root.$t('Login failed'),
           type: 'danger',
           icon: 'error',
           persist: false,
@@ -108,7 +114,7 @@ export default defineComponent({
   }
 });
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .form {
   &__element {
     display: block;

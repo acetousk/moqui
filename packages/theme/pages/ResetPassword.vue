@@ -77,29 +77,7 @@ import {
   useForgotPassword,
   forgotPasswordGetters
 } from '@vue-storefront/moqui';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-
-import { required, confirmed } from 'vee-validate/dist/rules';
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
-
-extend('confirmed', {
-  ...confirmed,
-  message: 'Passwords don\'t match'
-});
-
-extend('password', {
-  validate: (value) =>
-    String(value).length >= 8 &&
-    String(value).match(/[A-Za-z]/gi) &&
-    String(value).match(/[0-9]/gi) &&
-    String(value).match(/[#?!@$%^&*-]/gi),
-  message:
-    'Password must have at least 8 characters including one letter, a number and a special character'
-});
+import { ValidationProvider, ValidationObserver } from 'vee-validate';
 
 export default {
   name: 'ResetPassword',

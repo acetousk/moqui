@@ -5,25 +5,66 @@
         <SfAlert :message="error.message" type="danger" />
       </div>
       <div class="form__horizontal">
-        <ValidationProvider v-slot="{ errors }" rules="required|min:2|nothavenumber" class="form__element">
-          <SfInput v-model="form.firstName" name="firstName" :label="$t('First Name')" required :valid="!errors[0]"
-            :error-message="errors[0]" />
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required|min:2|nothavenumber"
+          class="form__element"
+        >
+          <SfInput
+            v-model="form.firstName"
+            name="firstName"
+            :label="$t('First Name')"
+            required
+            :valid="!errors[0]"
+            :error-message="errors[0]"
+          />
         </ValidationProvider>
-        <ValidationProvider v-slot="{ errors }" rules="required|min:2|nothavenumber" class="form__element">
-          <SfInput v-model="form.lastName" name="lastName" :label="$t('Last Name')" required :valid="!errors[0]"
-            :error-message="errors[0]" />
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required|min:2|nothavenumber"
+          class="form__element"
+        >
+          <SfInput
+            v-model="form.lastName"
+            name="lastName"
+            :label="$t('Last Name')"
+            required
+            :valid="!errors[0]"
+            :error-message="errors[0]"
+          />
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
-        <ValidationProvider v-slot="{ errors }" rules="required|email" class="form__element">
-          <SfInput v-model="form.email" type="email" name="email" :label="$t('Your e-mail')" required :valid="!errors[0]"
-            :error-message="errors[0]" />
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required|email"
+          class="form__element"
+        >
+          <SfInput
+            v-model="form.email"
+            type="email"
+            name="email"
+            :label="$t('Your e-mail')"
+            required
+            :valid="!errors[0]"
+            :error-message="errors[0]"
+          />
         </ValidationProvider>
       </div>
       <div class="form__horizontal">
-        <ValidationProvider v-slot="{ errors }" rules="required|password" class="form__element">
-          <SfInput v-model="newPassword" type="password" name="newPassword" :label="$t('Password')" required
-            class="form__element" />
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required|password"
+          class="form__element"
+        >
+          <SfInput
+            v-model="newPassword"
+            type="password"
+            name="newPassword"
+            :label="$t('Password')"
+            required
+            class="form__element"
+          />
         </ValidationProvider>
       </div>
       <SfButton class="form__button">
@@ -35,8 +76,7 @@
 
 <script>
 import { defineComponent, ref } from '@nuxtjs/composition-api';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required, min, email, confirmed } from 'vee-validate/dist/rules';
+import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import {
   SfInput,
   SfAlert,
@@ -46,36 +86,6 @@ import {
   SfProductOption
 } from '@storefront-ui/vue';
 import { useUiNotification } from '~/composables';
-
-extend('email', {
-  ...email,
-  message: 'Invalid email'
-});
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
-
-extend('min', {
-  ...min,
-  message: 'The field should have at least {length} characters'
-});
-
-extend('password', {
-  validate: value => String(value).length >= 8,
-  message: 'Password must have at least 8 characters'
-});
-
-extend('confirmed', {
-  ...confirmed,
-  message: 'Passwords don\'t match'
-});
-
-extend('nothavenumber', {
-  validate: value => String(value).match(/^([^0-9]*)$/),
-  message: 'Bad format - Cannot contain a number'
-});
 
 export default defineComponent({
   name: 'CreateAccountForm',
@@ -123,10 +133,10 @@ export default defineComponent({
         newPassword.value = '';
         resetValidationFn();
       };
-      const onError = (error) => {
+      const onError = () => {
         sendNotification({
           id: Symbol('user_update_failed'),
-          message: error?.message ? error?.message : 'Could not update user! Check password or lastname, firstname format.',
+          message: context.root.$t('Could not create an account'),
           type: 'danger',
           icon: 'error',
           persist: false,
@@ -147,7 +157,7 @@ export default defineComponent({
   }
 });
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .form {
   &__element {
     display: block;

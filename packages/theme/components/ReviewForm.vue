@@ -1,43 +1,86 @@
 <template>
   <ValidationObserver v-slot="{ handleSubmit, reset }" key="add-review">
     <form class="form" @submit.prevent="handleSubmit(submitForm(reset))">
-      <div class="form__label">
-        Your Rating ({{ form.rating }}/5)
-      </div>
+      <div class="form__label">Your Rating ({{ form.rating }}/5)</div>
       <div class="form__rating">
-        <SfCheckbox name="rating-1" :selected="form.rating > 0" @change="handleRatingChange(1)">
+        <SfCheckbox
+          name="rating-1"
+          :selected="form.rating > 0"
+          @change="handleRatingChange(1)"
+        >
           <template #checkmark>
-            <SfIcon icon="star" :color="form.rating > 0 ? 'yellow-primary' : 'gray-secondary'" />
+            <SfIcon
+              icon="star"
+              :color="form.rating > 0 ? 'yellow-primary' : 'gray-secondary'"
+            />
           </template>
         </SfCheckbox>
-        <SfCheckbox name="rating-2" :selected="form.rating > 1" @change="handleRatingChange(2)">
+        <SfCheckbox
+          name="rating-2"
+          :selected="form.rating > 1"
+          @change="handleRatingChange(2)"
+        >
           <template #checkmark>
-            <SfIcon icon="star" :color="form.rating > 1 ? 'yellow-primary' : 'gray-secondary'" />
+            <SfIcon
+              icon="star"
+              :color="form.rating > 1 ? 'yellow-primary' : 'gray-secondary'"
+            />
           </template>
         </SfCheckbox>
-        <SfCheckbox name="rating-3" :selected="form.rating > 2" @change="handleRatingChange(3)">
+        <SfCheckbox
+          name="rating-3"
+          :selected="form.rating > 2"
+          @change="handleRatingChange(3)"
+        >
           <template #checkmark>
-            <SfIcon icon="star" :color="form.rating > 2 ? 'yellow-primary' : 'gray-secondary'" />
+            <SfIcon
+              icon="star"
+              :color="form.rating > 2 ? 'yellow-primary' : 'gray-secondary'"
+            />
           </template>
         </SfCheckbox>
-        <SfCheckbox name="rating-4" :selected="form.rating > 3" @change="handleRatingChange(4)">
+        <SfCheckbox
+          name="rating-4"
+          :selected="form.rating > 3"
+          @change="handleRatingChange(4)"
+        >
           <template #checkmark>
-            <SfIcon icon="star" :color="form.rating > 3 ? 'yellow-primary' : 'gray-secondary'" />
+            <SfIcon
+              icon="star"
+              :color="form.rating > 3 ? 'yellow-primary' : 'gray-secondary'"
+            />
           </template>
         </SfCheckbox>
-        <SfCheckbox name="rating-5" :selected="form.rating > 4" @change="handleRatingChange(5)">
+        <SfCheckbox
+          name="rating-5"
+          :selected="form.rating > 4"
+          @change="handleRatingChange(5)"
+        >
           <template #checkmark>
-            <SfIcon icon="star" :color="form.rating > 4 ? 'yellow-primary' : 'gray-secondary'" />
+            <SfIcon
+              icon="star"
+              :color="form.rating > 4 ? 'yellow-primary' : 'gray-secondary'"
+            />
           </template>
         </SfCheckbox>
       </div>
-      <div class="form__label">
-        Your Review
-      </div>
+      <div class="form__label">Your Review</div>
       <div class="form__horizontal">
-        <ValidationProvider v-slot="{ errors }" rules="required|min:5" class="form__element">
-          <SfTextarea v-model="form.productReview" name="productReview" placeholder="Type your review..." :rows="6"
-            :cols="isMobile ? 60 : 40" required :valid="!errors[0]" :error-message="errors[0]" />
+        <ValidationProvider
+          v-slot="{ errors }"
+          rules="required|min:5"
+          class="form__element"
+        >
+          <SfTextarea
+            v-model="form.productReview"
+            name="productReview"
+            placeholder="Type your review..."
+            :rows="6"
+            :cols="isMobile ? 60 : 40"
+            required
+            :valid="!errors[0]"
+            :error-message="errors[0]"
+          />
         </ValidationProvider>
       </div>
       <SfButton type="submit" class="form__button" :disabled="loading">
@@ -48,7 +91,7 @@
     </form>
   </ValidationObserver>
 </template>
-<script >
+<script>
 import {
   SfModal,
   SfButton,
@@ -64,17 +107,7 @@ import {
 import { reactive } from '@nuxtjs/composition-api';
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import useUiNotification from '~/composables/useUiNotification';
-import { extend } from 'vee-validate';
-import { min, required } from 'vee-validate/dist/rules';
 
-extend('min', {
-  ...min,
-  message: 'Your review must be at least {length} characters'
-});
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
 export default {
   name: 'ReviewForm',
   components: {
@@ -99,7 +132,7 @@ export default {
     }
   },
   emits: ['submit'],
-  setup(props, { emit }) {
+  setup(props, { emit, $t }) {
     const form = reactive({
       productReview: '',
       rating: 5
@@ -113,7 +146,7 @@ export default {
       const onComplete = () => {
         sendNotification({
           id: Symbol('review_add_success'),
-          message: 'Your review has been successfully added!',
+          message: $t('Review added successfully'),
           type: 'success',
           icon: 'check',
           persist: false,
@@ -121,10 +154,10 @@ export default {
         });
         resetValidationFn();
       };
-      const onError = (error) => {
+      const onError = () => {
         sendNotification({
           id: Symbol('review_add_failed'),
-          message: error?.message || 'Unable to add a review.',
+          message: $t('Unable to add a review'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -148,11 +181,13 @@ export default {
 <style lang="scss" scoped>
 .form {
   &__label {
-    @include font(--form-header-font,
+    @include font(
+      --form-header-font,
       var(--font-weight--bold),
       var(--font-size--lg),
       1.6,
-      var(--font-family--secondary));
+      var(--font-family--secondary)
+    );
 
     margin-top: var(--spacer-sm);
   }

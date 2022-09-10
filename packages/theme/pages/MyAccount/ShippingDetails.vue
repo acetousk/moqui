@@ -1,12 +1,21 @@
 <template>
   <transition name="fade">
-    <SfTabs v-if="editingAddress" key="edit-address" :open-tab="1" class="tab-orphan">
+    <SfTabs
+      v-if="editingAddress"
+      key="edit-address"
+      :open-tab="1"
+      class="tab-orphan"
+    >
       <SfTab :title="isNewAddress ? $t('Add address') : $t('Edit address')">
         <p class="message">
           {{ $t('Contact details updated') }}
         </p>
-        <ShippingAddressForm :address="activeAddress" :isNew="isNewAddress" @cancel="cancelEditAddress"
-          @submit="saveAddress" />
+        <ShippingAddressForm
+          :address="activeAddress"
+          :isNew="isNewAddress"
+          @cancel="cancelEditAddress"
+          @submit="saveAddress"
+        />
       </SfTab>
     </SfTabs>
 
@@ -16,20 +25,33 @@
           {{ $t('Manage shipping addresses') }}
         </p>
         <transition-group tag="div" name="fade" class="shipping-list">
-          <div v-for="address in addresses" :key="userShippingGetters.getId(address)" class="shipping">
+          <div
+            v-for="address in addresses"
+            :key="userShippingGetters.getId(address)"
+            class="shipping"
+          >
             <div class="shipping__content">
               <div class="shipping__address">
                 <UserShippingAddress :address="address" />
               </div>
             </div>
             <div class="shipping__actions">
-              <SfIcon icon="cross" color="gray" size="14px" role="button" class="smartphone-only"
-                @click="removeAddress(address)" />
+              <SfIcon
+                icon="cross"
+                color="gray"
+                size="14px"
+                role="button"
+                class="smartphone-only"
+                @click="removeAddress(address)"
+              />
               <SfButton @click="changeAddress(address)">
                 {{ $t('Change') }}
               </SfButton>
 
-              <SfButton class="color-light shipping__button-delete desktop-only" @click="removeAddress(address)">
+              <SfButton
+                class="color-light shipping__button-delete desktop-only"
+                @click="removeAddress(address)"
+              >
                 {{ $t('Delete') }}
               </SfButton>
             </div>
@@ -46,7 +68,11 @@
 import { SfTabs, SfButton, SfIcon } from '@storefront-ui/vue';
 import UserShippingAddress from '~/components/UserShippingAddress';
 import ShippingAddressForm from '~/components/MyAccount/ShippingAddressForm';
-import { useUserShipping, userShippingGetters, useUser } from '@vue-storefront/moqui';
+import {
+  useUserShipping,
+  userShippingGetters,
+  useUser
+} from '@vue-storefront/moqui';
 import { ref, computed, useRouter } from '@nuxtjs/composition-api';
 import { onSSR } from '@vue-storefront/core';
 import { useUiNotification } from '~/composables';
@@ -96,7 +122,7 @@ export default {
       if (deleteAddressError.value) {
         sendNotification({
           id: Symbol('shipping_address_update_failed'),
-          message: error?.message || 'Address failed to delete.',
+          message: context.root.$t('Address failed to delete'),
           type: 'danger',
           icon: 'cross',
           persist: false,
@@ -105,7 +131,7 @@ export default {
       } else {
         sendNotification({
           id: Symbol('shipping_address_updated'),
-          message: 'Address deleted successfully!',
+          message: context.root.$t('Address deleted successfully'),
           type: 'success',
           icon: 'check',
           persist: false,

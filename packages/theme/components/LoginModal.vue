@@ -153,11 +153,7 @@
       <div v-else class="form">
         <div class="form-title">{{ $t('Create your new account') }}!</div>
         <div class="form-subtile">
-          {{
-            $t(
-              'Find your favorite products'
-            )
-          }}
+          {{ $t('Find your favorite products') }}
         </div>
         <ValidationObserver v-slot="{ handleSubmit }" key="sign-up">
           <form
@@ -165,7 +161,7 @@
             @submit.prevent="handleSubmit(handleRegister)"
             autocomplete="off"
           >
-            <ValidationProvider rules="required" v-slot="{ errors }">
+            <ValidationProvider rules="required|min:2|nothavenumber" v-slot="{ errors }">
               <SfInput
                 v-e2e="'login-modal-firstName'"
                 v-model="form.firstName"
@@ -176,7 +172,7 @@
                 class="form__element form__element--half"
               />
             </ValidationProvider>
-            <ValidationProvider rules="required" v-slot="{ errors }">
+            <ValidationProvider rules="required|min:2|nothavenumber" v-slot="{ errors }">
               <SfInput
                 v-e2e="'login-modal-lastName'"
                 v-model="form.lastName"
@@ -198,7 +194,7 @@
                 class="form__element"
               />
             </ValidationProvider>
-            <ValidationProvider rules="required" v-slot="{ errors }">
+            <ValidationProvider rules="required|password" v-slot="{ errors }">
               <SfInput
                 v-e2e="'login-modal-password'"
                 v-model="form.password"
@@ -283,20 +279,9 @@ import {
   SfBar,
   SfIcon
 } from '@storefront-ui/vue';
-import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-import { required, email } from 'vee-validate/dist/rules';
+import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import { useUser, useForgotPassword } from '@vue-storefront/moqui';
 import { useUiState } from '~/composables';
-
-extend('email', {
-  ...email,
-  message: 'Invalid email'
-});
-
-extend('required', {
-  ...required,
-  message: 'This field is required'
-});
 
 export default {
   name: 'LoginModal',
