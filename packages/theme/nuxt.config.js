@@ -62,14 +62,14 @@ export default {
           '@vue-storefront/core'
         ]
       },
-      performance: {
-        purgeCSS: {
-          enabled: process.env.NODE_ENV === 'production',
-          paths: [
-            '**/*.vue'
-          ]
-        }
-      }
+      // performance: {
+      //   purgeCSS: {
+      //     enabled: process.env.NODE_ENV === 'production',
+      //     paths: [
+      //       '**/*.vue'
+      //     ]
+      //   }
+      // }
     }],
     // @core-development-only-start
     ['@vue-storefront/nuxt-theme', {
