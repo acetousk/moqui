@@ -1,64 +1,100 @@
 <template>
   <nav class="sf-pagination">
     <slot name="prev" v-bind="{ isDisabled: !canGoPrev, go, prev: getPrev }">
-      <div :class="{ 'display-none': !hasArrows }" class="sf-pagination__item prev">
-        <SfButton :class="{
-          'sf-button--pure': true,
-          'sf-arrow--transparent': !canGoPrev,
-        }" :disabled="!canGoPrev ? true : false" aria-label="Go to previous page" data-testid="pagination-button-prev"
-          @click="go(getPrev)">
+      <div
+        :class="{ 'display-none': !hasArrows }"
+        class="sf-pagination__item prev"
+      >
+        <SfButton
+          :class="{
+            'sf-button--pure': true,
+            'sf-arrow--transparent': !canGoPrev
+          }"
+          :disabled="!canGoPrev ? true : false"
+          aria-label="Go to previous page"
+          data-testid="pagination-button-prev"
+          @click="go(getPrev)"
+        >
           <SfIcon icon="arrow_left" size="1.125rem" />
         </SfButton>
       </div>
     </slot>
     <template>
       <slot name="number" v-bind="{ page: 1 }">
-        <SfButton class="sf-pagination__item" :class="{
-          'sf-button--pure': true,
-          'display-none': !showFirst,
-        }" @click="go(1)">
+        <SfButton
+          class="sf-pagination__item"
+          :class="{
+            'sf-button--pure': true,
+            'display-none': !showFirst
+          }"
+          @click="go(1)"
+        >
           1
         </SfButton>
       </slot>
       <slot name="points">
-        <div :class="{ 'display-none': firstVisiblePageNumber <= 2 }" class="sf-pagination__item">
+        <div
+          :class="{ 'display-none': firstVisiblePageNumber <= 2 }"
+          class="sf-pagination__item"
+        >
           ...
         </div>
       </slot>
     </template>
     <template v-for="page in limitedPageNumbers">
       <slot name="number" v-bind="{ page, currentPage }">
-        <component :is="currentPage === page ? 'span' : 'SfButton'" :key="page" class="sf-pagination__item" :class="{
-          'sf-button--pure': currentPage !== page,
-          current: currentPage === page,
-        }" @click="currentPage !== page ? go(page) : null">
+        <component
+          :is="currentPage === page ? 'span' : 'SfButton'"
+          :key="page"
+          class="sf-pagination__item"
+          :class="{
+            'sf-button--pure': currentPage !== page,
+            current: currentPage === page
+          }"
+          @click="currentPage !== page ? go(page) : null"
+        >
           {{ page }}
         </component>
       </slot>
     </template>
     <template v-if="showLast">
       <slot name="points">
-        <div :class="{
-          'display-none': lastVisiblePageNumber >= total - 1,
-        }" class="sf-pagination__item">
+        <div
+          :class="{
+            'display-none': lastVisiblePageNumber >= total - 1
+          }"
+          class="sf-pagination__item"
+        >
           ...
         </div>
       </slot>
       <slot name="number" v-bind="{ page: total }">
-        <SfButton class="sf-pagination__item" :class="{
-          'sf-button--pure': true,
-        }" @click="go(total)">
+        <SfButton
+          class="sf-pagination__item"
+          :class="{
+            'sf-button--pure': true
+          }"
+          @click="go(total)"
+        >
           {{ total }}
         </SfButton>
       </slot>
     </template>
     <slot name="next" v-bind="{ isDisabled: !canGoNext, go, next: getNext }">
-      <div :class="{ 'display-none': !hasArrows }" class="sf-pagination__item next">
-        <SfButton :class="{
-          'sf-button--pure': true,
-          'sf-arrow--transparent': !canGoNext,
-        }" :disabled="!canGoNext ? true : false" aria-label="Go to previous next" data-testid="pagination-button-next"
-          @click="go(getNext)">
+      <div
+        :class="{ 'display-none': !hasArrows }"
+        class="sf-pagination__item next"
+      >
+        <SfButton
+          :class="{
+            'sf-button--pure': true,
+            'sf-arrow--transparent': !canGoNext
+          }"
+          :disabled="!canGoNext ? true : false"
+          aria-label="Go to previous next"
+          data-testid="pagination-button-next"
+          @click="go(getNext)"
+        >
           <SfIcon icon="arrow_right" size="1.125rem" />
         </SfButton>
       </div>
@@ -66,10 +102,7 @@
   </nav>
 </template>
 <script>
-import {
-  SfIcon,
-  SfButton
-} from '@storefront-ui/vue';
+import { SfIcon, SfButton } from '@storefront-ui/vue';
 export default {
   name: 'BasicPagination',
   components: {
@@ -158,6 +191,4 @@ export default {
   }
 };
 </script>
-  <style lang="scss">
-  @import "@storefront-ui/shared/styles/components/molecules/SfPagination.scss";
-  </style>
+<style lang="scss"></style>

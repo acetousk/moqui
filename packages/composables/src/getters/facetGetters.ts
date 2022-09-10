@@ -55,6 +55,10 @@ function getProducts(params: FacetSearchResult<Facet>): any {
   return params.data?.items || [];
 }
 
+function getCategories(params: FacetSearchResult<Facet>): any {
+  return params.data?.categories || [];
+}
+
 function getPagination(params: FacetSearchResult<Facet>): AgnosticPagination {
   return {
     currentPage: params.data?.currentPage || 1,
@@ -75,6 +79,7 @@ export const facetGetters: FacetsGetters<Facet, FacetSearchCriteria> = {
   getGrouped,
   getAll,
   getProducts,
+  getCategories,
   getCategoryTree,
   getBreadcrumbs,
   getPagination

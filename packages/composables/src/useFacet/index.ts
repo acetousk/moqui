@@ -45,12 +45,13 @@ export const useFacet = useFacetFactory<SearchParams>({
         const { data } = await context.$moqui.api.getProductSearch({
           term: params.input.term,
           page: params.input.page,
-          pageSize: params.input.itemsPerPage,
+          pageSize: params.input.itemsPerPage || 10,
           sort: params.input.sort,
           filters: params.input.filters
         });
         return {
           items: data?.productSearchResults?.productList || [],
+          categories: data?.productSearchResults?.categoryList || [],
           categoryTree: data?.productSearchResults?.categoryTree || [],
           availableFilters: data?.productSearchResults?.featureList,
           category: { categorySlug: params.input.categorySlug },

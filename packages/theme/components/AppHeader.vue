@@ -141,7 +141,7 @@ export default {
 
       result.value = {
         products: facetGetters.getProducts(searchResult.value),
-        categories: []
+        categories: facetGetters.getCategories(searchResult.value)
       };
     }, 1000);
 

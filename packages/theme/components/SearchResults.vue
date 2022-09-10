@@ -23,7 +23,7 @@
             <SfList>
               <SfListItem v-for="(category, key) in categories" :key="key">
                 <SfMenuItem
-                  :label="category.label"
+                  :label="category.categoryName"
                   :link="localePath(`/c/${category.slug}`)"
                 >
                   <template #mobile-nav-icon> &#8203; </template>

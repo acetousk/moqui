@@ -3,6 +3,7 @@ import { Product, ProductFilter } from './product';
 
 export type Facet = {
     items: Product[];
+    categories: Category[];
     categoryTree: Category;
     availableFilters: ProductFilter[];
     category: { categorySlug: string },

@@ -207,6 +207,7 @@ export type ProductSearchGetParams = {
 export type ProductSearchGetResponse = {
   productSearchResults: {
     categoryTree: Category[];
+    categoryList: Category[];
     productList: Product[];
     featureList: ProductFilter[];
     productListCount: number;
