@@ -31,6 +31,12 @@ export default ({ $vsf, $cookies }) => {
             '; ' +
             ($cookies.get('x-csrf-token')
               ? 'x-csrf-token=' + $cookies.get('x-csrf-token') + ';'
+              : '') +
+            ($cookies.get('vsf-locale')
+              ? 'vsf-locale=' + $cookies.get('vsf-locale') + ';'
+              : '') +
+            ($cookies.get('vsf-country')
+              ? 'vsf-country=' + $cookies.get('vsf-country') + ';'
               : '')
         })
       }

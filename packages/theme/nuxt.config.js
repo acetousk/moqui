@@ -77,7 +77,11 @@ export default {
     /* project-only-start
     ['@vue-storefront/nuxt-theme'],
     project-only-end */
-    ['@vue-storefront/moqui/nuxt', {}]
+    ['@vue-storefront/moqui/nuxt', {
+      i18n: {
+        useNuxtI18nConfig: true,
+      },
+    }]
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -119,6 +123,11 @@ export default {
         en: {
           currency: {
             style: 'currency', currency: 'USD', currencyDisplay: 'symbol'
+          }
+        },
+        ar: {
+          currency: {
+            style: 'currency', currency: 'EGP', currencyDisplay: 'symbol'
           }
         },
         de: {
@@ -167,7 +176,8 @@ export default {
     }
   },
   publicRuntimeConfig: {
-    theme
+    theme,
+    middlewareUrl: process.env.BASE_URL || 'http://0.0.0.0:3000'
   },
   pwa: {
     meta: {

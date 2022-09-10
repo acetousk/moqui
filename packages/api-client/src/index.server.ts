@@ -13,12 +13,18 @@ const init = (config: Config) => {
   });
 
   client.interceptors.request.use((axiosConfig) => {
-    // axiosConfig = {
-    //   ...axiosConfig,
-    //   headers: {
-    //     ...axiosConfig.headers
-    //   }
-    // };
+    const locale = config.state.getLocale();
+    const country = config.state.getCountry();
+    axiosConfig = {
+      ...axiosConfig,
+      headers: {
+        ...axiosConfig.headers,
+        Cookie:
+          (axiosConfig.headers.Cookie ? axiosConfig.headers.Cookie + ';' : '') +
+          (locale ? 'vsf-locale=' + locale + ';' : '') +
+          (country ? 'vsf-country=' + country + ';' : '')
+      }
+    };
 
     return axiosConfig;
   });

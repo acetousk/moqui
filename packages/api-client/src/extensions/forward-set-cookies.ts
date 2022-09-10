@@ -14,6 +14,10 @@ const forwardSetCookies: ApiClientExtension = {
           configuration.cookies?.xsrfCookieName || 'x-csrf-token';
         const authCookieName: string =
           configuration.cookies?.authCookieName || 'vsf-auth';
+        const localeCookieName: string =
+          configuration.cookies?.localeCookieName || 'vsf-locale';
+        const countryCookieName: string =
+          configuration.cookies?.countryCookieName || 'vsf-country';
 
         return {
           ...configuration,
@@ -41,7 +45,9 @@ const forwardSetCookies: ApiClientExtension = {
                 return;
               }
               res.cookie(authCookieName, JSON.stringify(state));
-            }
+            },
+            getLocale: () => req.cookies[localeCookieName],
+            getCountry: () => req.cookies[countryCookieName]
           }
         };
       },
