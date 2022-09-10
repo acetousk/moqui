@@ -19,8 +19,11 @@
         <SfListItem v-for="lang in availableLocales" :key="lang.code">
           <a
             :href="switchLocalePath(lang.code)"
-            @click="$i18n.setLocaleCookie(lang.code)"
-          >
+            @click="$cookies.set('vsf-locale', lang.code)"
+            >
+            <!-- this doesn't really work. probably because it doesn't know what the locale cookie name is? -->
+            <!-- anyway work-around above works fine -->
+            <!-- @click="$i18n.setLocaleCookie(lang.code)" -->
             <SfCharacteristic class="language">
               <template #title>
                 <span>{{ lang.label }}</span>
