@@ -26,4 +26,7 @@ coverage
 # OS generated files
 .DS_STORE
 
+# Nuxt build files
+.nuxt/**/*
+
 !scripts/lib
