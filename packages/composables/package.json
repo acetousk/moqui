@@ -1,6 +1,6 @@
 {
   "name": "@vue-storefront/moqui",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "sideEffects": false,
   "main": "./lib/index.js",
   "exports": {
@@ -33,7 +33,8 @@
     "@nuxtjs/composition-api": "^0.29.3"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "nuxt/**/*"
   ],
   "publishConfig": {
     "access": "public"
