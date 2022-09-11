@@ -1,7 +1,6 @@
 {
   "name": "@vue-storefront/moqui-api",
   "version": "0.9.0",
-  "private": true,
   "sideEffects": false,
   "main": "./lib/index.js",
   "exports": {
