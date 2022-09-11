@@ -1,6 +1,6 @@
-<img src="https://blog.vuestorefront.io/wp-content/uploads/2020/01/1QU9F6hQlFyHsJIbsdmt6FA.png" height="100px" />
+<img src="vsf-moqui.svg" style='max-height: 300px;' />
 
-# Vue Storefront 2 integration with moqui
+# Vue Storefront 2 integration with Moqui
 
 This project is a moqui integration for Vue Storefront 2.
 
