@@ -32,7 +32,7 @@
 import { useStore } from '@vue-storefront/moqui';
 import { SfMenuItem, SfModal } from '@storefront-ui/vue';
 import { useUiState } from '~/composables';
-import { computed } from '@vue/composition-api';
+import { computed } from '@nuxtjs/composition-api';
 export default {
   name: 'HeaderNavigation',
   components: {
