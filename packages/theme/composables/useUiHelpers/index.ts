@@ -1,5 +1,5 @@
 
-import { getCurrentInstance } from '@vue/composition-api';
+import { getCurrentInstance } from '@nuxtjs/composition-api';
 import { AgnosticFacetSearchParams, AgnosticFacet, AgnosticCategoryTree } from '@vue-storefront/core';
 
 const getContext = () => {

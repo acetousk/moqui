@@ -47,7 +47,7 @@ import {
   SfButton
 } from '@storefront-ui/vue';
 import { reviewGetters, productGetters, useReview, useUser } from '@vue-storefront/moqui';
-import { computed, onMounted } from '@vue/composition-api';
+import { computed, onMounted } from '@nuxtjs/composition-api';
 import ReviewForm from '~/components/ReviewForm.vue';
 import BasicPagination from '~/components/Shared/BasicPagination.vue';
 import { useUiState } from '~/composables';

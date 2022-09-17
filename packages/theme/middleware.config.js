@@ -6,7 +6,7 @@ module.exports = {
         api: 'http://localhost:8080',
         basePath: '/rest/s1/vsf',
         gatewayBasePath: '/rest/s1/accept',
-        defaultStoreId: 'ATQ_WEBSTORE',
+        defaultStoreId: 'POPC_DEFAULT',
         cookies: {
           currencyCookieName: 'vsf-currency',
           countryCookieName: 'vsf-country',

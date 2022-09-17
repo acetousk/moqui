@@ -61,7 +61,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@storefront-ui/vue/styles';
 
 .sf-header {
   --header-padding: var(--spacer-xs);
