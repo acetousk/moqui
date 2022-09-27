@@ -271,4 +271,9 @@ export default {
   'Your address was not updated': 'لم نتمكن من تحديث عنوان الشحن الخاص بك',
   'Shipping method set': 'تم تعيين طريقة الشحن بنجاح!',
   'Shipping method not set': 'لم يتم تعيين طريقة الشحن. حاول مرة اخرى',
+  'Please fill the form': 'يرجى ملء النموذج أدناه وسنتواصل معك قريبًا.',
+  'How can we help': 'كيف يمكننا المساعدة؟',
+  'Describe your issue': 'قم بوصف مشكلتك',
+  'Contact request failed':'نحن غير قادرين على إرسال طلب الاتصال الخاص بك. حاول مرة اخرى.',
+  'Contact request success':'لقد تلقينا طلب الاتصال الخاص بك! انتظر ، سنكون على اتصال قريبًا.',
 };

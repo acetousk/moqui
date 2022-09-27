@@ -275,4 +275,9 @@ export default {
   'Your address was not updated': 'We were unable to update your shipping address',
   'Shipping method set': 'Shipping method set successfully!',
   'Shipping method not set': 'Shipping method was not set. Please try again',
+  'Please fill the form': 'Please fill the form below and we will be in touch soon.',
+  'How can we help': 'How can we be of assistance?',
+  'Describe your issue': 'Describe your problem/concern',
+  'Contact request failed': 'We were unable to send your contact request. Please try again.',
+  'Contact request success': 'We received your contact request! Hold tight, we\'ll be in touch soon.',
 };

@@ -14,18 +14,19 @@
               v-model="form.countryId"
               :label="$t('Country')"
               name="country"
-              :disabled="loadingStore"
+              :disabled="loadingStore || loadingGeo"
               class="form__element form__element--half form__select sf-select--underlined"
               required
               :valid="!errors[0]"
               :errorMessage="errors[0]"
+              @input="handleCountryInput"
             >
               <SfSelectOption
-                v-for="countryOption in countriesList"
-                :key="countryOption.id"
-                :value="countryOption.id"
+                v-for="countryOption in countryList"
+                :key="countryOption.geoId"
+                :value="countryOption.geoId"
               >
-                {{ countryOption.name }}
+                {{ countryOption.geoName }}
               </SfSelectOption>
             </SfSelect>
           </ValidationProvider>
@@ -40,28 +41,49 @@
               v-model="form.stateId"
               :label="$t('Area')"
               name="state"
-              :disabled="loadingStore || !isStatesRequired"
+              :disabled="loadingStore || loadingGeo || !isStatesRequired"
               class="form__element form__element--half form__element--half-even form__select form__select--even sf-select--underlined"
+              required
+              :valid="!errors[0]"
+              :errorMessage="errors[0]"
+              @input="handleAreaInput"
+            >
+              <SfSelectOption
+                v-for="stateOption in areaList"
+                :key="stateOption.geoId"
+                :value="stateOption.geoId"
+              >
+                {{ stateOption.geoName }}
+              </SfSelectOption>
+            </SfSelect>
+          </ValidationProvider>
+          <ValidationProvider
+            name="cityId"
+            rules="required"
+            v-slot="{ errors }"
+            slim
+          >
+            <SfSelect
+              v-e2e="'shipping-city'"
+              v-model="form.cityId"
+              :label="$t('City')"
+              name="city"
+              :disabled="loadingStore || loadingGeo"
+              class="form__element form__element--half form__select sf-select--underlined"
               required
               :valid="!errors[0]"
               :errorMessage="errors[0]"
             >
               <SfSelectOption
-                v-for="stateOption in statesList"
-                :key="stateOption.id"
-                :value="stateOption.id"
+                v-for="cityOption in cityList"
+                :key="cityOption.geoId"
+                :value="cityOption.geoId"
               >
-                {{ stateOption.name }}
+                {{ cityOption.geoName }}
               </SfSelectOption>
             </SfSelect>
-          </ValidationProvider>
-          <ValidationProvider
-            name="city"
-            rules="required"
-            v-slot="{ errors }"
-            slim
-          >
-            <SfInput
+            <!-- If you want to keep city open to any inputs, uncomment this -->
+            <!-- <SfInput
               v-e2e="'shipping-city'"
               v-model="form.city"
               :label="$t('City')"
@@ -70,7 +92,7 @@
               required
               :valid="!errors[0]"
               :errorMessage="errors[0]"
-            />
+            /> -->
           </ValidationProvider>
           <ValidationProvider
             name="zipCode"
@@ -151,6 +173,7 @@
                 v-e2e="'select-shipping'"
                 class="form__action-button"
                 :loading="loading"
+                :disabled="loadingGeo"
                 type="submit"
               >
                 {{ $t('Save') }}
@@ -159,6 +182,7 @@
                 v-else
                 v-e2e="'select-shipping'"
                 class="form__action-button"
+                :disabled="loadingGeo"
                 :loading="loading"
                 type="submit"
               >
@@ -182,10 +206,11 @@ import {
   SfLink,
   SfLoader
 } from '@storefront-ui/vue';
-import { computed, ref } from '@nuxtjs/composition-api';
+import { computed, ref, onMounted } from '@nuxtjs/composition-api';
 import {
   useUserShipping,
   useStore,
+  useGeo,
   storeGetters,
   userShippingGetters
 } from '@vue-storefront/moqui';
@@ -222,6 +247,7 @@ export default {
           address1: '',
           address2: '',
           city: '',
+          cityId: '',
           stateId: null,
           countryId: null,
           postalCode: '',
@@ -234,6 +260,15 @@ export default {
     const { send: sendNotification } = useUiNotification();
     const { loading } = useUserShipping();
     const { response: store, loading: loadingStore } = useStore();
+    const {
+      getCountryList,
+      getAreaList,
+      getCityList,
+      countryList,
+      areaList,
+      cityList,
+      loading: loadingGeo
+    } = useGeo();
     const isFormSubmitted = ref(false);
 
     const form = ref({
@@ -241,7 +276,8 @@ export default {
       alias: props.address.alias,
       address1: props.address.address1,
       address2: props.address.address2,
-      city: props.address.city,
+      // city: props.address.city,
+      cityId: props.address.cityId,
       stateId: props.address.stateId,
       countryId: props.address.countryId,
       postalCode: props.address.postalCode,
@@ -304,13 +340,40 @@ export default {
       context.emit('cancel');
     };
 
+    onMounted(async () => {
+      await getCountryList();
+      if (props.address?.countryId) {
+        await getAreaList({ countryGeoId: props.address.countryId });
+      }
+      if (props.address?.stateId) {
+        await getCityList({ areaGeoId: props.address.stateId });
+      }
+    });
+
+    const handleCountryInput = async (val) => {
+      form.value.stateId = null;
+      form.value.cityId = null;
+      await getAreaList({ countryGeoId: val });
+    };
+
+    const handleAreaInput = async (val) => {
+      form.value.cityId = null;
+      await getCityList({ areaGeoId: val });
+    };
+
     return {
       loading,
       loadingStore,
+      loadingGeo,
       isFormSubmitted,
       form,
       countriesList,
       statesList,
+      countryList,
+      areaList,
+      cityList,
+      handleCountryInput,
+      handleAreaInput,
       submitForm,
       isStatesRequired,
       toggleAddNewAddressForm,

@@ -5,7 +5,6 @@
     </LazyHydrate>
 
     <AppHeader />
-
     <div id="layout">
       <nuxt :key="route.fullPath" />
 
@@ -33,7 +32,7 @@ import LazyHydrate from 'vue-lazy-hydration';
 import Notification from '~/components/Notification';
 import { onSSR } from '@vue-storefront/core';
 import { useRoute } from '@nuxtjs/composition-api';
-import { useCart, useStore, useUser } from '@vue-storefront/moqui';
+import { useCart, useStore, useUser, useGeo } from '@vue-storefront/moqui';
 import { watch } from '@nuxtjs/composition-api';
 
 export default {
@@ -54,10 +53,10 @@ export default {
   setup() {
     const route = useRoute();
     const { load: loadStores } = useStore();
+    const { getCountryList } = useGeo();
     const { load: loadUser, isAuthenticated } = useUser();
     const { load: loadCart, clear: clearCart, cart } = useCart();
     // const { load: loadWishlist } = useWishlist();
-
     watch(isAuthenticated, (newVal, oldVal) => {
       if (!oldVal && newVal === true) {
         try {
@@ -75,7 +74,8 @@ export default {
       await Promise.all([
         loadStores(),
         loadUser(),
-        loadCart()
+        loadCart(),
+        getCountryList()
 
         /* loadWishlist() */
       ]);

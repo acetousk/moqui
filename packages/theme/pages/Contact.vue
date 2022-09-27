@@ -1,36 +1,120 @@
 <template>
   <div id="static">
-    <SfBreadcrumbs class="breadcrumbs desktop-only" :breadcrumbs="breadcrumbs" />
-    <SfContentPages :active="activePage" :title="$t('Help')" @click:change="updateActive">
-      <SfContentPage v-for="(page, key) in pages" :key="key" :title="page.title">
+    <SfBreadcrumbs
+      class="breadcrumbs desktop-only"
+      :breadcrumbs="breadcrumbs"
+    />
+    <SfContentPages
+      :active="activePage"
+      :title="$t('Help')"
+      @click:change="updateActive"
+    >
+      <SfContentPage
+        v-for="(page, key) in pages"
+        :key="key"
+        :title="page.title"
+      >
         <template v-if="page.content[0] && typeof page.content[0] === 'string'">
-          <p v-for="(paragraph, index) in page.content" :key="index" class="paragraph paragraph--without-tab">
+          <p
+            v-for="(paragraph, index) in page.content"
+            :key="index"
+            class="paragraph paragraph--without-tab"
+          >
             {{ paragraph }}
           </p>
         </template>
         <template v-else>
           <SfTabs :open-tab="1">
-            <SfTab v-for="(tab, index) in page.content" :key="index" :title="tab.tabName">
-              <p v-for="(paragraph, i) in tab.tabContent" :key="i" class="paragraph">
+            <SfTab
+              v-for="(tab, index) in page.content"
+              :key="index"
+              :title="tab.tabName"
+            >
+              <p
+                v-for="(paragraph, i) in tab.tabContent"
+                :key="i"
+                class="paragraph"
+              >
                 {{ paragraph }}
               </p>
             </SfTab>
           </SfTabs>
         </template>
       </SfContentPage>
+      <SfContentPage :title="$t('Contact us')">
+        <ContactForm
+          :loading="contactLoading"
+          :error="sendContactRequestError"
+          @submit="handleContactSubmit"
+        />
+      </SfContentPage>
     </SfContentPages>
   </div>
 </template>
 <script>
 import { SfContentPages, SfTabs, SfBreadcrumbs } from '@storefront-ui/vue';
+import ContactForm from '~/components/Contact/ContactForm.vue';
+import { useContact } from '@vue-storefront/moqui';
+import { useUiNotification } from '~/composables';
+import { computed } from '@nuxtjs/composition-api';
+
 export default {
   name: 'Static',
   components: {
     SfContentPages,
     SfTabs,
-    SfBreadcrumbs
+    SfBreadcrumbs,
+    ContactForm
   },
-  data() {
+  setup(props, context) {
+    const { send: sendNotification } = useUiNotification();
+
+    const {
+      sendContactRequest,
+      loading: contactLoading,
+      error: contactError
+    } = useContact();
+
+    const sendContactRequestError = computed(
+      () => contactError.value.sendContactRequest
+    );
+
+    const handleContactSubmit = async ({ form, onComplete }) => {
+      console.log('form');
+      console.log(form);
+      await sendContactRequest({
+        request: {
+          ...form,
+          phone: {
+            countryCode: form.phone.substring(1, 2),
+            areaCode: form.phone.substring(2, 5),
+            contactNumber: form.phone.substring(5)
+          }
+        }
+      });
+
+      if (sendContactRequestError.value) {
+        sendNotification({
+          id: Symbol('contact_request_failed'),
+          message: context.root.$t('Contact request failed'),
+          type: 'danger',
+          icon: 'cross',
+          persist: false,
+          title: 'Contact Request'
+        });
+      } else {
+        sendNotification({
+          id: Symbol('contact_request_success'),
+          message: context.root.$t('Contact request success'),
+          type: 'success',
+          icon: 'check',
+          persist: false,
+          title: 'Contact Request'
+        });
+        onComplete();
+      }
+    };
+
     return {
       activePage: 'About us',
       breadcrumbs: [
@@ -90,16 +174,20 @@ export default {
           content: [
             'Return policy / This website ("website") is operated by Abc Inc., which includes Abc stores, and Abc Private Sales. This privacy policy only covers information collected at this website, and does not cover any information collected offline by Abc. All Abc websites are covered by this privacy policy.'
           ]
-        },
-        {
-          title: 'Contact us',
-          content: [
-            'Contact us / This website ("website") is operated by Abc Inc., which includes Abc stores, and Abc Private Sales. This privacy policy only covers information collected at this website, and does not cover any information collected offline by Abc. All Abc websites are covered by this privacy policy.'
-          ]
         }
-      ]
+        // {
+        //   title: 'Contact us',
+        //   content: [
+        //     'Contact us / This website ("website") is operated by Abc Inc., which includes Abc stores, and Abc Private Sales. This privacy policy only covers information collected at this website, and does not cover any information collected offline by Abc. All Abc websites are covered by this privacy policy.'
+        //   ]
+        // }
+      ],
+      handleContactSubmit,
+      contactLoading,
+      sendContactRequestError
     };
   },
+
   methods: {
     updateActive(title) {
       this.activePage = title;
@@ -108,7 +196,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "~@storefront-ui/vue/styles";
+@import '~@storefront-ui/vue/styles';
 
 #static {
   box-sizing: border-box;
