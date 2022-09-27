@@ -27,7 +27,7 @@ function getPostCode(address: AddressItem): string {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCity(address: AddressItem): string {
-  return address?.city || '';
+  return address?.cityName || address?.city || '';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,7 +50,7 @@ function getCountry(address: AddressItem): string {
 }
 
 function getPhone(address: AddressItem): string {
-  return address.phone ? (String(address.phone?.countryCode || '') + String(address.phone?.areaCode || '') + String(address.phone?.contactNumber || '')) : '';
+  return address?.phone ? (String(address.phone?.countryCode || '') + String(address.phone?.areaCode || '') + String(address.phone?.contactNumber || '')) : '';
 }
 
 function getProvince(address: AddressItem): string {

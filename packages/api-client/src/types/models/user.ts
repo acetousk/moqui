@@ -13,6 +13,7 @@ export type ShippingAddress = {
     address1: string;
     address2?: string;
     city: string;
+    cityId?: string;
     stateId: string;
     countryId: string;
     postalCode: string;
@@ -29,8 +30,10 @@ export type UserShippingAddressItem = {
     address1: string;
     address2?: string;
     city: string;
+    cityId: string;
     stateId: string;
     countryId: string;
+    cityName: string;
     stateName: string;
     countryName: string;
     postalCode: string;
@@ -40,6 +43,18 @@ export type UserShippingAddressItem = {
         contactNumber: number;
     };
     isDefault?: boolean;
+};
+
+export type ContactRequest = {
+    firstName?: string;
+    lastName?: string;
+    description: string;
+    emailAddress?: string;
+    phone?: {
+        countryCode: number;
+        areaCode: number;
+        contactNumber: number;
+    };
 };
 
 export type UserShippingAddress = UserShippingAddressItem[];

@@ -1,7 +1,7 @@
 import { Context } from './context';
-import { Store } from './models/store';
+import { Geo, Store } from './models/store';
 import { AxiosResponseHeaders } from 'axios';
-import { UserShippingAddress, User } from './models/user';
+import { UserShippingAddress, User, ContactRequest } from './models/user';
 import {
   Cart,
   Category,
@@ -21,6 +21,22 @@ export interface GetStoreParams {
 }
 
 export type GetStoreResponse = Store;
+
+/*
+    getGeoList
+*/
+export interface GetGeoParams {
+  parentGeoId?: string;
+}
+
+export type GetGeoResponse = Geo[];
+
+/*
+    addContactRequest
+*/
+export type AddContactRequestParams = ContactRequest;
+
+export type AddContactRequestResponse = Record<string, never>;
 
 /*
     Register
@@ -383,6 +399,13 @@ export type Endpoints = {
   ) => Promise<{
     headers: AxiosResponseHeaders;
     data: GetStoreResponse;
+  }>;
+  getGeoList: (
+    context: Context,
+    params: GetGeoParams
+  ) => Promise<{
+    headers: AxiosResponseHeaders;
+    data: GetGeoResponse;
   }>;
   registerUser: (
     context: Context,
