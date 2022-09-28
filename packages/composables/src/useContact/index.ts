@@ -8,8 +8,6 @@ export const useContact = useContactFactory<ContactRequest>({
     params: { request: ContactRequest; customQuery?: CustomQuery }
   ) {
     try {
-      console.log('params');
-      console.log(params);
       await context.$moqui.api.addContactRequest(params.request);
       return null;
     } catch (error) {

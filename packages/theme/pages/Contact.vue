@@ -80,8 +80,6 @@ export default {
     );
 
     const handleContactSubmit = async ({ form, onComplete }) => {
-      console.log('form');
-      console.log(form);
       await sendContactRequest({
         request: {
           ...form,
