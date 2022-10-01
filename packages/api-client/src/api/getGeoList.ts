@@ -6,7 +6,6 @@ export default async function getGeoList(
   context: Context,
   params: GetGeoParams
 ) {
-  console.log('getGeoList');
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/geo', context.config.api);
 
@@ -19,8 +18,6 @@ export default async function getGeoList(
   const { data, headers } = await context.client.get<GetGeoResponse>(url.href, {
     headers: getHeaders(context)
   });
-  console.log('data');
-  console.log(data);
   // Return data from the API
   return {
     data,
