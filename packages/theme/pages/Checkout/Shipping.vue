@@ -1,19 +1,35 @@
 <template>
   <div class="sf-shipping">
-    <SfHeading :title="$t('Shipping')" :level="2" class="sf-heading--left sf-heading--no-underline title" />
+    <SfHeading
+      :title="$t('Shipping')"
+      :level="2"
+      class="sf-heading--left sf-heading--no-underline title"
+    />
     <SfLoader :class="{ loading }" :loading="loading">
       <div class="form">
         <div class="form__radio-group" data-testid="shipping-method">
-          <ShippingProvider :shipping-methods="shippingMethods" :selected-method="selectedMethod"
-            @save="selectMethod" />
+          <ShippingProvider
+            :shipping-methods="shippingMethods"
+            :selected-method="selectedMethod"
+            @save="selectMethod"
+          />
         </div>
       </div>
     </SfLoader>
     <div class="summary__action">
-      <SfButton type="button" class="sf-button color-secondary summary__back-button" @click.prevent="$emit('go-back')">
+      <SfButton
+        type="button"
+        class="sf-button color-secondary summary__back-button"
+        @click="router.push(localePath({ name: 'account' }))"
+      >
         {{ $t('Go back') }}
       </SfButton>
-      <SfButton v-e2e="'continue-to-payment'" :disabled="!selectedMethod" type="button" @click="saveShippingMethod">
+      <SfButton
+        v-e2e="'continue-to-payment'"
+        :disabled="!selectedMethod"
+        type="button"
+        @click="saveShippingMethod"
+      >
         {{ $t('Continue to payment') }}
       </SfButton>
     </div>
@@ -21,7 +37,13 @@
 </template>
 
 <script>
-import { SfButton, SfRadio, SfLink, SfLoader, SfHeading } from '@storefront-ui/vue';
+import {
+  SfButton,
+  SfRadio,
+  SfLink,
+  SfLoader,
+  SfHeading
+} from '@storefront-ui/vue';
 import { onSSR } from '@vue-storefront/core';
 import { ref, computed, useRouter } from '@nuxtjs/composition-api';
 import { useShippingProvider, useCart } from '@vue-storefront/moqui';
@@ -41,11 +63,21 @@ export default {
   setup(props, context) {
     const router = useRouter();
     const { send: sendNotification } = useUiNotification();
-    const { load: loadShippingProvider, state: shippingMethods, save, loading, error } = useShippingProvider();
+    const {
+      load: loadShippingProvider,
+      state: shippingMethods,
+      save,
+      loading,
+      error
+    } = useShippingProvider();
     const { cart } = useCart();
 
     const shippingProviderSaveError = computed(() => error.value.save);
-    const cartShipmentMethodRefId = computed(() => cart.value?.orderPart?.carrierPartyId && `${cart.value.orderPart.carrierPartyId}-${cart.value.orderPart.shipmentMethodEnumId}`);
+    const cartShipmentMethodRefId = computed(
+      () =>
+        cart.value?.orderPart?.carrierPartyId &&
+        `${cart.value.orderPart.carrierPartyId}-${cart.value.orderPart.shipmentMethodEnumId}`
+    );
 
     const selectedMethod = ref(cartShipmentMethodRefId.value || null);
     const selectMethod = async (method) => {
@@ -53,8 +85,15 @@ export default {
     };
 
     const saveShippingMethod = async () => {
-      const shipmentMethod = shippingMethods.value.find(method => method.referenceId === selectedMethod.value);
-      await save({ shippingMethod: { shipmentMethodId: shipmentMethod.shipmentMethodId, carrierId: shipmentMethod.carrierId } });
+      const shipmentMethod = shippingMethods.value.find(
+        (method) => method.referenceId === selectedMethod.value
+      );
+      await save({
+        shippingMethod: {
+          shipmentMethodId: shipmentMethod.shipmentMethodId,
+          carrierId: shipmentMethod.carrierId
+        }
+      });
 
       if (shippingProviderSaveError.value) {
         sendNotification({
@@ -91,7 +130,8 @@ export default {
       selectedMethod,
       selectMethod,
       saveShippingMethod,
-      loading
+      loading,
+      router
     };
   }
 };
@@ -153,7 +193,8 @@ export default {
         --radio-container-padding: var(--spacer-xs);
 
         @include for-desktop {
-          --radio-container-padding: var(--spacer-xs) var(--spacer-xs) var(--spacer-xs) var(--spacer-sm);
+          --radio-container-padding: var(--spacer-xs) var(--spacer-xs)
+            var(--spacer-xs) var(--spacer-sm);
         }
       }
     }

@@ -9,17 +9,15 @@ import type { UseShippingAddParams as AddParams } from '../types';
 
 const params: UseShippingParams<ShippingAddress, AddParams> = {
   provide() {
-    return {
-      useCart: useCart()
-    };
+    return useCart();
   },
 
-  load: async (context: Context, { customQuery }) => {
+  load: async (context: Context) => {
     try {
-      if (!context.useCart.cart) {
-        await context.useCart.load(customQuery);
-      }
-      const shippingAddress = context.useCart?.cart?.value?.postalAddress || {};
+      const { data } = await context.$moqui.api.getCart();
+      context.setCart(data);
+
+      const shippingAddress = context.cart?.value?.postalAddress || {};
 
       return shippingAddress;
     } catch (error) {
@@ -30,17 +28,18 @@ const params: UseShippingParams<ShippingAddress, AddParams> = {
     }
   },
 
-  save: async (context: Context, { shippingDetails, customQuery }) => {
+  save: async (context: Context, { shippingDetails }) => {
     try {
-      if (!context.useCart.cart) {
-        await context.useCart.load(customQuery);
+      if (!context.cart.value?.orderHeader?.orderId) {
+        await context.load();
       }
       const { data } = await context.$moqui.api.setCartShippingAddress({
         addressId: shippingDetails.addressId
       });
 
       // Refetch cart since to get our shipping charge
-      await context.useCart.load(customQuery);
+      const { data: updatedCart } = await context.$moqui.api.getCart();
+      context.setCart(updatedCart);
 
       return data;
     } catch (error) {

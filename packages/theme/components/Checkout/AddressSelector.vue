@@ -8,7 +8,7 @@
           v-for="address in addressesList"
           :key="userShippingGetters.getId(address)"
         >
-          <sf-address
+          <SfAddress
             :name="userShippingGetters.getId(address)"
             class="address-picker__item"
           >
@@ -25,7 +25,7 @@
                 {{ $t('Delete') }}
               </SfLink>
             </div>
-          </sf-address>
+          </SfAddress>
         </div>
         <div
           v-if="
