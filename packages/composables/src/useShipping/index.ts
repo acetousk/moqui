@@ -5,9 +5,7 @@ import {
 } from '@vue-storefront/core';
 import type { ShippingAddress } from '@vue-storefront/moqui-api';
 import { useCart } from 'src/useCart';
-import type {
-  UseShippingAddParams as AddParams
-} from '../types';
+import type { UseShippingAddParams as AddParams } from '../types';
 
 const params: UseShippingParams<ShippingAddress, AddParams> = {
   provide() {
@@ -40,8 +38,11 @@ const params: UseShippingParams<ShippingAddress, AddParams> = {
       const { data } = await context.$moqui.api.setCartShippingAddress({
         addressId: shippingDetails.addressId
       });
-      return data;
 
+      // Refetch cart since to get our shipping charge
+      await context.useCart.load(customQuery);
+
+      return data;
     } catch (error) {
       throw {
         message: error.response?.data?.message || error.message,
@@ -51,4 +52,6 @@ const params: UseShippingParams<ShippingAddress, AddParams> = {
   }
 };
 
-export const useShipping = useShippingFactory<ShippingAddress, AddParams>(params);
+export const useShipping = useShippingFactory<ShippingAddress, AddParams>(
+  params
+);
