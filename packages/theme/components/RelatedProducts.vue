@@ -13,17 +13,12 @@
           <SfProductCard
             :title="productGetters.getName(product)"
             :image="addBasePath(productGetters.getCoverImage(product))"
-            :regular-price="
-              $n(
-                productGetters.getFormattedPrice(
-                  productGetters.getPrice(product).regular
-                ),
-                'currency'
-              )
-            "
+            :badgeLabel="product.isDiscounted ? 'DISCOUNT' : ''"
+            :badgeColor="product.isDiscounted ? 'color-danger' : ''"
+            :regular-price="$n(getProductPrice(product, false), 'currency')"
             :special-price="
-              productGetters.getPrice(product).special &&
-              $n(productGetters.getPrice(product).special, 'currency')
+              getProductPrice(product, true) &&
+              $n(getProductPrice(product, true), 'currency')
             "
             :max-rating="5"
             :score-rating="productGetters.getAverageRating(product)"
@@ -93,11 +88,22 @@ export default {
     // const product = productsInWhishlist.value.find(wishlistProduct => wishlistProduct.variant.sku === productItem.sku);
     // removeItemFromWishlist({ product });
     // };
+
+    const getProductPrice = (product, special) => {
+      if (product.hasVariants && !special)
+        return productGetters.getPriceRange(product)?.min;
+      else {
+        if (special) return productGetters.getPrice(product)?.special;
+        return productGetters.getPrice(product)?.regular;
+      }
+    };
+
     return {
       // addItemToWishlist,
       // isInWishlist,
       // removeProductFromWishlist,
       productGetters,
+      getProductPrice,
       addItemToCart,
       isInCart,
       addBasePath

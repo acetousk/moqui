@@ -52,11 +52,13 @@
             <SfProductCard v-e2e="'category-product-card'" v-for="(product, i) in products"
               :key="productGetters.getSlug(product)" :style="{ '--index': i }" :title="productGetters.getName(product)"
               :image="addBasePath(productGetters.getCoverImage(product))" :is-added-to-cart="isInCart({ product })"
+              :badgeLabel="product.isDiscounted?'DISCOUNT':''"
+              :badgeColor="product.isDiscounted?'color-danger':''"
               :link="localePath(
               `/p/${productGetters.getSlug(product)}/${productGetters.getDefaultVariantSlug(product)}`)"
-              :regular-price="$n(productGetters.getPrice(product).regular, 'currency')" :special-price="
-                productGetters.getPrice(product).special &&
-                $n(productGetters.getPrice(product).special, 'currency')
+              :regular-price="$n(getProductPrice(product, false), 'currency')" :special-price="
+                getProductPrice(product, true) &&
+                $n(getProductPrice(product, true), 'currency')
               " :max-rating="5" :score-rating="productGetters.getAverageRating(product)"
               :show-add-to-cart-button="true" class="products__product-card"
               @click:add-to-cart="addToCart({ product, quantity: 1 })">
@@ -68,6 +70,12 @@
                 <nuxt-img :src="addBasePath(productGetters.getCoverImage(product))" width="214" height="214"
                   sizes="sm:100vw md:50vw lg:400px" />
               </template>
+              <template #price>
+              <div v-if="product.hasVariants && getProductPrice(product, false)">
+                <span class="product__price-caption">{{$t('starting at')}}</span>
+                {{$n(getProductPrice(product, false), 'currency')}}
+              </div>
+              </template>
             </SfProductCard>
           </transition-group>
           <!--
@@ -76,6 +84,8 @@
           <transition-group v-else appear name="products__slide" tag="div" class="products__list">
             <SfProductCardHorizontal v-e2e="'category-product-card'" v-for="(product, i) in products"
               class="products__product-card-horizontal" :key="productGetters.getSlug(product)" :style="{ '--index': i }"
+              :badgeLabel="product.isDiscounted?'DISCOUNT':''"
+              :badgeColor="product.isDiscounted?'color-danger':''"
               :title="productGetters.getName(product)" :description="productGetters.getDescription(product)"
               :image="addBasePath(productGetters.getCoverImage(product))" :link="
                 localePath(
@@ -83,8 +93,8 @@
                     product
                   )}`
                 )
-              " :regular-price="$n(productGetters.getPrice(product).regular, 'currency')" :special-price="productGetters.getPrice(product).special &&
-              $n(productGetters.getPrice(product).special, 'currency')" :max-rating="5"
+              " :regular-price="$n(getProductPrice(product, false), 'currency')" :special-price="getProductPrice(product, true) &&
+              $n(getProductPrice(product, true), 'currency')" :max-rating="5"
               :score-rating="productGetters.getAverageRating(product)" :qty="1" @click:add-to-cart="
                 addToCart({
                   product,
@@ -110,6 +120,16 @@
                     </SfButton>
                   </template>
                 </SfProperty>
+              </template>
+               <template #price>
+                <div
+                  v-if="product.hasVariants && getProductPrice(product, false)"
+                >
+                  <span class="product__price-caption">{{
+                    $t("starting at")
+                  }}</span>
+                  {{ $n(getProductPrice(product, false), "currency") }}
+                </div>
               </template>
               <!-- <template #actions>
                 <SfButton class="sf-button--text desktop-only" style="margin: 0 0 1rem auto; display: block"
@@ -247,6 +267,15 @@ export default {
       });
     };
 
+    const getProductPrice = (product, special) => {
+      if (product.hasVariants && !special)
+        return productGetters.getPriceRange(product)?.min;
+      else {
+        if (special) return productGetters.getPrice(product)?.special;
+        return productGetters.getPrice(product)?.regular;
+      }
+    };
+
     onSSR(async () => {
       await search(th.getFacetsFromURL());
       if (error?.value?.search) context.root.$nuxt.error({ statusCode: 404 });
@@ -265,6 +294,7 @@ export default {
       // addItemToWishlist,
       // removeProductFromWishlist,
       // isInWishlist,
+      getProductPrice,
       addToCart,
       isInCart,
       productsQuantity,

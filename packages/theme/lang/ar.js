@@ -276,4 +276,5 @@ export default {
   'Describe your issue': 'قم بوصف مشكلتك',
   'Contact request failed':'نحن غير قادرين على إرسال طلب الاتصال الخاص بك. حاول مرة اخرى.',
   'Contact request success':'لقد تلقينا طلب الاتصال الخاص بك! انتظر ، سنكون على اتصال قريبًا.',
+  'starting at': 'يبدأ من'
 };

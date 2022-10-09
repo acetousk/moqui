@@ -280,4 +280,5 @@ export default {
   'Describe your issue': 'Describe your problem/concern',
   'Contact request failed': 'We were unable to send your contact request. Please try again.',
   'Contact request success': 'We received your contact request! Hold tight, we\'ll be in touch soon.',
+  'starting at': 'starting at'
 };

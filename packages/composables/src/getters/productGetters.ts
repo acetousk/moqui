@@ -6,6 +6,7 @@ import {
   AgnosticBreadcrumb
 } from '@vue-storefront/core';
 import type { Product, ProductVariant, ProductFilter } from '@vue-storefront/moqui-api';
+import { ProductPriceRange } from 'src/types';
 
 function getId(product: Product): string {
   return product?.productId || '';
@@ -28,11 +29,27 @@ function getDefaultVarianId(product: Product): string {
 }
 
 function getPrice(product: Product, productVariant?: ProductVariant): AgnosticPrice {
-  const regularPrice = productVariant?.prices.price || product?.listPrice || product?.price || 0;
-  const specialPrice = productVariant?.prices.price || product?.price || product?.listPrice || 0;
+  const regularPrice = productVariant?.prices.listPrice || productVariant?.prices.price || product?.listPrice || product?.price || 0;
+  const specialPrice = productVariant?.prices.price || productVariant?.prices.listPrice || product?.price || product?.listPrice || 0;
   return {
     regular: regularPrice,
     special: (regularPrice !== specialPrice) ? specialPrice : null
+  };
+}
+
+function getPriceRange(product: Product): ProductPriceRange {
+  if (!product?.hasVariants) {
+    const price = getPrice(product);
+    return {
+      min: price.regular,
+      max: price.regular,
+      isDiscounted: price.special && (price.special < price.regular)
+    };
+  }
+  return {
+    min: product.minimalPrice,
+    max: product.maximalPrice,
+    isDiscounted: product.isDiscounted
   };
 }
 
@@ -252,6 +269,7 @@ export const productGetters: ProductGetters<Product, ProductFilter> = {
   getDefaultVariantSlug,
   getProductVariantFromFilters,
   getPrice,
+  getPriceRange,
   getGallery,
   getCoverImage,
   getFiltered,

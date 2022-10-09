@@ -1,6 +1,4 @@
-import {
-  ProductsSearchParams
-} from '@vue-storefront/core';
+import { ProductsSearchParams } from '@vue-storefront/core';
 import { Category, Product, ProductFilter } from '@vue-storefront/moqui-api';
 
 export type TODO = any;
@@ -9,18 +7,23 @@ export type UseCategorySearchParams = TODO;
 export type UseShippingAddParams = TODO;
 export type UseStoreFilterParams = TODO;
 
+export type ProductPriceRange = {
+  min: number | null;
+  max: number | null;
+  isDiscounted: boolean;
+};
 export type UseFacetSearchParams = {
   searchType?: string;
   items: Product[];
   categoryTree: Category;
   availableFilters: ProductFilter[];
-  category: { categorySlug: string },
+  category: { categorySlug: string };
   sortOptions: {
     options: {
       id: string;
       type: string;
       value: string;
-    }[],
+    }[];
     selected: string;
   };
   perPageOptions: Array<number>;

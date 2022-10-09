@@ -7,10 +7,13 @@ export type ProductVariant = {
     descriptionLong?: string;
     quantity?: number;
     prices?: {
+        listPrice?: number,
         price?: number,
         priceUomId?: string;
     };
     contentList: Array<any>;
+    isProductAvailable?: boolean;
+    productStock?: number;
     isReadyForSales?: boolean;
     salesDates?: {
         salesIntroDate?: string;
@@ -27,6 +30,8 @@ export type Product = {
     productName: string;
     descriptionSmall?: string;
     descriptionLong?: string;
+    minimalPrice: number;
+    maximalPrice: number;
     price: number;
     listPrice: number;
     priceUomId: number;
@@ -63,6 +68,8 @@ export type Product = {
         salesIntroDate?: string;
         salesDiscontinueDate?: string;
     };
+    isProductAvailable?: boolean;
+    productStock?: number;
     categoryPath?: {
         productCategoryId: string;
         categorySlug: string;

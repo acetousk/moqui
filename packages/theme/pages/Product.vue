@@ -25,15 +25,22 @@
         </div>
         <div class="product__price-and-rating">
           <SfPrice
-            :regular="$n(productGetters.getPrice(product).regular, 'currency')"
+            :regular="productPrice && $n(productPrice.regular || productPrice.min, 'currency')"
             :special="
-              productGetters.getPrice(product, productVariant).special &&
+              productPrice.special &&
               $n(
-                productGetters.getPrice(product, productVariant).special,
+                productPrice.special,
                 'currency'
               )
             "
-          />
+          >
+            <template #regular>
+              <div v-if="productPrice && productPrice.min">
+                <span class="product__price-caption">{{$t('starting at')}}</span>
+                {{$n(productPrice.min, 'currency')}}
+              </div>
+            </template>
+          </SfPrice>
           <div>
             <div class="product__rating">
               <SfRating :score="averageRating" :max="5" />
@@ -90,10 +97,10 @@
 
           <SfAddToCart
             v-e2e="'product_add-to-cart'"
-            :stock="stock"
+            :stock="product.productStock"
             v-model="qty"
             :disabled="loading"
-            :canAddToCart="stock > 0"
+            :canAddToCart="product.isProductAvailable"
             class="product__add-to-cart"
             @click="
               addItem({
@@ -258,6 +265,14 @@ export default {
       productGetters.getProductVariantFromUrlSlug(products.value, slug.value)
     );
 
+    const productPrice = computed(()=>{
+      if (product.value.hasVariants && !productVariant.value) {
+        return productGetters.getPriceRange(product.value);
+      } else {
+        return productGetters.getPrice(product.value, productVariant.value);
+      }
+    });
+
     const categories = computed(() =>
       productGetters.getCategoryIds(product.value)
     );
@@ -321,6 +336,7 @@ export default {
       updateFilter,
       configuration,
       product,
+      productPrice,
       breadcrumbs,
       productVariant,
       standardAttributes,
@@ -437,6 +453,12 @@ export default {
 
   &__drag-icon {
     animation: moveicon 1s ease-in-out infinite;
+  }
+
+  &__price-caption{
+    font-weight: var(--font-weight--light);
+    font-size: var(--font-size--sm);
+    font-style: oblique;
   }
 
   &__price-and-rating {
