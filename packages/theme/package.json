@@ -1,6 +1,6 @@
 {
   "name": "@vue-storefront/moqui-theme",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "engines": {
     "node": ">=14.17.x"
   },
@@ -23,7 +23,7 @@
   "dependencies": {
     "@storefront-ui/vue": "0.11.4",
     "@vue-storefront/middleware": "~2.5.4",
-    "@vue-storefront/moqui": "0.9.4",
+    "@vue-storefront/moqui": "0.9.5",
     "@vue-storefront/nuxt": "~2.5.4",
     "@vue-storefront/nuxt-theme": "~2.5.4",
     "cookie-universal-nuxt": "^2.1.5",

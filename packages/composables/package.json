@@ -1,6 +1,6 @@
 {
   "name": "@vue-storefront/moqui",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "sideEffects": false,
   "main": "./lib/index.js",
   "exports": {
@@ -22,7 +22,7 @@
     "update:update": "ncu -u"
   },
   "dependencies": {
-    "@vue-storefront/moqui-api": "0.9.4",
+    "@vue-storefront/moqui-api": "0.9.5",
     "@vue-storefront/core": "~2.5.4"
   },
   "devDependencies": {
