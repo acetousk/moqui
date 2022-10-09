@@ -30,6 +30,7 @@ export type Product = {
     productName: string;
     descriptionSmall?: string;
     descriptionLong?: string;
+    isDiscounted: boolean;
     minimalPrice: number;
     maximalPrice: number;
     price: number;
