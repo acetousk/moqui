@@ -7,6 +7,8 @@ export default async function loadUser(context: Context, params: UserLoadParams)
   // Create URL object containing full endpoint URL
   const url = new URL(context.config.basePath + '/customer/info', context.config.api);
 
+  url.searchParams.set('productStoreId', context.config.defaultStoreId);
+
   // Use axios to send a GET request
   const response = await context.client.get<UserLoadResponse>(url.href, {
     headers: getHeaders(context)
